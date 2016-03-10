@@ -87,7 +87,7 @@ int main()
 
 
     mainWindow.Swap();
-
+    game.PostFrame();
     Input::Reset();
   }
 
