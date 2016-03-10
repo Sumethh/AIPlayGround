@@ -17,15 +17,15 @@ struct Node
     E = 4 ,
     SW = 5 ,
     S = 6 ,
-    SE = 7
+    SE = 7 ,
+    NeighborCount
   };
   glm::vec2 pos;
   glm::vec2 index;
   int indexSingle;
   Node* neighbors[ 8 ];
-  float gCost;
-  float hCost;
-  float fCost;
+  Node* parent;
+  float gCost , hCost , fCost;
   bool bwalkable;
   int tileIndex;
   bool btoBeProcessed;

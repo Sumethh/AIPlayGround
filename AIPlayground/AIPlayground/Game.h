@@ -2,6 +2,8 @@
 #include "Grid.h"
 #include "PlayerController.h"
 #include "Camera.h"
+#include "Pathfinder.h"
+
 class Window;
 class Game
 {
@@ -19,5 +21,6 @@ private:
   Grid m_grid;
   PlayerController m_playerController;
   Camera m_camera;
+  Pathfinder m_pathfinder;
 };
 

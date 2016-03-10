@@ -240,7 +240,12 @@ void Grid::CalculateNeighbors()
       i.neighbors[ Node::Neighbors::S ] = GetNode( nodeIndexX , nodeIndexY + 1 );
 
       if( nodeIndexX + 1 < m_tileCountX )
+      {
+
         i.neighbors[ Node::Neighbors::SE ] = GetNode( nodeIndexX + 1 , nodeIndexY + 1 );
+
+
+      }
       else
         i.neighbors[ Node::Neighbors::SE ] = nullptr;
 
@@ -252,6 +257,24 @@ void Grid::CalculateNeighbors()
       i.neighbors[ Node::Neighbors::SE ] = nullptr;
     }
 
+    if( i.neighbors[ Node::Neighbors::S ] && !i.neighbors[ Node::Neighbors::S ]->bwalkable ||
+      i.neighbors[ Node::Neighbors::E ] && !i.neighbors[ Node::Neighbors::E ]->bwalkable )
+      i.neighbors[ Node::Neighbors::SE ] = nullptr;
+
+
+    if( i.neighbors[ Node::Neighbors::N ] && !i.neighbors[ Node::Neighbors::N ]->bwalkable ||
+      i.neighbors[ Node::Neighbors::E ] && !i.neighbors[ Node::Neighbors::E ]->bwalkable )
+      i.neighbors[ Node::Neighbors::NE ] = nullptr;
+
+
+    if( i.neighbors[ Node::Neighbors::N ] && !i.neighbors[ Node::Neighbors::N ]->bwalkable ||
+      i.neighbors[ Node::Neighbors::W ] && !i.neighbors[ Node::Neighbors::W ]->bwalkable )
+      i.neighbors[ Node::Neighbors::NW ] = nullptr;
+
+
+    if( i.neighbors[ Node::Neighbors::S ] && !i.neighbors[ Node::Neighbors::S ]->bwalkable ||
+      i.neighbors[ Node::Neighbors::W ] && !i.neighbors[ Node::Neighbors::W ]->bwalkable )
+      i.neighbors[ Node::Neighbors::SW ] = nullptr;
 
   }
 
