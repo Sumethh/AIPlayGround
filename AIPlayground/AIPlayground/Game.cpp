@@ -60,3 +60,8 @@ void Game::Render( Window* const a_window )
     }
   }
 }
+
+void Game::PostFrame()
+{
+
+}
