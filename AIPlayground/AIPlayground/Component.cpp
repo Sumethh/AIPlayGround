@@ -22,6 +22,11 @@ void Component::OnDestroy()
 
 }
 
+void Component::BeginPlay()
+{
+  m_hasBegunPlay = true;
+}
+
 void Component::Update()
 {
 
@@ -33,6 +38,11 @@ void Component::PreRender()
 }
 
 void Component::Render()
+{
+
+}
+
+void Component::PostFrame()
 {
 
 }

@@ -12,7 +12,7 @@ public:
   ~Game();
 
   void Init();
-  void Update(float a_dt);
+  void Update( float a_dt );
   void PreRender();
   void Render( Window* const a_window );
   void PostFrame();
