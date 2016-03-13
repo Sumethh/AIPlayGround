@@ -7,6 +7,8 @@
 #include <string.h>
 #include "Game.h"
 #include "Common/DebugOnScreenTimer.h"
+#include <cstdlib>
+#include <ctime>
 
 int32 frames;
 float currentFPS;
@@ -17,6 +19,7 @@ Game game;
 
 int main()
 {
+  std::srand( std::time(0) );
   DebugOnScreenTimer::Init();
   Window mainWindow( 1280 , 720 , "AiPlayground" );
 

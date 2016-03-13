@@ -1,8 +1,5 @@
 #pragma once
-#include "Grid.h"
-#include "PlayerController.h"
-#include "Camera.h"
-#include "Pathfinder.h"
+#include "World.h"
 
 class Window;
 class Game
@@ -18,9 +15,6 @@ public:
   void PostFrame();
 
 private:
-  Grid m_grid;
-  PlayerController m_playerController;
-  Camera m_camera;
-  Pathfinder m_pathfinder;
+  World m_world;
 };
 

@@ -1,10 +1,7 @@
 #pragma once
 #include <map>
 #include <functional>
-enum EComponentTypes
-{
-
-};
+#include "ComponentTypes.h"
 
 class Component;
 class GameObject;

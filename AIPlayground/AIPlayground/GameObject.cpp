@@ -4,7 +4,8 @@
 typedef std::vector<Component*>::iterator ComponentItr;
 
 
-GameObject::GameObject() :
+GameObject::GameObject( EGameObjectType a_type ) :
+  m_goType( a_type ) ,
   m_hasBegunPlay( false ) ,
   m_toBeDestroyed( false ) ,
   m_world( nullptr )
@@ -15,8 +16,15 @@ GameObject::GameObject() :
 GameObject::~GameObject()
 {
 }
-void GameObject::OnCosntruct()
+
+void GameObject::OnCosntruct( GameObjectConstructionDescriptor* a_constructionDescriptor )
 {
+  if( a_constructionDescriptor )
+  {
+    for( auto i : a_constructionDescriptor->listOfComps )
+      AddComponent( i );
+  }
+  PostFrame();
   for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
     ( *itr )->OnCosntruct();
 }
@@ -25,8 +33,6 @@ void GameObject::OnDestroy()
 {
   for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
     ( *itr )->OnDestroy();
-
-  m_toBeDestroyed = true;
 }
 
 void GameObject::BeginPlay()
@@ -36,10 +42,10 @@ void GameObject::BeginPlay()
     ( *itr )->BeginPlay();
 }
 
-void GameObject::Update()
+void GameObject::Update( float a_dt )
 {
   for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
-    ( *itr )->Update();
+    ( *itr )->Update( a_dt );
 }
 
 void GameObject::PreRender()
@@ -49,10 +55,10 @@ void GameObject::PreRender()
     ( *itr )->PreRender();
 }
 
-void GameObject::Render()
+void GameObject::Render( Window* a_window )
 {
   for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
-    ( *itr )->Render();
+    ( *itr )->Render( a_window );
 }
 
 void GameObject::PostFrame()
@@ -60,7 +66,7 @@ void GameObject::PostFrame()
   for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
     ( *itr )->PostFrame();
 
-  for( int i = 0; i < m_componentsToAdd.size(); ++i )
+  for( size_t i = 0; i < m_componentsToAdd.size(); ++i )
   {
     Component* newComp = m_componentsToAdd[ i ];
     m_components.push_back( newComp );
@@ -76,5 +82,13 @@ void GameObject::AddComponent( EComponentTypes a_componentType )
   if( !nullptr )
     m_componentsToAdd.push_back( newComp );
 
+}
 
+
+Component* GameObject::GetComponentOfType( EComponentTypes a_type )
+{
+  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
+    if( ( *itr )->IsComponentOfType( a_type ) )
+      return ( *itr );
+  return nullptr;
 }

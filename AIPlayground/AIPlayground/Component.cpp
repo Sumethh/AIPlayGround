@@ -2,8 +2,9 @@
 
 
 
-Component::Component( GameObject* a_gameObject ) :
-  m_parent( a_gameObject )
+Component::Component( GameObject* a_gameObject , EComponentTypes a_componentType) :
+  m_parent( a_gameObject ),
+  m_componentType(a_componentType)
 {
 }
 
@@ -27,7 +28,7 @@ void Component::BeginPlay()
   m_hasBegunPlay = true;
 }
 
-void Component::Update()
+void Component::Update(float a_dt)
 {
 
 }
@@ -37,7 +38,7 @@ void Component::PreRender()
 
 }
 
-void Component::Render()
+void Component::Render(Window* a_window)
 {
 
 }

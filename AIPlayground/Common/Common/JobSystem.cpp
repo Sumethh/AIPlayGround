@@ -18,7 +18,7 @@ void WorkerThread::WorkerMainFunction()
 {
   runningFlag.test_and_set();
   LOGS( "Thread %d is now running" , threadID );
-  std::atomic<int> t;
+
   while( runningFlag.test_and_set() )
   {
     if( JobSystem::m_jobCount > 0 )

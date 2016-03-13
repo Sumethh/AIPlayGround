@@ -7,7 +7,7 @@
 #include <mutex>
 #include <thread>
 #include <atomic>
-class Node;
+struct Node;
 class Grid;
 
 struct Path

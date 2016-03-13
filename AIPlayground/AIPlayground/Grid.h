@@ -54,7 +54,7 @@ public:
   {
     const int indexX = (int)a_pos.x / m_tileSizeX;
     const int indexY = (int)a_pos.y / m_tileSizeY;
-    if( indexX + indexY * m_tileCountX < m_nodes.size() )
+    if( (size_t)( indexX + indexY * m_tileCountX ) < m_nodes.size() )
       return &m_nodes[ indexY* m_tileCountX + indexX ];
     return nullptr;
 
@@ -63,7 +63,7 @@ public:
 
   inline Node* GetNode( const int a_indexX , const int a_indexY )
   {
-    if( a_indexX + a_indexY * m_tileCountX < m_nodes.size() )
+    if( (size_t)( a_indexX + a_indexY * m_tileCountX ) < m_nodes.size() )
       return &m_nodes[ a_indexY* m_tileCountX + a_indexX ];
 
     return nullptr;
@@ -71,7 +71,7 @@ public:
 
   inline void SetNodeWalkable( const int a_indexX , const int a_indexY , const bool a_walkable )
   {
-    if( a_indexX + a_indexY * m_tileCountX < m_nodes.size() )
+    if( (size_t)( a_indexX + a_indexY * m_tileCountX ) < m_nodes.size() )
     {
       Node& node = m_nodes[ a_indexY * m_tileCountX + a_indexX ];
       if( node.bwalkable != a_walkable )
@@ -88,13 +88,13 @@ public:
 
   inline void SetNodeTileIndex( const int a_indexX , const int a_indexY , const int a_newTileIndex )
   {
-    if( a_indexX + a_indexY * m_tileCountX < m_nodes.size() )
+    if( (size_t)( a_indexX + a_indexY * m_tileCountX ) < m_nodes.size() )
     {
       Node& node = m_nodes[ a_indexY * m_tileCountX + a_indexX ];
       if( node.tileIndex != a_newTileIndex )
       {
         node.tileIndex = a_newTileIndex;
-        node.bwalkable = a_newTileIndex;
+        node.bwalkable = a_newTileIndex > 0;
         node.btoBeProcessed = true;
         m_dirtyTileIndiciesQueue.push( a_indexY * m_tileCountX + a_indexX );
         m_bImageDirty = true;

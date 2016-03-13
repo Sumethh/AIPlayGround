@@ -20,7 +20,7 @@ Pathfinder::~Pathfinder()
 
 int GetDistance( Node* a_node , Node* a_otherNode )
 {
-  
+
   int dstX = (int)abs( a_node->pos.x - a_otherNode->pos.x );
   int dstY = (int)abs( a_node->pos.y - a_otherNode->pos.y );
   return ( dstX * 10 ) + dstY * 10;
@@ -121,11 +121,11 @@ Path* Pathfinder::GetPath( glm::vec2 a_start , glm::vec2 a_end )
       if( closedSet.find( currentNeighbor ) != closedSet.end() || !currentNeighbor->bwalkable )
         continue;
 
-      int newMoveCost = currentNode->gCost + GetDistance( currentNode , currentNeighbor );
+      float newMoveCost = currentNode->gCost + GetDistance( currentNode , currentNeighbor);
       if( newMoveCost < currentNeighbor->gCost || ( std::find( openSet.begin() , openSet.end() , currentNeighbor ) == openSet.end() ) )
       {
         currentNeighbor->gCost = newMoveCost;
-        currentNeighbor->hCost = GetDistance( currentNeighbor , endNode );
+        currentNeighbor->hCost = (float)GetDistance( currentNeighbor , endNode );
         currentNeighbor->parent = currentNode;
         currentNeighbor->GetFCost();
         if( std::find( openSet.begin() , openSet.end() , neighbours[ i ] ) == openSet.end() )
@@ -164,7 +164,7 @@ Path* Pathfinder::RetracePath( Node* a_start , Node* a_end )
   Path* newPath = new Path();
 
   Node* currentNode = a_end;
-  while( currentNode->parent )
+  while( currentNode->parent != a_start )
   {
     newPath->nodes.push_back( currentNode->pos );
     currentNode = currentNode->parent;

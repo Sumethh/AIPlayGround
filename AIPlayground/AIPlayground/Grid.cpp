@@ -145,7 +145,7 @@ bool Grid::LoadFromDisk()
     if( count < m_nodes.size() )
     {
       m_nodes[ count ].tileIndex = std::atoi( sub.c_str() );
-      m_nodes[ count ].bwalkable = m_nodes[ count ].tileIndex;
+      m_nodes[ count ].bwalkable = m_nodes[ count ].tileIndex > 0;
       if( m_nodes[ count ].tileIndex )
         m_dirtyTileIndiciesQueue.push( m_nodes[ count ].indexSingle );
     }

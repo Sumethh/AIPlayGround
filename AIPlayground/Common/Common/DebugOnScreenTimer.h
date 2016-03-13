@@ -19,8 +19,8 @@ public:
     OnScreenTimer( const OnScreenTimer& a_copyingTimer ) :
       value( a_copyingTimer.value ) ,
       baseText( a_copyingTimer.baseText ) ,
-      trailingText( a_copyingTimer.trailingText ),
-      displayingText( a_copyingTimer.displayingText ),
+      trailingText( a_copyingTimer.trailingText ) ,
+      displayingText( a_copyingTimer.displayingText ) ,
       timerMutex() ,
       active( a_copyingTimer.active )
     {
@@ -45,7 +45,7 @@ public:
     {
       m_text.setFont( m_font );
       m_text.setCharacterSize( FONT_SIZE );
-      
+
     }
 
   }
@@ -53,7 +53,7 @@ public:
   inline static int32 AddNewTimer( std::string& a_baseText )
   {
     size_t returnValue = m_timers.size();
-    for( int i = 0; i < m_timers.size(); i++ )
+    for( size_t i = 0; i < m_timers.size(); i++ )
     {
       if( m_timers[ i ].active == false )
       {
@@ -75,18 +75,18 @@ public:
 
   inline static void SetTimerValue( int32 a_timerIndex , float a_newValue )
   {
-    if( a_timerIndex < m_timers.size() && m_timers[ a_timerIndex ].active )
+    if( (size_t)a_timerIndex < m_timers.size() && m_timers[ a_timerIndex ].active )
     {
       m_timers[ a_timerIndex ].value = a_newValue;
       m_timers[ a_timerIndex ].displayingText = m_timers[ a_timerIndex ].baseText +
         std::to_string( a_newValue ) + m_timers[ a_timerIndex ].trailingText;
-      
+
     }
   }
 
   inline static void SetTimerTrailingText( int32 a_timerIndex , std::string a_trailing )
   {
-    if( a_timerIndex < m_timers.size() && m_timers[ a_timerIndex ].active )
+    if( (size_t)a_timerIndex < m_timers.size() && m_timers[ a_timerIndex ].active )
     {
       m_timers[ a_timerIndex ].trailingText = a_trailing;
     }
@@ -94,7 +94,7 @@ public:
 
   inline static void DisableTimer( int32 a_timerIndex )
   {
-    if( a_timerIndex < m_timers.size() )
+    if( (size_t)a_timerIndex < m_timers.size() )
       m_timers[ a_timerIndex ].active = false;
 
   }
@@ -103,11 +103,11 @@ public:
   {
     if( m_text.getFont() != nullptr )
     {
-      for( int i = 0; i < m_timers.size(); i++ )
+      for( size_t i = 0; i < m_timers.size(); i++ )
       {
         if( m_timers[ i ].active == false )
           continue;
-        float yPos = 5.0f + (FONT_SIZE + 2) * (float)i;
+        float yPos = 5.0f + ( FONT_SIZE + 2 ) * (float)i;
         m_text.setPosition( sf::Vector2f( 5.0f , yPos ) );
         m_text.setString( m_timers[ i ].displayingText );
         a_window->RenderDrawable( m_text );

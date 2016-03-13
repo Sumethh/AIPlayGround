@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\DebugOnScreenTimer.h" />
+    <ClInclude Include="Common\HelperFunctions.h" />
     <ClInclude Include="Common\Input.h" />
     <ClInclude Include="Common\JobSystem.h" />
     <ClInclude Include="Common\log.h" />

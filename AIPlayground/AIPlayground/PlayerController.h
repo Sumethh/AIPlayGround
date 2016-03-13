@@ -19,7 +19,7 @@ private:
   sf::Sprite m_selectionSprite;
   sf::Texture m_selectionTexture;
 
-  const float m_moveSpeed = 32.0f;
+  const float m_moveSpeed = 512.0f;
 
   Grid * const  m_grid;
   Camera* const m_camera;

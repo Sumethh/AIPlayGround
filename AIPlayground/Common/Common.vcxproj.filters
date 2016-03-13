@@ -39,6 +39,9 @@
     <ClInclude Include="Common\DebugOnScreenTimer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Common\HelperFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\Input.cpp">
