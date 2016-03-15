@@ -163,18 +163,24 @@ void Grid::CreateGrid()
   m_gridImage.create( m_tileSizeX * m_tileCountX , m_tileSizeY * m_tileCountY , sf::Color::Red );
 
   glm::vec2 nodeNewPos = m_gridOrigin;
+  glm::vec2 nodeNewCenter = m_gridOrigin;
+
   uint32 yIndex = 0;
 
   for( int y = 0; y < m_tileCountY; ++y )
   {
     nodeNewPos.y = (float)( m_tileSizeY * y );
+    nodeNewCenter.y = (float)( m_tileSizeY * y + m_tileSizeY / 2.0f );
+
     yIndex = m_tileCountX * y;
     for( int x = 0; x < m_tileCountX; ++x )
     {
       m_nodes.push_back( Node() );
       Node& currentNode = m_nodes[ yIndex + x ];
       nodeNewPos.x = (float)( m_tileSizeX * x );
+      nodeNewCenter.x = (float)( m_tileSizeX * x + m_tileSizeX / 2.0f );
       currentNode.pos = nodeNewPos;
+      currentNode.center = nodeNewCenter;
       currentNode.bwalkable = true;
       currentNode.tileIndex = 1;
       currentNode.indexSingle = yIndex + x;

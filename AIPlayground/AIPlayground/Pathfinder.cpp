@@ -166,10 +166,10 @@ Path* Pathfinder::RetracePath( Node* a_start , Node* a_end )
   Node* currentNode = a_end;
   while( currentNode->parent != a_start )
   {
-    newPath->nodes.push_back( currentNode->pos );
+    newPath->nodes.push_back( currentNode->center );
     currentNode = currentNode->parent;
   }
-  newPath->nodes.push_back( currentNode->pos );
+  newPath->nodes.push_back( currentNode->center );
   std::reverse( newPath->nodes.begin() , newPath->nodes.end() );
 
   LOGI( "Time taken to generate path %f" , (float)m_timer.IntervalMS() );

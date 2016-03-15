@@ -21,6 +21,7 @@ struct Node
     NeighborCount
   };
   glm::vec2 pos;
+  glm::vec2 center;
   glm::vec2 index;
   int indexSingle;
   Node* neighbors[ 8 ];

@@ -54,6 +54,7 @@ int main()
   {
     float dt = (float)deltaTime.IntervalMS() / 1000.0f;
     DebugOnScreenTimer::SetTimerValue( dtTimerIndex , dt );
+    deltaTime.Reset();
 
 
     mainWindow.Clear( sf::Color::Blue );
@@ -81,7 +82,6 @@ int main()
       frameTimer.Reset();
     }
     frames++;
-    deltaTime.Reset();
 
 
     DebugOnScreenTimer::DrawTimers( &mainWindow );
