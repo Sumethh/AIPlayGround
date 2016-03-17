@@ -9,6 +9,9 @@
 #include "Common/DebugOnScreenTimer.h"
 #include <cstdlib>
 #include <ctime>
+#include "Common/TimedFunctionCallManager.h"
+#include "Common/InvokableEvent.h"
+
 
 int32 frames;
 float currentFPS;
@@ -19,10 +22,9 @@ Game game;
 
 int main()
 {
-  std::srand( std::time(0) );
+  std::srand( (uint)std::time( 0 ) );
   DebugOnScreenTimer::Init();
   Window mainWindow( 1280 , 720 , "AiPlayground" );
-
 
   std::string baseString( "FPS: " );
   fpsTimerIndex = DebugOnScreenTimer::AddNewTimer( baseString );
@@ -52,7 +54,7 @@ int main()
   deltaTime.Start();
   while( !mainWindow.IsCloseRequested() )
   {
-    float dt = (float)deltaTime.IntervalMS() / 1000.0f;
+    float dt = (float)deltaTime.IntervalS();
     DebugOnScreenTimer::SetTimerValue( dtTimerIndex , dt );
     deltaTime.Reset();
 
@@ -62,11 +64,12 @@ int main()
 
     updateTimer.Start();
     game.Update( dt );
+    TimedFunctionCallManager::GI()->Update();
     DebugOnScreenTimer::SetTimerValue( updateTimerIndex , (float)updateTimer.IntervalMS() );
 
     preRenderTimer.Start();
     game.PreRender();
-    DebugOnScreenTimer::SetTimerValue( preRenderTimerIndex, (float)preRenderTimer.IntervalMS() );
+    DebugOnScreenTimer::SetTimerValue( preRenderTimerIndex , (float)preRenderTimer.IntervalMS() );
 
     renderTimer.Start();
     game.Render( &mainWindow );

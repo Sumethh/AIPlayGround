@@ -22,8 +22,11 @@
     <ClInclude Include="Common\DebugOnScreenTimer.h" />
     <ClInclude Include="Common\HelperFunctions.h" />
     <ClInclude Include="Common\Input.h" />
+    <ClInclude Include="Common\InvokableEvent.h" />
     <ClInclude Include="Common\JobSystem.h" />
     <ClInclude Include="Common\log.h" />
+    <ClInclude Include="Common\TimedFunctionCall.h" />
+    <ClInclude Include="Common\TimedFunctionCallManager.h" />
     <ClInclude Include="Common\timer.h" />
     <ClInclude Include="Common\Types.h" />
     <ClInclude Include="Common\Window.h" />
@@ -32,6 +35,8 @@
   <ItemGroup>
     <ClCompile Include="Common\Input.cpp" />
     <ClCompile Include="Common\JobSystem.cpp" />
+    <ClCompile Include="Common\TimedFunctionCall.cpp" />
+    <ClCompile Include="Common\TimedFunctionCallManager.cpp" />
     <ClCompile Include="Common\Window.cpp" />
     <ClCompile Include="Common\WindowManager.cpp" />
   </ItemGroup>

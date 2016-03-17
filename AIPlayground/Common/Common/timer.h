@@ -1,5 +1,3 @@
-//Written by Max Oomen
-
 #pragma once
 
 #include <chrono>
@@ -27,7 +25,11 @@ public:
     auto us = duration_cast<microseconds>(Clock::now() - start).count();
     return (double)us / 1000.0;
   }
-
+  
+  double IntervalS() //return interval in milliseconds
+  {
+    return IntervalMS() / 1000.0;
+  }
 private:
   Tick start;
 };
