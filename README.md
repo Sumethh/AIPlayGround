@@ -6,6 +6,6 @@ The goal is to have one AI per team that is a Commander who makes decisions base
 
 At the moment the project is in its early stages. At the moment I have setup a basic GameObject Component system and added pathfinding. Currently the project can handle 1000+ GameObjects wandering around with path requests. I used The SFML frame work to handle the rendering and windows.
 
-Possible Future Additions:
+Possible Future Considerations:
 * Networking using unix sockets
 * Customizing the commander AI to fight the way you want it
