@@ -7,6 +7,7 @@
 #include "PlayerController.h"
 #include "GameObjectTypes.h"
 #include "GameObject.h"
+#include <memory.h>
 class GameObject;
 class Window;
 
@@ -30,9 +31,9 @@ public:
   virtual void PostFrame();
 
   GameObject* CreateGameObject(EGameObjectType a_type = EGameObjectType::GOT_Generic);
-  inline PlayerController* GetPlayerController() { return &m_playerController; }
-  inline Pathfinder* GetPathfinder() { return &m_pathfinder; }
-  inline Camera* GetCamera() { return &m_camera; }
+  inline std::weak_ptr<PlayerController> GetPlayerController() { return m_playerController; }
+  inline std::weak_ptr<Pathfinder> GetPathfinder() { return m_pathfinder; }
+  inline std::weak_ptr<Camera> GetCamera() { return m_camera; }
   inline WorldLimits GetWorldLimits()const { return m_worldLimits; }
 
 protected:
@@ -43,9 +44,9 @@ private:
 
   WorldLimits m_worldLimits;
 
-  Grid m_grid;
-  PlayerController m_playerController;
-  Camera m_camera;
-  Pathfinder m_pathfinder;
+  std::shared_ptr<Grid> m_grid;
+  std::shared_ptr<Camera> m_camera;
+  std::shared_ptr<PlayerController> m_playerController;
+  std::shared_ptr<Pathfinder> m_pathfinder;
 };
 

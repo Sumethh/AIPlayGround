@@ -24,12 +24,13 @@ void RendererComponent::PreRender()
   {
     Transform goTransform = GetParent()->GetTransform();
     World* world = GetParent()->GetWorld();
-    Camera* cam = nullptr;
+    std::weak_ptr<Camera> cam;
     if( world )
       cam = world->GetCamera();
-    if( cam )
+    if( !cam.expired() )
     {
-      m_sprite.setPosition( ConvertVec2( goTransform.position - cam->GetPos() )  );
+      std::shared_ptr<Camera> camera = cam.lock();
+      m_sprite.setPosition( ConvertVec2( goTransform.position - camera->GetPos() )  );
       m_sprite.setScale( ConvertVec2( goTransform.scale ) );
       m_sprite.setRotation( goTransform.rotation );
       parent->ResetRenderStateDirtyFlag();

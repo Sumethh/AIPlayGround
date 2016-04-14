@@ -12,8 +12,10 @@ const int g_tileCountY = 100;
 const glm::vec2 g_gridOrigin( 0 , 0 );
 
 World::World() :
-  m_grid( g_gridOrigin , g_tileCountX , g_tileCountY , g_tileSizeX , g_tileSizeY ) ,
-  m_playerController( &m_grid , &m_camera ) , m_pathfinder( &m_grid )
+  m_grid( new Grid( g_gridOrigin , g_tileCountX , g_tileCountY , g_tileSizeX , g_tileSizeY ) ) ,
+  m_camera(new Camera()), 
+  m_playerController( new PlayerController( m_grid , m_camera ) ),
+  m_pathfinder( new Pathfinder( m_grid) )
 {
   for( unsigned short i = 0; i < (unsigned int)EGameObjectType::GOT_Max; ++i )
     m_gameObjectDescriptors[ (EGameObjectType)i ] = {};
@@ -37,7 +39,7 @@ RendererComponent* comp;
 void World::OnConstruct()
 {
 
-  m_grid.Init();
+  m_grid->Init();
   for( int i = 0; i < 1000; i++ )
   {
     GameObject* newGO = CreateGameObject( EGameObjectType::GOT_Unit );
@@ -66,7 +68,7 @@ void World::BeginPlay()
 void World::Update( float a_dt )
 {
 
-  m_playerController.Update( a_dt );
+  m_playerController->Update( a_dt );
 
   for( auto gameObject : m_gameObjects )
   {
@@ -77,7 +79,7 @@ void World::Update( float a_dt )
 
 void World::PreRender()
 {
-  m_grid.PreRender( m_camera.GetPos() );
+  m_grid->PreRender( m_camera->GetPos() );
   for( auto gameObject : m_gameObjects )
     gameObject->PreRender();
 }
@@ -85,8 +87,8 @@ void World::PreRender()
 void World::Render( Window* const a_window )
 {
 
-  m_grid.Render( a_window );
-  m_playerController.Render( a_window );
+  m_grid->Render( a_window );
+  m_playerController->Render( a_window );
 
   for( auto gameObject : m_gameObjects )
     gameObject->Render( a_window );

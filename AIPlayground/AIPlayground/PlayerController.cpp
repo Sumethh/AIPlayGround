@@ -6,7 +6,7 @@
 
 
 
-PlayerController::PlayerController( Grid* const a_grid , Camera* const a_camera ) :
+PlayerController::PlayerController( std::shared_ptr<Grid>& a_grid , std::shared_ptr<Camera>& a_camera ) :
   m_grid( a_grid ) ,
   m_camera( a_camera )
 {
@@ -30,18 +30,22 @@ void PlayerController::Init()
 void PlayerController::Update( float a_dt )
 {
   int tileSizeX = 0 , tileSizeY = 0;
-  if( m_grid && m_camera )
+  if( !m_grid.expired() && !m_camera.expired() )
   {
-    tileSizeX = m_grid->GetTileSizeX();
-    tileSizeY = m_grid->GetTileSizeY();
+    std::shared_ptr<Grid> grid = m_grid.lock();
+    std::shared_ptr<Camera> camera = m_camera.lock();
+
+
+    tileSizeX = grid->GetTileSizeX();
+    tileSizeY = grid->GetTileSizeY();
 
     glm::vec2 mousePos = Input::GetMousePosition();
 
     sf::Vector2f newSpritePos;
-    glm::vec2 camPos = m_camera->GetPos();
+    glm::vec2 camPos = camera->GetPos();
     int indexX = (int)( mousePos.x + camPos.x ) / tileSizeX;
     int indexY = (int)( mousePos.y + camPos.y ) / tileSizeY;
-    Node* node = m_grid->GetNode( indexX , indexY );
+    Node* node = grid->GetNode( indexX , indexY );
     if( node )
     {
       newSpritePos.x = node->pos.x - camPos.x;
@@ -49,28 +53,29 @@ void PlayerController::Update( float a_dt )
 
       m_selectionSprite.setPosition( newSpritePos );
       if( Input::GetMouseButton( sf::Mouse::Left ) )
-        m_grid->SetNodeTileIndex( indexX , indexY , 0 );
+        grid->SetNodeTileIndex( indexX , indexY , 0 );
 
       if( Input::GetMouseButton( sf::Mouse::Right ) )
-        m_grid->SetNodeTileIndex( indexX , indexY , 1 );
+        grid->SetNodeTileIndex( indexX , indexY , 1 );
     }
 
     if( Input::GetKey( sf::Keyboard::F10 ) )
-      m_grid->SaveToDisk();
+      grid->SaveToDisk();
   }
 
-  if( m_camera )
+  if( !m_camera.expired() )
   {
+    std::shared_ptr<Camera> camera = m_camera.lock();
     if( Input::GetKeyDown( sf::Keyboard::Key::A ) )
-      m_camera->MoveX( -m_moveSpeed*a_dt );
+      camera->MoveX( -m_moveSpeed*a_dt );
     if( Input::GetKeyDown( sf::Keyboard::Key::D ) )
-      m_camera->MoveX( m_moveSpeed*a_dt );
+      camera->MoveX( m_moveSpeed*a_dt );
 
     if( Input::GetKeyDown( sf::Keyboard::Key::W ) )
-      m_camera->MoveY( -m_moveSpeed*a_dt );
+      camera->MoveY( -m_moveSpeed*a_dt );
 
     if( Input::GetKeyDown( sf::Keyboard::Key::S ) )
-      m_camera->MoveY( m_moveSpeed*a_dt );
+      camera->MoveY( m_moveSpeed*a_dt );
   }
 }
 

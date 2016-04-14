@@ -1,12 +1,12 @@
 #pragma once
 #include "Grid.h"
 
-
+#include <memory>
 class Camera;
 class PlayerController
-{
+  {
 public:
-  PlayerController( Grid* const a_grid , Camera* const a_camera );
+  PlayerController( std::shared_ptr<Grid>& a_grid , std::shared_ptr<Camera>& a_camera );
   ~PlayerController();
 
   void Init();
@@ -21,7 +21,7 @@ private:
 
   const float m_moveSpeed = 512.0f;
 
-  Grid * const  m_grid;
-  Camera* const m_camera;
+  std::weak_ptr<Grid> const  m_grid;
+  std::weak_ptr<Camera> const m_camera;
 };
 

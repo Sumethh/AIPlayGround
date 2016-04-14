@@ -4,7 +4,7 @@
 
 #include <map>
 
-Pathfinder::Pathfinder( Grid* const a_grid ) :
+Pathfinder::Pathfinder( std::shared_ptr<Grid>& a_grid ) :
   m_grid( a_grid ) ,
   m_threadRunningFlag() ,
   m_pathFindingThread( &Pathfinder::ThreadMainFunc , this )
@@ -33,13 +33,17 @@ int GetDistance( Node* a_node , Node* a_otherNode )
 void Pathfinder::AddPathfindingJob( std::function<void( Path* )> a_callback , glm::vec2 a_startPos , glm::vec2 a_endPos )
 {
   PathJob newJob;
-  Node* startNode = m_grid->GetNode( a_startPos );
-  Node* endNode = m_grid->GetNode( a_endPos );
-  newJob.callback = a_callback;
-  newJob.startNode = startNode;
-  newJob.endNode = endNode;
-  std::lock_guard<std::mutex> mutexLock( m_queueMutex );
-  m_pathJobs.push( newJob );
+  if( !m_grid.expired() )
+  {
+    std::shared_ptr<Grid> grid = m_grid.lock();
+    Node* startNode = grid->GetNode( a_startPos );
+    Node* endNode = grid->GetNode( a_endPos );
+    newJob.callback = a_callback;
+    newJob.startNode = startNode;
+    newJob.endNode = endNode;
+    std::lock_guard<std::mutex> mutexLock( m_queueMutex );
+    m_pathJobs.push( newJob );
+  }
 }
 
 void Pathfinder::AddPathfindingJob( std::function<void( Path* )> a_callback , Node* a_startNode , Node* a_endNode )
@@ -55,7 +59,7 @@ void Pathfinder::AddPathfindingJob( std::function<void( Path* )> a_callback , No
 Path* Pathfinder::GetPath( glm::vec2 a_start , glm::vec2 a_end )
 {
   m_timer.Start();
-  if( !m_grid )
+  if( m_grid.expired() )
   {
     LOGE( "I got a path request however i dont have a grid" );
     return nullptr;
@@ -66,10 +70,10 @@ Path* Pathfinder::GetPath( glm::vec2 a_start , glm::vec2 a_end )
     LOGW( "Got a path requested with the same start and end positions " );
     return nullptr;
   }
-
+  std::shared_ptr<Grid> grid = m_grid.lock();
   Node* startNode = nullptr , *endNode = nullptr;
-  startNode = m_grid->GetNode( a_start );
-  endNode = m_grid->GetNode( a_end );
+  startNode = grid->GetNode( a_start );
+  endNode = grid->GetNode( a_end );
 
   if( endNode && !endNode->bwalkable )
   {

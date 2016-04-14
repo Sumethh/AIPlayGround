@@ -9,7 +9,7 @@
 
 
 WanderingComponent::WanderingComponent( GameObject * a_go , EComponentTypes a_type ) :
-  Component( a_go , a_type)
+  Component( a_go , a_type )
 {
 
 }
@@ -44,9 +44,21 @@ void WanderingComponent::Update( float a_dt )
         destY = (float)( std::rand() % (int)limits.bottomRight.y ) + limits.topLeft.y;
         glm::vec2 destination( destX , destY );
         Transform parentTransform = GetParent()->GetTransform();
+        std::weak_ptr<Grid> gridWkPtr = m_pathfindingComp->GetGrid();
+        if( !gridWkPtr.expired() )
+        {
+          std::shared_ptr<Grid> grid = gridWkPtr.lock();
+          Node* node = grid->GetNode( destination );
+          Node* currentNode = grid->GetNode( parentTransform.position );
+          /*while( !node->bwalkable && node != currentNode );
+          {
 
-        m_pathfindingComp->RequestPath( parentTransform.position , destination );
-
+            destination.x = (float)( std::rand() % (int)limits.bottomRight.x ) + limits.topLeft.x;
+            destination.y = (float)( std::rand() % (int)limits.bottomRight.y ) + limits.topLeft.y;
+            node = grid->GetNode( destination );
+          }
+          m_pathfindingComp->RequestPath( parentTransform.position , destination );*/
+        }
       }
     }
     else if( path )
