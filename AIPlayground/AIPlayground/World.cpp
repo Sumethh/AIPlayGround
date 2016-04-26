@@ -40,7 +40,7 @@ void World::OnConstruct()
 {
 
   m_grid->Init();
-  for( int i = 0; i < 1000; i++ )
+  for( int i = 0; i < 10000; i++ )
   {
     GameObject* newGO = CreateGameObject( EGameObjectType::GOT_Unit );
     Transform transform = newGO->GetTransform();
@@ -49,9 +49,6 @@ void World::OnConstruct()
     transform.rotation = 0.0f;
     newGO->SetTransfrom( transform );
   }
-
-
-
 }
 
 void World::OnDestroyed()

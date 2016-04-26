@@ -56,8 +56,8 @@ void WanderingComponent::Update( float a_dt )
             destination.x = (float)( std::rand() % (int)limits.bottomRight.x ) + limits.topLeft.x;
             destination.y = (float)( std::rand() % (int)limits.bottomRight.y ) + limits.topLeft.y;
             node = grid->GetNode( destination );
-          }
-          m_pathfindingComp->RequestPath( parentTransform.position , destination );*/
+          }*/
+          m_pathfindingComp->RequestPath( parentTransform.position , destination );
         }
       }
     }

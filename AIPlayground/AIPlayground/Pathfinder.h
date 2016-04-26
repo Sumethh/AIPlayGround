@@ -2,6 +2,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include <Common/timer.h>
+#include <Common/JobSystem.h>
 #include <functional>
 #include <queue>
 #include <mutex>
@@ -14,11 +15,10 @@ struct Path
 {
   std::vector<glm::vec2> nodes;
 };
-struct PathJob
+struct PathParameters : public JobParametersBase
 {
   std::function<void( Path* )> callback;
   Node* endNode , *startNode;
-
 };
 
 class Pathfinder
@@ -35,16 +35,10 @@ public:
 
 private:
 
-  void ThreadMainFunc();
-  Path* GetPath( glm::vec2 a_start , glm::vec2 a_end );
+  void GetPath( JobParametersBase* a_params );
   Path* RetracePath( Node* a_start , Node* a_end );
   std::weak_ptr<Grid> m_grid;
   Timer m_timer;
 
-
-  std::atomic_flag m_threadRunningFlag;
-  std::mutex m_queueMutex;
-  std::queue <PathJob> m_pathJobs;
-  std::thread m_pathFindingThread;
 };
 

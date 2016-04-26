@@ -5,17 +5,13 @@
 #include <map>
 
 Pathfinder::Pathfinder( std::shared_ptr<Grid>& a_grid ) :
-  m_grid( a_grid ) ,
-  m_threadRunningFlag() ,
-  m_pathFindingThread( &Pathfinder::ThreadMainFunc , this )
+  m_grid( a_grid )
 {
 }
 
 
 Pathfinder::~Pathfinder()
 {
-  m_threadRunningFlag.clear();
-  m_pathFindingThread.join();
 }
 
 int GetDistance( Node* a_node , Node* a_otherNode )
@@ -32,60 +28,72 @@ int GetDistance( Node* a_node , Node* a_otherNode )
 
 void Pathfinder::AddPathfindingJob( std::function<void( Path* )> a_callback , glm::vec2 a_startPos , glm::vec2 a_endPos )
 {
-  PathJob newJob;
   if( !m_grid.expired() )
   {
     std::shared_ptr<Grid> grid = m_grid.lock();
     Node* startNode = grid->GetNode( a_startPos );
     Node* endNode = grid->GetNode( a_endPos );
-    newJob.callback = a_callback;
-    newJob.startNode = startNode;
-    newJob.endNode = endNode;
-    std::lock_guard<std::mutex> mutexLock( m_queueMutex );
-    m_pathJobs.push( newJob );
+    AddPathfindingJob( a_callback , startNode , endNode );
   }
 }
 
 void Pathfinder::AddPathfindingJob( std::function<void( Path* )> a_callback , Node* a_startNode , Node* a_endNode )
 {
-  PathJob newJob;
-  newJob.callback = a_callback;
-  newJob.startNode = a_startNode;
-  newJob.endNode = a_endNode;
-  std::lock_guard<std::mutex> mutexLock( m_queueMutex );
-  m_pathJobs.push( newJob );
+  Job* newJob = new Job();
+  PathParameters* params = new PathParameters();
+  params->callback = a_callback;
+  params->startNode = a_startNode;
+  params->endNode = a_endNode;
+
+  newJob->jobCondition = JobCondition::ONE_AT_A_TIME;
+  newJob->taskFunction = std::bind( &Pathfinder::GetPath , this , std::placeholders::_1 );
+  newJob->jobParams = params;
+  newJob->threadCleanUpJob = true;
+  newJob->typeHashCode = typeid( params ).hash_code();
+  JobSystem::ScheduleJob( newJob );
 }
 
-Path* Pathfinder::GetPath( glm::vec2 a_start , glm::vec2 a_end )
+void Pathfinder::GetPath( JobParametersBase* a_params )
 {
+  if( !a_params )
+  {
+    LOGE( "Did not get any parameters" );
+    return;
+  }
+  PathParameters* params = reinterpret_cast<PathParameters*>( a_params );
+  Node* startNode = nullptr , *endNode = nullptr;
+  startNode = params->startNode;
+  endNode = params->endNode;
+
   m_timer.Start();
   if( m_grid.expired() )
   {
     LOGE( "I got a path request however i dont have a grid" );
-    return nullptr;
+    params->callback( nullptr );
+    return ;
   }
 
-  if( a_start == a_end )
+  if( startNode == endNode )
   {
     LOGW( "Got a path requested with the same start and end positions " );
-    return nullptr;
+    params->callback( nullptr );
+    return;
   }
   std::shared_ptr<Grid> grid = m_grid.lock();
-  Node* startNode = nullptr , *endNode = nullptr;
-  startNode = grid->GetNode( a_start );
-  endNode = grid->GetNode( a_end );
 
   if( endNode && !endNode->bwalkable )
   {
     LOGW( "Got a path requested with end node being unwalkable" );
-    return nullptr;
+    params->callback( nullptr );
+    return;
   }
 
   if( !endNode || !startNode )
   {
 
     LOGW( "Got a path requested with end node or start node being nullptr" );
-    return nullptr;
+    params->callback( nullptr );
+    return;
   }
 
   std::vector<Node*> openSet;
@@ -139,28 +147,7 @@ Path* Pathfinder::GetPath( glm::vec2 a_start , glm::vec2 a_end )
     }
   }
 
-  return RetracePath( startNode , endNode );
-}
-
-void Pathfinder::ThreadMainFunc()
-{
-  m_threadRunningFlag.test_and_set();
-  while( m_threadRunningFlag.test_and_set( std::memory_order::memory_order_relaxed ) )
-  {
-    if( m_pathJobs.size() == 0 )
-      std::this_thread::yield();
-    else
-    {
-      m_queueMutex.lock();
-      PathJob job = m_pathJobs.front();
-      m_pathJobs.pop();
-      m_queueMutex.unlock();
-
-      Path* path = nullptr;
-      path = GetPath( job.startNode->pos , job.endNode->pos );
-      job.callback( path );
-    }
-  }
+  params->callback( RetracePath( startNode , endNode ));
 }
 
 Path* Pathfinder::RetracePath( Node* a_start , Node* a_end )
