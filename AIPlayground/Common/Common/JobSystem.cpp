@@ -115,7 +115,10 @@ bool JobSystem::CheckJobConditions( Job* a_job )
 
 Job* JobSystem::GetAnyAvaidableJob()
 {
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
   Job* returningJob = nullptr;
   if( !m_jobsMutex.try_lock() )
     return nullptr;
