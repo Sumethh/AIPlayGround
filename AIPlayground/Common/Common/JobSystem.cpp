@@ -140,6 +140,7 @@ void JobSystem::AddActiveJob( Job* a_job )
   {
     std::lock_guard<std::mutex> lock( m_activeJobsMutex );
     m_activeJobs[ a_job->jobID ] = a_job;
+    //This is a test
   }
 
 }
