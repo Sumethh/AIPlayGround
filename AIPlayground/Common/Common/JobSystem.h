@@ -66,8 +66,6 @@ public:
   static uint32 ScheduleJob( Job* a_jobToAdd );
 
 
-  static bool AddActiveJob( Job* a_job );
-  static bool CheckJobConditions( Job* a_job );
 
 private:
   JobSystem& operator = ( JobSystem& a_right );
@@ -75,6 +73,8 @@ private:
 
   static Job* GetAnyAvaidableJob();
   static void JobCompleted( Job* a_job );
+  static void AddActiveJob( Job* a_job );
+  static bool CheckJobConditions( Job* a_job );
 
   static std::map<uint32, Job*> m_activeJobs;
   static std::mutex m_activeJobsMutex;

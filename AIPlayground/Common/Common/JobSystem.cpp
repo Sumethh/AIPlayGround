@@ -125,8 +125,7 @@ Job* JobSystem::GetAnyAvaidableJob()
       returningJob = *job;
       m_jobs.erase( job );
       m_jobCount--;
-      std::lock_guard<std::mutex> lock( m_activeJobsMutex );
-      m_activeJobs[ returningJob->jobID ] = returningJob;
+      AddActiveJob( returningJob );
       break;
     }
     job++;
@@ -135,6 +134,15 @@ Job* JobSystem::GetAnyAvaidableJob()
   return returningJob;
 }
 
+void JobSystem::AddActiveJob( Job* a_job )
+{
+  if( a_job )
+  {
+    std::lock_guard<std::mutex> lock( m_activeJobsMutex );
+    m_activeJobs[ a_job->jobID ] = a_job;
+  }
+
+}
 void JobSystem::JobCompleted( Job* a_job )
 {
   m_activeJobsMutex.lock();
@@ -194,3 +202,4 @@ uint32 JobSystem::ScheduleJob( Job* a_jobToAdd )
     LOGE( "Tried to schedule job but jobsystem has not be initialized" );
   return jobID;
 }
+

@@ -40,7 +40,7 @@ void World::OnConstruct()
 {
 
   m_grid->Init();
-  for( int i = 0; i < 10000; i++ )
+  for( int i = 0; i < 30000; i++ )
   {
     GameObject* newGO = CreateGameObject( EGameObjectType::GOT_Unit );
     Transform transform = newGO->GetTransform();
