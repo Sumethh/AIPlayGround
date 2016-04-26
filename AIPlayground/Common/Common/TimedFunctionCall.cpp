@@ -29,8 +29,7 @@ bool TimedFunctionCall::Update()
     else
       m_timer.Reset();
   }
-  else
-    return false;
+  return false;
 }
 
 TimedFunctionCall* TimedFunctionCall::Create( float a_timeToWaitFor , std::function<void( TimeFunctionCallArgument )> a_funcToCall , TimeFunctionCallArgument a_argument , bool a_looping )

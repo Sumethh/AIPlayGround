@@ -11,6 +11,8 @@
 #include <ctime>
 #include "Common/TimedFunctionCallManager.h"
 #include "Common/InvokableEvent.h"
+#include "Common/JobSystem.h"
+#include "Common/JobSystemDebugInfo.h"
 
 
 int32 frames;
@@ -19,13 +21,12 @@ float currentFPS;
 Timer frameTimer , deltaTime , renderTimer , updateTimer , preRenderTimer;
 int fpsTimerIndex , dtTimerIndex , renderTimerIndex , updateTimerIndex , preRenderTimerIndex;
 Game game;
-
 int main()
 {
+  LOGI( "Application starting" );
   std::srand( (uint)std::time( 0 ) );
   DebugOnScreenTimer::Init();
   Window mainWindow( 1280 , 720 , "AiPlayground" );
-
   std::string baseString( "FPS: " );
   fpsTimerIndex = DebugOnScreenTimer::AddNewTimer( baseString );
 
@@ -52,6 +53,9 @@ int main()
   LOGI( "Game Init Took: %fms" , initTimer.IntervalMS() );
   frameTimer.Start();
   deltaTime.Start();
+
+  JobSystem::Init( 4 );
+
   while( !mainWindow.IsCloseRequested() )
   {
     float dt = (float)deltaTime.IntervalS();
@@ -88,6 +92,8 @@ int main()
 
 
     DebugOnScreenTimer::DrawTimers( &mainWindow );
+    JobSystemDebugInfo::GI()->Render( &mainWindow );
+
     if( Input::GetKey( sf::Keyboard::Key::Escape ) )
       mainWindow.Close();
 
@@ -96,6 +102,8 @@ int main()
     game.PostFrame();
     Input::Reset();
   }
+
+  JobSystem::UnInit();
 
   return 0;
 }
