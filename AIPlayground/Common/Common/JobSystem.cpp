@@ -176,7 +176,7 @@ void JobSystem::UnInit()
 }
 
 uint32 JobSystem::ScheduleJob( Job* a_jobToAdd )
-{
+\{
   int32 jobID = 0;
 
   if( m_hasInitBeenCalled )
@@ -192,8 +192,11 @@ uint32 JobSystem::ScheduleJob( Job* a_jobToAdd )
       jobID = m_freeIDs.front();
       m_freeIDs.pop();
     }
-    jobID = m_currentMaxID;
-    m_currentMaxID++;
+    else
+    {
+      jobID = m_currentMaxID;
+      m_currentMaxID++;
+    }
     a_jobToAdd->jobID = jobID;
     m_jobs.push_back( a_jobToAdd );
     m_jobCount++;
