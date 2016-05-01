@@ -8,7 +8,7 @@ ComponentFactory* ComponentFactory::m_instance;
 sf::Texture t;
 
 
-Component* MakeRenderComponent( GameObject* a_go )
+Component* MakeRenderComponent( std::weak_ptr<GameObject> a_go )
 {
   RendererComponent* comp = new RendererComponent( a_go , EComponentTypes::CT_RenderComponent );
   if( comp )
@@ -16,12 +16,12 @@ Component* MakeRenderComponent( GameObject* a_go )
   return comp;
 }
 
-Component* MakePathfindingAgentComponent( GameObject* a_go )
+Component* MakePathfindingAgentComponent( std::weak_ptr<GameObject> a_go )
 {
   return new PathfindingAgentComponent( a_go , EComponentTypes::CT_PathfindingAgentComponent );
 }
 
-Component* MakeWanderingComponent( GameObject* a_go )
+Component* MakeWanderingComponent( std::weak_ptr<GameObject>  a_go )
 {
   return new WanderingComponent( a_go , EComponentTypes::CT_WanderingComponent );
 }
@@ -43,7 +43,7 @@ ComponentFactory::~ComponentFactory()
 {
 }
 
-Component* ComponentFactory::MakeComponent( EComponentTypes a_component , GameObject* a_gameObject )
+Component* ComponentFactory::MakeComponent( EComponentTypes a_component , std::weak_ptr<GameObject> a_gameObject )
 {
   Component* newComponent = nullptr;
   if( m_instance->m_functionMap[ a_component ] )

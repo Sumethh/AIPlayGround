@@ -5,7 +5,7 @@
 
 #include "world.h"
 
-RendererComponent::RendererComponent( GameObject* a_gameObject , EComponentTypes a_type ) :
+RendererComponent::RendererComponent( std::weak_ptr<GameObject> a_gameObject , EComponentTypes a_type ) :
   Component( a_gameObject , a_type )
 {
 }
@@ -19,18 +19,18 @@ RendererComponent::~RendererComponent()
 void RendererComponent::PreRender()
 {
   Component::PreRender();
-  GameObject* parent = GetParent();
+  std::shared_ptr<GameObject> parent = GetParentShared();
   if( parent && parent->RenderStateDirty() )
   {
-    Transform goTransform = GetParent()->GetTransform();
-    World* world = GetParent()->GetWorld();
+    Transform goTransform = GetParentShared()->GetTransform();
+    World* world = GetParentShared()->GetWorld();
     std::weak_ptr<Camera> cam;
     if( world )
       cam = world->GetCamera();
     if( !cam.expired() )
     {
       std::shared_ptr<Camera> camera = cam.lock();
-      m_sprite.setPosition( ConvertVec2( goTransform.position - camera->GetPos() )  );
+      m_sprite.setPosition( ConvertVec2( goTransform.position - camera->GetPos() ) );
       m_sprite.setScale( ConvertVec2( goTransform.scale ) );
       m_sprite.setRotation( goTransform.rotation );
       parent->ResetRenderStateDirtyFlag();

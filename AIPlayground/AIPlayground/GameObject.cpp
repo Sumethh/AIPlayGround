@@ -8,7 +8,8 @@ GameObject::GameObject( EGameObjectType a_type ) :
   m_goType( a_type ) ,
   m_hasBegunPlay( false ) ,
   m_toBeDestroyed( false ) ,
-  m_world( nullptr )
+  m_world( nullptr ) ,
+  m_thisSharedPtr( this )
 {
 }
 
@@ -78,7 +79,7 @@ void GameObject::PostFrame()
 
 void GameObject::AddComponent( EComponentTypes a_componentType )
 {
-  Component* newComp = ComponentFactory::GI()->MakeComponent( a_componentType , this );
+  Component* newComp = ComponentFactory::GI()->MakeComponent( a_componentType , m_thisSharedPtr );
   if( !nullptr )
     m_componentsToAdd.push_back( newComp );
 

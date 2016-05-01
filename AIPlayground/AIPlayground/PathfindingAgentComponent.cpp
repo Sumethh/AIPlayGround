@@ -5,7 +5,7 @@
 #include "Common/HelperFunctions.h"
 #include <SFML/Graphics.hpp>
 #include "Common/Window.h"
-PathfindingAgentComponent::PathfindingAgentComponent( GameObject* a_go , EComponentTypes a_type ) :
+PathfindingAgentComponent::PathfindingAgentComponent( std::weak_ptr<GameObject> a_go , EComponentTypes a_type ) :
   Component( a_go , a_type )
 {
 }
@@ -17,7 +17,7 @@ PathfindingAgentComponent::~PathfindingAgentComponent()
 
 void PathfindingAgentComponent::OnCosntruct()
 {
-  GameObject* parent = GetParent();
+  std::shared_ptr<GameObject> parent = GetParentShared();
   if( parent )
   {
     World* world = parent->GetWorld();
@@ -31,7 +31,7 @@ void PathfindingAgentComponent::Render( Window* a_window )
 
   if( m_path )
   {
-    World* world = GetParent()->GetWorld();
+    World* world = GetParentShared()->GetWorld();
     std::weak_ptr<Camera> cam;
     if( world )
       cam = world->GetCamera();

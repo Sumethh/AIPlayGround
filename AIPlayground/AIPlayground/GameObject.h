@@ -76,6 +76,8 @@ private:
 
   EGameObjectType m_goType;
 
+  std::shared_ptr<GameObject> m_thisSharedPtr;
+
   bool m_hasBegunPlay;
   bool m_toBeDestroyed;
   bool m_renderStateDirty;

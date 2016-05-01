@@ -8,7 +8,7 @@
 
 
 
-WanderingComponent::WanderingComponent( GameObject * a_go , EComponentTypes a_type ) :
+WanderingComponent::WanderingComponent( std::weak_ptr<GameObject> a_go , EComponentTypes a_type ) :
   Component( a_go , a_type )
 {
 
@@ -21,7 +21,7 @@ WanderingComponent::~WanderingComponent()
 
 void WanderingComponent::BeginPlay()
 {
-  GameObject* owner = GetParent();
+  std::shared_ptr<GameObject> owner = GetParentShared();
   if( owner )
   {
     m_pathfindingComp = reinterpret_cast<PathfindingAgentComponent*>( owner->GetComponentOfType( EComponentTypes::CT_PathfindingAgentComponent ) );
@@ -35,7 +35,8 @@ void WanderingComponent::Update( float a_dt )
     Path* path = m_pathfindingComp->GetPath();
     if( !path && !m_pathfindingComp->HasPathBeenRequested() )
     {
-      World* world = GetParent()->GetWorld();
+      World* world;
+      world = GetParentShared()->GetWorld();
       if( world )
       {
         WorldLimits limits = world->GetWorldLimits();
@@ -43,7 +44,7 @@ void WanderingComponent::Update( float a_dt )
         destX = (float)( std::rand() % (int)limits.bottomRight.x ) + limits.topLeft.x;
         destY = (float)( std::rand() % (int)limits.bottomRight.y ) + limits.topLeft.y;
         glm::vec2 destination( destX , destY );
-        Transform parentTransform = GetParent()->GetTransform();
+        Transform parentTransform = GetParentShared()->GetTransform();
         std::weak_ptr<Grid> gridWkPtr = m_pathfindingComp->GetGrid();
         if( !gridWkPtr.expired() )
         {
@@ -66,7 +67,7 @@ void WanderingComponent::Update( float a_dt )
       if( path->nodes.size() > 0 )
       {
         glm::vec2 currentNode = path->nodes[ 0 ];
-        Transform parentTransform = GetParent()->GetTransform();
+        Transform parentTransform = GetParentShared()->GetTransform();
         glm::vec2 vecBetween = currentNode - parentTransform.position;
         float length = glm::length( vecBetween );
         if( length < 2.0f )
@@ -83,7 +84,7 @@ void WanderingComponent::Update( float a_dt )
         }
         glm::vec2 direction = glm::normalize( vecBetween );
         parentTransform.position += direction* 128.0f * a_dt;
-        GetParent()->SetPosition( parentTransform.position );
+        GetParentShared()->SetPosition( parentTransform.position );
       }
       else
         m_pathfindingComp->ClearPath();

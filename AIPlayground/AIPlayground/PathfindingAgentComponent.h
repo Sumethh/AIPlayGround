@@ -9,7 +9,7 @@ struct Path;
 class PathfindingAgentComponent :public Component
 {
 public:
-  PathfindingAgentComponent( GameObject* a_go , EComponentTypes a_type );
+  PathfindingAgentComponent( std::weak_ptr<GameObject> a_go , EComponentTypes a_type );
   ~PathfindingAgentComponent();
 
   void OnCosntruct() override;

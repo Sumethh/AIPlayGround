@@ -176,7 +176,7 @@ void JobSystem::UnInit()
 }
 
 uint32 JobSystem::ScheduleJob( Job* a_jobToAdd )
-\{
+{
   int32 jobID = 0;
 
   if( m_hasInitBeenCalled )
