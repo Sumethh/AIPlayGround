@@ -5,7 +5,7 @@
 #include "Common/HelperFunctions.h"
 #include <SFML/Graphics.hpp>
 #include "Common/Window.h"
-PathfindingAgentComponent::PathfindingAgentComponent( std::weak_ptr<GameObject> a_go , EComponentTypes a_type ) :
+PathfindingAgentComponent::PathfindingAgentComponent( GameObject::SharedPtr a_go , EComponentTypes a_type ) :
   Component( a_go , a_type )
 {
 }

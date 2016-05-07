@@ -3,6 +3,7 @@
 #include "Transform.h"
 #include "ComponentFactory.h"
 #include "GameObjectTypes.h"
+#include "PhysicsStructs.h"
 class Component;
 class World;
 class Window;
@@ -20,13 +21,22 @@ public:
   GameObject( EGameObjectType a_type = EGameObjectType::GOT_Generic );
   virtual ~GameObject();
 
-  virtual void OnCosntruct( GameObjectConstructionDescriptor* a_constructionDescriptor);
+  typedef std::shared_ptr<GameObject> SharedPtr;
+  typedef std::weak_ptr<GameObject> WeakPtr;
+  virtual void OnCosntruct( GameObjectConstructionDescriptor* a_constructionDescriptor );
   virtual void OnDestroy();
   virtual void BeginPlay();
   virtual void Update( float a_dt );
+  virtual void FixedUpdate( float a_dt );
   virtual void PreRender();
   virtual void Render( Window* a_windows );
   virtual void PostFrame();
+
+  virtual void OnCollisionEnter( Collision a_collision );
+  virtual void OnCollisionLeave( Collision a_collision );
+  virtual void OnCollisionStay( Collision a_collision );
+
+
 
   void AddComponent( EComponentTypes a_componentType );
 
@@ -36,21 +46,29 @@ public:
   {
     m_transform = a_newTransform;
     m_renderStateDirty = true;
+    m_rotationMatrixDirty = true;
+    m_physicsDirty = true;
   }
   inline void SetPosition( glm::vec2 a_position )
   {
     m_transform.position = a_position;
     m_renderStateDirty = true;
+    m_physicsDirty = true;
+
   }
   inline void SetScale( glm::vec2 a_scale )
   {
     m_transform.scale = a_scale;
     m_renderStateDirty = true;
+    m_physicsDirty = true;
+
   }
   inline void SetRotation( float a_angle )
   {
     m_transform.rotation = a_angle;
     m_renderStateDirty = true;
+    m_rotationMatrixDirty = true;
+    m_physicsDirty = true;
   }
 
   inline void Destroy() { m_toBeDestroyed = true; }
@@ -65,11 +83,14 @@ public:
 
   inline EGameObjectType GetGoType() const { return m_goType; }
 
+  inline bool GetPhysicsDirtyFlag() { return m_physicsDirty; }
+  inline void ResetPhysicsDirtyFlag() { m_physicsDirty = false; }
+
 private:
   void SetWorld( World* a_newWorld ) { m_world = a_newWorld; };
 
-  std::vector<Component*> m_components;
-  std::vector<Component*> m_componentsToAdd;
+  std::vector<std::shared_ptr<Component>> m_components;
+  std::vector<std::shared_ptr<Component>> m_componentsToAdd;
 
   Transform m_transform;
   World* m_world;
@@ -81,5 +102,8 @@ private:
   bool m_hasBegunPlay;
   bool m_toBeDestroyed;
   bool m_renderStateDirty;
+  bool m_physicsDirty;
+  bool m_rotationMatrixDirty;
+
 };
 

@@ -1,7 +1,8 @@
 #include "GameObject.h"
 #include "Component.h"
+#include <glm/gtc/matrix_transform.hpp>
 
-typedef std::vector<Component*>::iterator ComponentItr;
+typedef std::vector<std::shared_ptr<Component>>::iterator ComponentItr;
 
 
 GameObject::GameObject( EGameObjectType a_type ) :
@@ -9,7 +10,8 @@ GameObject::GameObject( EGameObjectType a_type ) :
   m_hasBegunPlay( false ) ,
   m_toBeDestroyed( false ) ,
   m_world( nullptr ) ,
-  m_thisSharedPtr( this )
+  m_thisSharedPtr( this ) ,
+  m_rotationMatrixDirty( true )
 {
 }
 
@@ -47,6 +49,22 @@ void GameObject::Update( float a_dt )
 {
   for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
     ( *itr )->Update( a_dt );
+  if( m_rotationMatrixDirty )
+  {
+    glm::mat2 rMatrix = m_transform.rotationMatrix;
+    float cosResult = glm::cos( glm::radians( m_transform.rotation ) );
+    float sinResult = glm::sin( glm::radians( m_transform.rotation ) );
+    rMatrix[ 0 ][ 0 ] = cosResult;
+    rMatrix[ 0 ][ 1 ] = -sinResult;
+    rMatrix[ 1 ][ 0 ] = sinResult;
+    rMatrix[ 1 ][ 1 ] = cosResult;
+  }
+}
+
+void GameObject::FixedUpdate( float a_dt )
+{
+  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
+    ( *itr )->FixedUpdate( a_dt );
 }
 
 void GameObject::PreRender()
@@ -69,7 +87,7 @@ void GameObject::PostFrame()
 
   for( size_t i = 0; i < m_componentsToAdd.size(); ++i )
   {
-    Component* newComp = m_componentsToAdd[ i ];
+    std::shared_ptr<Component> newComp = m_componentsToAdd[ i ];
     m_components.push_back( newComp );
     if( HasBegunPlay() && !newComp->HasBegunPlay() )
       newComp->BeginPlay();
@@ -77,9 +95,27 @@ void GameObject::PostFrame()
   m_componentsToAdd.clear();
 }
 
+void GameObject::OnCollisionEnter( Collision a_collision )
+{
+  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
+    ( *itr )->OnCollisionEnter( a_collision );
+}
+
+void GameObject::OnCollisionLeave( Collision a_collision )
+{
+  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
+    ( *itr )->OnCollisionLeave( a_collision );
+}
+
+void GameObject::OnCollisionStay( Collision a_collision )
+{
+  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
+    ( *itr )->OnCollisionStay( a_collision );
+}
+
 void GameObject::AddComponent( EComponentTypes a_componentType )
 {
-  Component* newComp = ComponentFactory::GI()->MakeComponent( a_componentType , m_thisSharedPtr );
+  std::shared_ptr<Component> newComp( ComponentFactory::GI()->MakeComponent( a_componentType , m_thisSharedPtr ) );
   if( !nullptr )
     m_componentsToAdd.push_back( newComp );
 
@@ -90,6 +126,6 @@ Component* GameObject::GetComponentOfType( EComponentTypes a_type )
 {
   for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
     if( ( *itr )->IsComponentOfType( a_type ) )
-      return ( *itr );
+      return ( itr )->get();
   return nullptr;
 }

@@ -3,7 +3,7 @@
 #include <queue>
 #include <SFML/Graphics.hpp>
 #include <glm/glm.hpp>
-
+#include <memory>
 class Window;
 
 struct Node
@@ -42,7 +42,8 @@ class Grid
 public:
   Grid( glm::vec2 m_gridOrigin , int a_tileCountX , int a_tileCountY , int a_tileSizeX , int a_tileSizeY );
   ~Grid();
-
+  typedef std::weak_ptr<Grid> WeakPtr;
+  typedef std::shared_ptr<Grid> SharedPtr;
   void Init();
   void PreRender( const glm::vec2 a_cameraPo );
   void Render( Window* const a_windowToDrawTo );

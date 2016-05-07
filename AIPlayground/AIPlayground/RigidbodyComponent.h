@@ -8,11 +8,16 @@
 class RigidbodyComponent : public PhysicsComponentBase
 {
 public:
-  RigidbodyComponent( std::weak_ptr<GameObject> a_go , EComponentTypes a_compType );
+  RigidbodyComponent( GameObject::SharedPtr  a_go , EComponentTypes a_compType );
   ~RigidbodyComponent();
+  typedef std::shared_ptr<RigidbodyComponent> SharedPtr;
+  typedef std::weak_ptr<RigidbodyComponent> WeakPtr;
+
   void BeginPlay() override;
   void PhysicsUpdate( float a_fixedDt ) override;
 
+
+  void OnCollisionEnter( Collision& a_collision ) override;
 
   inline void SetDrag( const float a_drag ) { m_drag = a_drag; }
   inline void SetMass( const float a_mass ) { m_mass = a_mass; }

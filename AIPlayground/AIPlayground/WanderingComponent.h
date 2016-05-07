@@ -4,7 +4,7 @@ class PathfindingAgentComponent;
 class WanderingComponent :public Component
 {
 public:
-  WanderingComponent( std::weak_ptr<GameObject> a_go , EComponentTypes a_type );
+  WanderingComponent( GameObject::SharedPtr , EComponentTypes a_type );
   ~WanderingComponent();
   void BeginPlay() override;
   void Update( float a_dt ) override;

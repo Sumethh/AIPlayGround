@@ -8,7 +8,7 @@
 
 
 
-WanderingComponent::WanderingComponent( std::weak_ptr<GameObject> a_go , EComponentTypes a_type ) :
+WanderingComponent::WanderingComponent( GameObject::SharedPtr a_go, EComponentTypes a_type ) :
   Component( a_go , a_type )
 {
 
@@ -24,7 +24,7 @@ void WanderingComponent::BeginPlay()
   std::shared_ptr<GameObject> owner = GetParentShared();
   if( owner )
   {
-    m_pathfindingComp = reinterpret_cast<PathfindingAgentComponent*>( owner->GetComponentOfType( EComponentTypes::CT_PathfindingAgentComponent ) );
+    m_pathfindingComp =  (PathfindingAgentComponent*)owner->GetComponentOfType( EComponentTypes::CT_PathfindingAgentComponent );
   }
 }
 

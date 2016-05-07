@@ -5,7 +5,7 @@
 class RendererComponent : public Component
 {
 public:
-  RendererComponent( std::weak_ptr<GameObject>  a_gameObject , EComponentTypes a_type );
+  RendererComponent( GameObject::SharedPtr , EComponentTypes a_type );
   ~RendererComponent();
 
 

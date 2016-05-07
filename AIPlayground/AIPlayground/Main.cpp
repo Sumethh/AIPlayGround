@@ -13,13 +13,13 @@
 #include "Common/InvokableEvent.h"
 #include "Common/JobSystem.h"
 #include "Common/JobSystemDebugInfo.h"
-
+#include "TimeConsts.h"
 
 int32 frames;
 float currentFPS;
 
 Timer frameTimer , deltaTime , renderTimer , updateTimer , preRenderTimer;
-int fpsTimerIndex , dtTimerIndex , renderTimerIndex , updateTimerIndex , preRenderTimerIndex;
+int fpsTimerIndex , dtTimerIndex , renderTimerIndex , updateTimerIndex , preRenderTimerIndex , physicsTimerIndex;
 Game game;
 int main()
 {
@@ -38,6 +38,11 @@ int main()
   updateTimerIndex = DebugOnScreenTimer::AddNewTimer( baseString );
   DebugOnScreenTimer::SetTimerTrailingText( updateTimerIndex , " ms" );
 
+  baseString = "Game::PhysicsUpdate: ";
+  physicsTimerIndex = DebugOnScreenTimer::AddNewTimer( baseString );
+  DebugOnScreenTimer::SetTimerTrailingText( updateTimerIndex , " ms" );
+
+
 
   baseString = "Game::PrRender: ";
   preRenderTimerIndex = DebugOnScreenTimer::AddNewTimer( baseString );
@@ -55,10 +60,12 @@ int main()
   deltaTime.Start();
 
   JobSystem::Init( 4 );
-
+  float fixedUpdateAccum = 0.0f;
   while( !mainWindow.IsCloseRequested() )
   {
     float dt = (float)deltaTime.IntervalS();
+    fixedUpdateAccum += dt;
+    TimeConsts::DeltaTime = dt;
     DebugOnScreenTimer::SetTimerValue( dtTimerIndex , dt );
     deltaTime.Reset();
 
@@ -66,10 +73,18 @@ int main()
     mainWindow.Clear( sf::Color::Blue );
     mainWindow.Update();
 
+    if( fixedUpdateAccum >= TimeConsts::fixedUpdateTimeStep )
+    {
+      fixedUpdateAccum -= TimeConsts::fixedUpdateTimeStep;
+      game.FixedUpdate( TimeConsts::fixedUpdateTimeStep );
+    }
+
     updateTimer.Start();
     game.Update( dt );
     TimedFunctionCallManager::GI()->Update();
     DebugOnScreenTimer::SetTimerValue( updateTimerIndex , (float)updateTimer.IntervalMS() );
+    DebugOnScreenTimer::SetTimerValue( physicsTimerIndex , PhysicsSystem::time );
+
 
     preRenderTimer.Start();
     game.PreRender();

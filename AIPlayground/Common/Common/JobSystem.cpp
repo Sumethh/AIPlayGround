@@ -15,6 +15,8 @@ std::mutex JobSystem::m_activeJobsMutex;
 
 uint32 JobSystem::m_currentMaxID;
 
+std::condition_variable JobSystem::m_jobCondition;
+
 WorkerThread::WorkerThread( uint a_threadID ) :
   workerThread( &WorkerThread::WorkerMainFunction , this ) ,
   threadID( a_threadID )
@@ -116,8 +118,8 @@ bool JobSystem::CheckJobConditions( Job* a_job )
 Job* JobSystem::GetAnyAvaidableJob()
 {
   Job* returningJob = nullptr;
-  if( !m_jobsMutex.try_lock() )
-    return nullptr;
+  std::unique_lock<std::mutex> lock( m_jobsMutex );
+  m_jobCondition.wait( lock , [] {return m_jobCount > 0 || !m_hasInitBeenCalled; } );
   for( auto job = m_jobs.begin(); job != m_jobs.end(); )
   {
     if( CheckJobConditions( *job ) )
@@ -130,7 +132,9 @@ Job* JobSystem::GetAnyAvaidableJob()
     }
     job++;
   }
-  m_jobsMutex.unlock();
+  lock.unlock();
+  m_jobCondition.notify_one();
+
   return returningJob;
 }
 
@@ -158,6 +162,7 @@ void JobSystem::JobCompleted( Job* a_job )
 
 void JobSystem::UnInit()
 {
+  m_jobCondition.notify_all();
   if( m_hasInitBeenCalled )
   {
     m_hasInitBeenCalled = false;
@@ -200,7 +205,8 @@ uint32 JobSystem::ScheduleJob( Job* a_jobToAdd )
     a_jobToAdd->jobID = jobID;
     m_jobs.push_back( a_jobToAdd );
     m_jobCount++;
-
+    if( CheckJobConditions( a_jobToAdd ) )
+      m_jobCondition.notify_one();
   }
   else
     LOGE( "Tried to schedule job but jobsystem has not be initialized" );

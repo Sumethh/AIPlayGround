@@ -5,7 +5,7 @@
 
 #include "world.h"
 
-RendererComponent::RendererComponent( std::weak_ptr<GameObject> a_gameObject , EComponentTypes a_type ) :
+RendererComponent::RendererComponent( GameObject::SharedPtr  a_gameObject , EComponentTypes a_type ) :
   Component( a_gameObject , a_type )
 {
 }

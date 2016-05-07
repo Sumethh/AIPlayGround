@@ -26,7 +26,7 @@ public:
     return (double)us / 1000.0;
   }
   
-  double IntervalS() //return interval in milliseconds
+  double IntervalS() //return interval in seconds
   {
     return IntervalMS() / 1000.0;
   }
