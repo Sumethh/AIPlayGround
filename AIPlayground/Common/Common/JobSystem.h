@@ -65,7 +65,8 @@ public:
   static void Init( uint a_threadCount );
   static void UnInit();
   static uint32 ScheduleJob( Job* a_jobToAdd );
-
+  static uint32 ScheduleJobWithoutLock( Job* a_jobToAdd );
+  static std::mutex& GetLock() { return m_jobsMutex; }
 
 
 private:

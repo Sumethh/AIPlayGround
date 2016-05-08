@@ -34,15 +34,13 @@ Timer myTime;
 void PhysicsSystem::Update( float a_dt )
 {
   myTime.Start();
-
   for( auto it = m_physicsObjects.begin(); it != m_physicsObjects.end(); it++ )
   {
     ( *it )->PhysicsUpdate( a_dt );
   }
-
   m_grid->Update();
-
- time = myTime.IntervalMS();
+  m_grid->PerformCollisionTests();
+ time = (float)myTime.IntervalMS();
 }
 
 void PhysicsSystem::Render( Window* a_window )
@@ -60,45 +58,45 @@ void PhysicsSystem::RegisterCollider( ColliderComponent* a_collider )
   m_grid->AddCollider( a_collider );
 }
 
-bool PhysicsSystem::BoxCollisionTest( ColliderComponent::SharedPtr  a_boxCollider , ColliderComponent::SharedPtr a_other , Collision& a_collision )
-{
-  return false;
-}
-
-
-bool PhysicsSystem::SphereCollisionTest( ColliderComponent::SharedPtr  a_sphereCollider , ColliderComponent::SharedPtr a_other , Collision& a_collision )
-{
-  Collision collision;
-  Collider sphereCol = a_sphereCollider->GetCollider();
-  GameObject::SharedPtr go1 = a_sphereCollider->GetParentShared();
-  Transform transform1 = go1->GetTransform();
-  switch( a_other->GetColliderType() )
-  {
-  case EColliderType::Sphere:
-  {
-    Collider otherCollider = a_other->GetCollider();
-    GameObject::SharedPtr go2 = a_other->GetParentShared();
-    Transform transform2 = go2->GetTransform();
-    glm::vec2 diff = transform2.position - transform1.position;
-    float radiSum = otherCollider.radius + sphereCol.radius;
-    if( dot( diff , diff ) <= radiSum*radiSum )
-    {
-      collision.collisionNormal = glm::normalize( diff );
-      return true;
-    }
-    return false;
-    break;
-  }
-  case EColliderType::Box:
-  {
-    return false;
-    break;
-  }
-  default:
-    break;
-  }
-  return false;
-}
+//bool PhysicsSystem::BoxCollisionTest( ColliderComponent::SharedPtr  a_boxCollider , ColliderComponent::SharedPtr a_other , Collision& a_collision )
+//{
+//  return false;
+//}
+//
+//
+//bool PhysicsSystem::SphereCollisionTest( ColliderComponent::SharedPtr  a_sphereCollider , ColliderComponent::SharedPtr a_other , Collision& a_collision )
+//{
+//  Collision collision;
+//  Collider sphereCol = a_sphereCollider->GetCollider();
+//  GameObject::SharedPtr go1 = a_sphereCollider->GetParentShared();
+//  Transform transform1 = go1->GetTransform();
+//  switch( a_other->GetColliderType() )
+//  {
+//  case EColliderType::Sphere:
+//  {
+//    Collider otherCollider = a_other->GetCollider();
+//    GameObject::SharedPtr go2 = a_other->GetParentShared();
+//    Transform transform2 = go2->GetTransform();
+//    glm::vec2 diff = transform2.position - transform1.position;
+//    float radiSum = otherCollider.radius + sphereCol.radius;
+//    if( dot( diff , diff ) <= radiSum*radiSum )
+//    {
+//      collision.collisionNormal = glm::normalize( diff );
+//      return true;
+//    }
+//    return false;
+//    break;
+//  }
+//  case EColliderType::Box:
+//  {
+//    return false;
+//    break;
+//  }
+//  default:
+//    break;
+//  }
+//  return false;
+//}
 
 void PhysicsSystem::PerformCollisionTests()
 {

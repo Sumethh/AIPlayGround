@@ -86,6 +86,8 @@ public:
   inline bool GetPhysicsDirtyFlag() { return m_physicsDirty; }
   inline void ResetPhysicsDirtyFlag() { m_physicsDirty = false; }
 
+  inline void SetPhysicsFlagDirty() { m_physicsDirty = true; }
+
 private:
   void SetWorld( World* a_newWorld ) { m_world = a_newWorld; };
 

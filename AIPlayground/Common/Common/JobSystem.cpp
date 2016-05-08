@@ -213,3 +213,35 @@ uint32 JobSystem::ScheduleJob( Job* a_jobToAdd )
   return jobID;
 }
 
+uint32 JobSystem::ScheduleJobWithoutLock( Job* a_jobToAdd )
+{
+  int32 jobID = 0;
+
+  if( m_hasInitBeenCalled )
+  {
+    if( !a_jobToAdd )
+    {
+      LOGE( "I recieved a null job!" );
+      return jobID;
+    }
+    if( !m_freeIDs.empty() )
+    {
+      jobID = m_freeIDs.front();
+      m_freeIDs.pop();
+    }
+    else
+    {
+      jobID = m_currentMaxID;
+      m_currentMaxID++;
+    }
+    a_jobToAdd->jobID = jobID;
+    m_jobs.push_back( a_jobToAdd );
+    m_jobCount++;
+    if( CheckJobConditions( a_jobToAdd ) )
+      m_jobCondition.notify_one();
+  }
+  else
+    LOGE( "Tried to schedule job but jobsystem has not be initialized" );
+  return jobID;
+}
+

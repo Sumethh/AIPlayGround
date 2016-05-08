@@ -6,7 +6,9 @@
 
 #define TILE_COUNT_X_PER_CELL 6;
 #define TILE_COUNT_Y_PER_CELL 6;
+#define COLLIDERS_PER_CELL 10
 class Window;
+class ColliderComponent;
 struct GridCell
 {
   glm::vec2 center;
@@ -15,7 +17,6 @@ struct GridCell
   std::vector<ColliderComponent*> colliders;
 
   GridCell* neighbors[ 8 ];
-  GridCell* children[ 4 ];
 };
 
 
@@ -37,11 +38,13 @@ public:
 private:
    
 
-  void SplitCell(GridCell* a_cell);
-  inline void UpdateCell( GridCell& a_cell );
-  bool TestColliderWithGridCell( GridCell& a_cell , ColliderComponent* a_collider );
+  //void SplitCell(GridCell* a_cell);
+  //void AddColliderToCell( GridCell* a_cell , ColliderComponent* a_component );
+  //void AddColliderToSplitCell( GridCell* a_grid , ColliderComponent* a_component );
 
-  inline GridCell* GetCell( int index );
+  inline void UpdateCell( GridCell& a_cell );
+
+  inline GridCell* GetCell( uint index );
   inline GridCell* GetCellFromPosition( glm::vec2 a_pos );
   PhysicsSystem::WeakPtr m_physicsSystem;
 

@@ -1,11 +1,11 @@
 #pragma once
 #include "PhysicsComponentBase.h"
-#include "ColliderComponent.h"
 #include <memory>
 
 class PhysicsGrid;
 class World;
 class Window;
+class ColliderComponent;
 class PhysicsSystem
 {
 public:
@@ -32,8 +32,8 @@ private:
   std::weak_ptr<World> m_world;
 
 
-  inline bool BoxCollisionTest( ColliderComponent::SharedPtr  a_boxCollider, ColliderComponent::SharedPtr a_other , Collision& a_collision);
-  inline bool SphereCollisionTest( ColliderComponent::SharedPtr a_sphereCollider , ColliderComponent::SharedPtr a_other , Collision& a_collision);
+  //inline bool BoxCollisionTest( ColliderComponent::SharedPtr  a_boxCollider, ColliderComponent::SharedPtr a_other , Collision& a_collision);
+  //inline bool SphereCollisionTest( ColliderComponent::SharedPtr a_sphereCollider , ColliderComponent::SharedPtr a_other , Collision& a_collision);
 
   void PerformCollisionTests();
   

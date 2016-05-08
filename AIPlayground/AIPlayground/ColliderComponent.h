@@ -8,7 +8,7 @@ enum class EColliderType : uint8
   Box
 };
 
-class GridCell;
+struct GridCell;
 
 struct Collider
 {
@@ -27,12 +27,18 @@ public:
   typedef std::shared_ptr<ColliderComponent> SharedPtr;
   typedef std::weak_ptr<ColliderComponent> WeakPtr;
 
-  inline bool TestCollision( ColliderComponent* a_other, Collision& a_collision );
+
+  void Update(float a_dt) override;
+
+  bool TestCollision( ColliderComponent* a_other , Collision& a_collision );
 
   inline EColliderType GetColliderType() const { return m_colliderType; }
   inline Collider GetCollider() const { return m_collider; }
   inline void SetCollider( Collider a_collider ) { m_collider = a_collider; }
   inline void SetGridCell( GridCell* a_gridCell ) { m_currentCell = a_gridCell; }
+
+  std::map<ColliderComponent* , bool>& GetTestedColliders() { return m_testedColliders; }
+  inline void ResetTestedColliders() { m_testedColliders.clear(); }
 private:
 
   inline bool CircleCircleColTest( ColliderComponent* a_collider1 , ColliderComponent* a_collider2 , Collision& a_collision );
@@ -40,8 +46,9 @@ private:
 
   inline bool BoxCircleColTest( ColliderComponent* a_box , ColliderComponent* a_circle , Collision& a_collision );
 
-  GridCell* m_currentCell;
+  std::map<ColliderComponent* , bool> m_testedColliders;
 
+  GridCell* m_currentCell;
   EColliderType m_colliderType;
   Collider m_collider;
 };

@@ -13,6 +13,9 @@ GameObject::GameObject( EGameObjectType a_type ) :
   m_thisSharedPtr( this ) ,
   m_rotationMatrixDirty( true )
 {
+  SetScale( glm::vec2( 1.0f , 1.0f ) );
+  SetRotation( 0 );
+  SetPosition( glm::vec2( 0.0f , 0.0f ));
 }
 
 

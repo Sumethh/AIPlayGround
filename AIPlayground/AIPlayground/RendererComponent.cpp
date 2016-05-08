@@ -19,11 +19,11 @@ RendererComponent::~RendererComponent()
 void RendererComponent::PreRender()
 {
   Component::PreRender();
-  std::shared_ptr<GameObject> parent = GetParentShared();
+  GameObject* parent = GetParent();
   if( parent && parent->RenderStateDirty() )
   {
-    Transform goTransform = GetParentShared()->GetTransform();
-    World* world = GetParentShared()->GetWorld();
+    Transform goTransform = parent->GetTransform();
+    World* world = parent->GetWorld();
     std::weak_ptr<Camera> cam;
     if( world )
       cam = world->GetCamera();
@@ -48,8 +48,10 @@ void RendererComponent::SetTexture( sf::Texture* a_texture )
 {
   m_texture = a_texture;
   if( m_texture )
+  {
     m_sprite.setTexture( *m_texture , true );
-  sf::Vector2u scale = m_texture->getSize();
-  m_dimensions = ConvertVec2( scale );
-  m_sprite.setOrigin( m_dimensions.x / 2.0f , m_dimensions.y / 2.0f );
+    sf::Vector2u scale = m_texture->getSize();
+    m_dimensions = ConvertVec2( scale );
+    m_sprite.setOrigin( m_dimensions.x / 2.0f , m_dimensions.y / 2.0f );
+  }
 }

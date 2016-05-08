@@ -57,11 +57,12 @@ void World::OnConstruct()
     m_physicsSystem->Construct();
   }
   m_grid->Init();
-  for( int i = 0; i < 1000; i++ )
+  glm::vec2 worldSize = m_worldLimits.bottomRight - m_worldLimits.topLeft;
+  for( int i = 0; i < 2500; i++ )
   {
-    GameObject* newGO = CreateGameObject( EGameObjectType::GOT_Unit);
+    GameObject* newGO = CreateGameObject( EGameObjectType::GOT_Unit );
     Transform transform = newGO->GetTransform();
-    //transform.position = glm::vec2( 320 + 32 * i, 320 + 32 * (int)(i/ 30) );
+    transform.position = glm::vec2( std::rand() % (int)worldSize.x , std::rand() % (int)worldSize.y );
     //transform.scale = glm::vec2( 1 , 1 );
     transform.rotation = 0.0f;
     newGO->SetTransfrom( transform );
@@ -70,7 +71,7 @@ void World::OnConstruct()
   if( t )
   {
     RigidbodyComponent* a = (RigidbodyComponent*)t;
-    a->AddForce( glm::vec2(10,0));
+    a->AddForce( glm::vec2( 10 , 0 ) );
     a->SetDrag( 0 );
   }
 }
@@ -94,6 +95,9 @@ void World::Update( float a_dt )
     if( !gameObject->IsDestroyed() )
       gameObject->Update( a_dt );
   }
+  Timer t;
+  t.Start();
+  m_pathfinder->ScheduleJobs();
 }
 
 void World::FixedUpdate( float a_dt )
@@ -127,9 +131,9 @@ void World::Render( Window* const a_window )
 
   m_grid->Render( a_window );
   m_playerController->Render( a_window );
+  m_physicsSystem->Render( a_window );
   for( auto gameObject : m_gameObjects )
     gameObject->Render( a_window );
-  m_physicsSystem->Render( a_window );
 }
 
 void World::PostFrame()

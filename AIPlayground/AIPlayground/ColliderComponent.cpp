@@ -4,8 +4,8 @@
 
 ColliderComponent::ColliderComponent( GameObject::SharedPtr a_go , EComponentTypes a_compType , EColliderType a_colliderType ) :
   Component( a_go , a_compType ) ,
-  m_colliderType( a_colliderType ),
-  m_currentCell(nullptr)
+  m_colliderType( a_colliderType ) ,
+  m_currentCell( nullptr )
 {
   m_collider.radius = 16;
   GameObject* parent = GetParent();
@@ -25,11 +25,18 @@ ColliderComponent::ColliderComponent( GameObject::SharedPtr a_go , EComponentTyp
 
 ColliderComponent::~ColliderComponent()
 {
-  
+
+}
+
+void ColliderComponent::Update( float a_dt )
+{
+  Component::Update( a_dt );
+  ResetTestedColliders();
 }
 
 bool ColliderComponent::TestCollision( ColliderComponent* a_other , Collision& a_collision )
 {
+  m_testedColliders[ a_other ] = true;
   switch( m_colliderType )
   {
   case EColliderType::Sphere:
@@ -112,10 +119,10 @@ bool ColliderComponent::CircleCircleColTest( ColliderComponent* a_collider1 , Co
 
 bool ColliderComponent::BoxBoxColTest( ColliderComponent* a_collider1 , ColliderComponent* a_collider2 , Collision& a_collision )
 {
-
+  return false;
 }
 
 bool ColliderComponent::BoxCircleColTest( ColliderComponent* a_box , ColliderComponent* a_circle , Collision& a_collision )
 {
-
+  return false;
 }

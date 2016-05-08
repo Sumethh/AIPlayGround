@@ -33,10 +33,13 @@ public:
 
   std::weak_ptr<Grid> GetGrid() { return m_grid; }
 
+  void ScheduleJobs();
+
 private:
 
   void GetPath( JobParametersBase* a_params );
   Path* RetracePath( Node* a_start , Node* a_end );
+  std::vector<Job*> m_jobsToSchedule;
   std::weak_ptr<Grid> m_grid;
   Timer m_timer;
 
