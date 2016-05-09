@@ -1,6 +1,6 @@
 #include "JobSystem.h"
 #include "log.h"
-
+#include <malloc.h>
 
 std::vector<Job*> JobSystem::m_jobs;
 std::mutex JobSystem::m_jobsMutex;
@@ -16,7 +16,7 @@ std::mutex JobSystem::m_activeJobsMutex;
 uint32 JobSystem::m_currentMaxID;
 
 std::condition_variable JobSystem::m_jobCondition;
-
+SLIST_HEADER JobSystem::m_jobList;
 WorkerThread::WorkerThread( uint a_threadID ) :
   workerThread( &WorkerThread::WorkerMainFunction , this ) ,
   threadID( a_threadID )
@@ -80,6 +80,9 @@ void JobSystem::Init( uint a_threadCount )
   for( uint i = 0; i < a_threadCount; i++ )
     m_workerThreads.push_back( new WorkerThread( i ) );
   m_currentMaxID = 1;
+
+  InitializeSListHead( &m_jobList );
+
 }
 
 
@@ -132,6 +135,22 @@ Job* JobSystem::GetAnyAvaidableJob()
     }
     job++;
   }
+
+  if( QueryDepthSList( &m_jobList ) > 0 )
+  {
+    SLIST_ENTRY* entry = nullptr;
+    LinkedListEntry* jobEntry = nullptr;
+    do
+    {
+      entry = InterlockedPopEntrySList( &m_jobList );
+      if( entry )
+      {
+        jobEntry = (LinkedListEntry*)entry;
+        m_jobs.push_back( jobEntry->job );
+      }
+    } while( entry != nullptr );
+  }
+
   lock.unlock();
   m_jobCondition.notify_one();
 
@@ -162,13 +181,13 @@ void JobSystem::JobCompleted( Job* a_job )
 
 void JobSystem::UnInit()
 {
-  m_jobCondition.notify_all();
   if( m_hasInitBeenCalled )
   {
     m_hasInitBeenCalled = false;
     for( uint i = 0; i < m_workerThreads.size(); i++ )
       m_workerThreads[ i ]->runningFlag.clear();
 
+    m_jobCondition.notify_all();
     for( uint i = 0; i < m_workerThreads.size(); i++ )
     {
       if( !m_workerThreads[ i ]->workerThread.joinable() )
@@ -191,25 +210,28 @@ uint32 JobSystem::ScheduleJob( Job* a_jobToAdd )
       LOGE( "I recieved a null job!" );
       return jobID;
     }
-    std::lock_guard<std::mutex> lock( m_jobsMutex );
-    if( !m_freeIDs.empty() )
-    {
-      jobID = m_freeIDs.front();
-      m_freeIDs.pop();
-    }
-    else
-    {
-      jobID = m_currentMaxID;
-      m_currentMaxID++;
-    }
-    a_jobToAdd->jobID = jobID;
-    m_jobs.push_back( a_jobToAdd );
+    LinkedListEntry* entry = (LinkedListEntry*)_aligned_malloc( sizeof( LinkedListEntry ) , MEMORY_ALLOCATION_ALIGNMENT );
+    entry->job = a_jobToAdd;
+    InterlockedPushEntrySList( &m_jobList , &( entry->entry ) );
     m_jobCount++;
-    if( CheckJobConditions( a_jobToAdd ) )
-      m_jobCondition.notify_one();
+    m_jobCondition.notify_one();
+    //std::lock_guard<std::mutex> lock( m_jobsMutex );
+    //if( !m_freeIDs.empty() )
+    //{
+    //  jobID = m_freeIDs.front();
+    //  m_freeIDs.pop();
+    //}
+    //else
+    //{
+    //  jobID = m_currentMaxID;
+    //  m_currentMaxID++;
+    //}
+    //a_jobToAdd->jobID = jobID;
+    //m_jobs.push_back( a_jobToAdd );
+    //m_jobCount++;
+    //if( CheckJobConditions( a_jobToAdd ) )
+    //  m_jobCondition.notify_one();
   }
-  else
-    LOGE( "Tried to schedule job but jobsystem has not be initialized" );
   return jobID;
 }
 

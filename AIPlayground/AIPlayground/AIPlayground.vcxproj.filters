@@ -69,6 +69,9 @@
     <ClCompile Include="PhysicsGrid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DebugValues.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -135,6 +138,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PhysicsGrid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugValues.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,7 +1,7 @@
 #include "Pathfinder.h"
 #include "Grid.h"
 #include <Common/log.h>
-
+#include <future>
 #include <map>
 
 Pathfinder::Pathfinder( std::shared_ptr<Grid>& a_grid ) :
@@ -55,14 +55,15 @@ void Pathfinder::AddPathfindingJob( std::function<void( Path* )> a_callback , No
 
 void Pathfinder::ScheduleJobs()
 {
-  std::mutex& lock = JobSystem::GetLock();
-  lock.lock();
+  std::
+  //std::mutex& lock = JobSystem::GetLock();
+  //lock.lock();
   for( auto it = m_jobsToSchedule.begin(); it != m_jobsToSchedule.end(); )
   {
-    JobSystem::ScheduleJobWithoutLock( *it );
+    JobSystem::ScheduleJob( *it );
     ++it;
   }
-  lock.unlock();
+  //lock.unlock();
   m_jobsToSchedule.clear();
 }
 

@@ -5,6 +5,8 @@
 #include "glm/gtx/rotate_vector.hpp"
 #include "Common/HelperFunctions.h"
 #include "RigidbodyComponent.h"
+#include "Common/Input.h"
+#include "DebugValues.h"
 const int g_tileSizeX = 32; //Tile Size X in pixels
 const int g_tileSizeY = 32; //Tile Size Y in pixels
 
@@ -98,6 +100,11 @@ void World::Update( float a_dt )
   Timer t;
   t.Start();
   m_pathfinder->ScheduleJobs();
+  if( Input::GetKey( sf::Keyboard::Key::P ) )
+  {
+    DebugValues::GI()->RenderGrid = !DebugValues::GI()->RenderGrid;
+  }
+  
 }
 
 void World::FixedUpdate( float a_dt )

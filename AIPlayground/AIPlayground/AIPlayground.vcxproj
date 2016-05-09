@@ -180,6 +180,7 @@
     <ClCompile Include="ColliderComponent.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentFactory.cpp" />
+    <ClCompile Include="DebugValues.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Grid.cpp" />
@@ -201,6 +202,7 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="ComponentFactory.h" />
     <ClInclude Include="ComponentTypes.h" />
+    <ClInclude Include="DebugValues.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameObjectTypes.h" />

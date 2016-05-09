@@ -10,7 +10,8 @@
 #include <mutex>
 #include <typeinfo>
 #include <map>
-#include <condition_variable>
+#include <windows.h>
+
 enum class JobCondition : int
 {
   NONE,
@@ -35,6 +36,12 @@ public:
   JobCondition jobCondition;
   uint32 typeHashCode;
   uint32 jobID;
+};
+
+struct LinkedListEntry
+{
+  SLIST_ENTRY entry;
+  Job* job;
 };
 
 
@@ -93,4 +100,7 @@ private:
   static std::vector<WorkerThread*> m_workerThreads;
   static uint32 m_currentMaxID;
   static bool m_hasInitBeenCalled;
+
+
+  static SLIST_HEADER m_jobList;
 };
