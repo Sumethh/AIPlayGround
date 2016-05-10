@@ -55,7 +55,6 @@ void Pathfinder::AddPathfindingJob( std::function<void( Path* )> a_callback , No
 
 void Pathfinder::ScheduleJobs()
 {
-  std::
   //std::mutex& lock = JobSystem::GetLock();
   //lock.lock();
   for( auto it = m_jobsToSchedule.begin(); it != m_jobsToSchedule.end(); )

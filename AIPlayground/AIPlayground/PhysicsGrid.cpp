@@ -120,21 +120,34 @@ void PhysicsGrid::AddCollider( ColliderComponent* a_collider )
   }
 }
 
+void SwapCollisionResults( Collision& a_collision , ColliderComponent* a_component )
+{
+  a_collision.othercollider = a_component;
+  a_collision.otherGameObject = a_component->GetParent();
+  a_collision.otherRigidBody = a_component->GetParent()->GetComponentOfType( EComponentTypes::CT_RigidbodyComponent );
+  a_collision.collisionNormal *= -1;
+}
+
 
 void PhysicsGrid::PerformCollisionTests()
 {
   for( uint i = 0; i < m_gridCountX * m_gridCountY; i++ )
   {
     GridCell& cell = m_grid[ i ];
-    for( auto collider = cell.colliders.begin(); collider != cell.colliders.end(); ++collider )
+    for( int collider = 0; collider < cell.colliders.size(); ++collider )
     {
-      std::map<ColliderComponent* , bool>& testedCol = ( *collider )->GetTestedColliders();
-      for( auto collider2 = collider; collider2 != cell.colliders.end(); ++collider2 )
+      ColliderComponent* colliderPtr = cell.colliders[ collider ];
+      std::map<ColliderComponent* , bool>& testedCol = colliderPtr->GetTestedColliders();
+      for( int collider2 = collider + 1; collider2 < cell.colliders.size(); ++collider2 )
       {
+        ColliderComponent* colliderPtr2 = cell.colliders[ collider2 ];
         Collision result;
-        if( !testedCol[ *collider2 ] )
-          if( ( *collider )->TestCollision( *collider2 , result ) )
+        if( !testedCol[ colliderPtr2 ] && colliderPtr != colliderPtr2 )
+          if( colliderPtr->TestCollision( colliderPtr2 , result ) )
           {
+            colliderPtr->GetParent()->OnCollisionEnter( result );
+            SwapCollisionResults( result , colliderPtr);
+            colliderPtr2->GetParent()->OnCollisionEnter( result );
 
           }
       }

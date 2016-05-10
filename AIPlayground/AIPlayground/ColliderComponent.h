@@ -28,7 +28,7 @@ public:
   typedef std::weak_ptr<ColliderComponent> WeakPtr;
 
 
-  void Update(float a_dt) override;
+  void Update( float a_dt ) override;
 
   bool TestCollision( ColliderComponent* a_other , Collision& a_collision );
 
@@ -37,8 +37,13 @@ public:
   inline void SetCollider( Collider a_collider ) { m_collider = a_collider; }
   inline void SetGridCell( GridCell* a_gridCell ) { m_currentCell = a_gridCell; }
 
+  inline void Render( Window* a_window );
+  inline void SetColliderType( EColliderType a_type ) { m_colliderType = a_type; }
+
   std::map<ColliderComponent* , bool>& GetTestedColliders() { return m_testedColliders; }
   inline void ResetTestedColliders() { m_testedColliders.clear(); }
+
+  void OnCollisionEnter( Collision& a_collision ) override;
 private:
 
   inline bool CircleCircleColTest( ColliderComponent* a_collider1 , ColliderComponent* a_collider2 , Collision& a_collision );

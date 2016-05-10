@@ -7,6 +7,7 @@
 #include "RigidbodyComponent.h"
 #include "Common/Input.h"
 #include "DebugValues.h"
+#include "ColliderComponent.h"
 const int g_tileSizeX = 32; //Tile Size X in pixels
 const int g_tileSizeY = 32; //Tile Size Y in pixels
 
@@ -60,22 +61,43 @@ void World::OnConstruct()
   }
   m_grid->Init();
   glm::vec2 worldSize = m_worldLimits.bottomRight - m_worldLimits.topLeft;
-  for( int i = 0; i < 2500; i++ )
+  for( int i = 0; i < 10; i++ )
   {
     GameObject* newGO = CreateGameObject( EGameObjectType::GOT_Unit );
-    Transform transform = newGO->GetTransform();
-    transform.position = glm::vec2( std::rand() % (int)worldSize.x , std::rand() % (int)worldSize.y );
-    //transform.scale = glm::vec2( 1 , 1 );
-    transform.rotation = 0.0f;
+    Transform transform;
+    //if( i == 0 )
+    //{
+      transform = newGO->GetTransform();
+      transform.position = glm::vec2( 400 , 400 );
+      transform.rotation = 0.0f;
+
+
+    //  auto t = (RigidbodyComponent*)m_gameObjects[ 0 ]->GetComponentOfType//( EComponentTypes::CT_RigidbodyComponent );
+    //
+    //  t->AddForce( glm::vec2( 10.0f , 0.0f ) );
+    //
+    //  auto collider = (ColliderComponent*)newGO->GetComponentOfType( EComponentTypes::CT_ColliderComponent );
+    //  Collider col;
+    //  col.radius = 32.0f/2.0f;
+    //  collider->SetCollider( col );
+    //  collider->SetColliderType( EColliderType::Sphere );
+    //}
+    //else if( i == 1 )
+    //{
+    //  transform = newGO->GetTransform();
+    //  transform.position = glm::vec2( 500 , 400 );
+    //  transform.rotation = 0.0f;
+    //
+    //  auto collider = (ColliderComponent*)newGO->GetComponentOfType( EComponentTypes::CT_ColliderComponent );
+    //  collider->SetColliderType( EColliderType::Sphere );
+    //  Collider col;
+    //  col.radius = 32.0f/2.0f;
+    //  collider->SetCollider( col );
+    //
+    //}
     newGO->SetTransfrom( transform );
   }
-  auto t = m_gameObjects[ 0 ]->GetComponentOfType( EComponentTypes::CT_RigidbodyComponent );
-  if( t )
-  {
-    RigidbodyComponent* a = (RigidbodyComponent*)t;
-    a->AddForce( glm::vec2( 10 , 0 ) );
-    a->SetDrag( 0 );
-  }
+
 }
 
 void World::OnDestroyed()
@@ -104,7 +126,7 @@ void World::Update( float a_dt )
   {
     DebugValues::GI()->RenderGrid = !DebugValues::GI()->RenderGrid;
   }
-  
+
 }
 
 void World::FixedUpdate( float a_dt )

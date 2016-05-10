@@ -43,7 +43,7 @@ void RigidbodyComponent::BeginPlay()
 void RigidbodyComponent::PhysicsUpdate( float a_dt )
 {
   PhysicsComponentBase::PhysicsUpdate( a_dt );
-  if( !GetParent() )
+  if( GetParent() )
   {
     GameObject* parent = GetParent();
     Transform parentTransform = parent->GetTransform();
@@ -63,8 +63,12 @@ void RigidbodyComponent::PhysicsUpdate( float a_dt )
     m_force *= 0.0f;
   }
 }
-
+bool collided = false;
 void RigidbodyComponent::OnCollisionEnter( Collision& a_collision )
 {
-  m_velocity *= 0;
+  if( !collided )
+  {
+    m_velocity *= -1;
+    collided = true;
+  }
 }
