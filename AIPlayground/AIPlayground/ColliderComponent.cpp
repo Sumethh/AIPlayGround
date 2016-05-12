@@ -7,7 +7,7 @@
 ColliderComponent::ColliderComponent( GameObject::SharedPtr a_go , EComponentTypes a_compType , EColliderType a_colliderType ) :
   Component( a_go , a_compType ) ,
   m_colliderType( a_colliderType ) ,
-  m_currentCell( nullptr )
+  m_cellsRegistered( 4 )
 {
   m_collider.radius = 16;
   GameObject* parent = GetParent();
@@ -30,15 +30,108 @@ ColliderComponent::~ColliderComponent()
 
 }
 
+void CalculateRotatedVerts( Collider& a_collider , Transform& a_transform )
+{
+  const float cosResult = glm::cos( a_transform.rotation );
+  const float sinResult = glm::sin( a_transform.rotation );
+
+  glm::vec2& position = a_transform.position;
+  glm::vec2& halfExtents = a_collider.extents * 0.5f;
+
+  // [0] TopLeft [1] BottomLeft [2] TopRight [2]BottomRight
+
+  __m128 xPositions , yPositions , cosResultm128 , sinResultm128;
+  union
+  {
+    float xFinalPosition[ 4 ];
+    __m128 finalPositionsX;
+  };
+  union
+  {
+    float yFinalPosition[ 4 ];
+    __m128 finalPositionsY;
+  };
+
+  xPositions = _mm_set_ps( -halfExtents.x , -halfExtents.x , halfExtents.x , halfExtents.x );
+  yPositions = _mm_set_ps( -halfExtents.y , halfExtents.y , -halfExtents.y , halfExtents.y );
+  cosResultm128 = _mm_set_ps1( cosResult );
+  sinResultm128 = _mm_set_ps1( sinResult );
+
+  finalPositionsX = _mm_sub_ps( _mm_mul_ps( xPositions , cosResultm128 ) , _mm_mul_ps( sinResultm128 , yPositions ) );
+
+  finalPositionsY = _mm_add_ps( _mm_mul_ps( xPositions , sinResultm128 ) , _mm_mul_ps( yPositions , cosResultm128 ) );
+
+  a_collider.rotatedVertices[ 0 ] = glm::vec2( xFinalPosition[ 0 ] + position.x , yFinalPosition[ 0 ] + position.y );
+  a_collider.rotatedVertices[ 1 ] = glm::vec2( xFinalPosition[ 2 ] + position.x , yFinalPosition[ 2 ] + position.y );
+  a_collider.rotatedVertices[ 2 ] = glm::vec2( xFinalPosition[ 1 ] + position.x , yFinalPosition[ 1 ] + position.y );
+  a_collider.rotatedVertices[ 3 ] = glm::vec2( xFinalPosition[ 3 ] + position.x , yFinalPosition[ 3 ] + position.y );
+
+
+
+}
+
+void ColliderComponent::CalculateTestingVerts( Collider& a_collider , Transform& a_transform )
+{
+  static glm::vec2 circleTests[ 4 ] = { glm::normalize( glm::vec2( -1.0f , 1.0f ) ) , glm::normalize( glm::vec2( 1.0f , -1.0f ) ), glm::normalize( glm::vec2( 1.0f , 1.0f ) ),glm::normalize( glm::vec2( -1.0f , -1.0f ) ) };
+
+
+  switch( m_colliderType )
+  {
+  case EColliderType::Sphere:
+  {
+    a_collider.testableVerts[ 0 ] = a_transform.position + circleTests[ 0 ] * a_collider.radius;
+    a_collider.testableVerts[ 1 ] = a_transform.position + glm::vec2( 0.0f , -1.0f )*a_collider.radius;
+    a_collider.testableVerts[ 2 ] = a_transform.position + circleTests[ 1 ] * a_collider.radius;
+    a_collider.testableVerts[ 3 ] = a_transform.position + glm::vec2( 1.0f , 0.0f )*a_collider.radius;
+    a_collider.testableVerts[ 4 ] = a_transform.position + circleTests[ 2 ] * a_collider.radius;
+    a_collider.testableVerts[ 5 ] = a_transform.position + glm::vec2( 0.0f , 1.0f )*a_collider.radius;
+    a_collider.testableVerts[ 6 ] = a_transform.position + circleTests[ 3 ] * a_collider.radius;
+    a_collider.testableVerts[ 7 ] = a_transform.position + glm::vec2( -1.0f , 0.0f )*a_collider.radius;
+    break;
+  }
+  case EColliderType::Box:
+  {
+    glm::vec2 halfExtents = a_collider.extents / 2.0f;
+    a_collider.testableVerts[ 0 ] = a_collider.rotatedVertices[ 0 ];
+    a_collider.testableVerts[ 1 ] = glm::normalize( a_collider.rotatedVertices[ 1 ] - a_collider.rotatedVertices[ 0 ] ) * halfExtents + a_collider.rotatedVertices[ 0 ];
+    a_collider.testableVerts[ 2 ] = a_collider.rotatedVertices[ 1 ];
+    a_collider.testableVerts[ 3 ] = glm::normalize( a_collider.rotatedVertices[ 3 ] - a_collider.rotatedVertices[ 1 ] ) * halfExtents + a_collider.rotatedVertices[ 1 ];
+    a_collider.testableVerts[ 4 ] = a_collider.rotatedVertices[ 2 ];
+    a_collider.testableVerts[ 5 ] = glm::normalize( a_collider.rotatedVertices[ 3 ] - a_collider.rotatedVertices[ 2 ] ) * halfExtents + a_collider.rotatedVertices[ 2 ];
+    a_collider.testableVerts[ 6 ] = a_collider.rotatedVertices[ 3 ];
+    a_collider.testableVerts[ 7 ] = glm::normalize( a_collider.rotatedVertices[ 0 ] - a_collider.rotatedVertices[ 2 ] ) * halfExtents + a_collider.rotatedVertices[ 2 ];
+    break;
+  }
+  default:
+    break;
+  }
+}
+
 void ColliderComponent::Update( float a_dt )
 {
   Component::Update( a_dt );
+  GameObject* parent = GetParent();
+  if( parent->GetCollisionDirtyFlag() )
+  {
+    if( m_colliderType == EColliderType::Box )
+    {
+      //Calculate rotated vertices;
+      CalculateRotatedVerts( m_collider , parent->GetTransform() );
+      CalculateTestingVerts( m_collider , parent->GetTransform() );
+      parent->ResetCollisionDirtyFlag();
+    }
+    else
+    {
+      CalculateTestingVerts( m_collider , parent->GetTransform() );
+      parent->ResetCollisionDirtyFlag();
+
+    }
+  }
   ResetTestedColliders();
 }
 
 bool ColliderComponent::TestCollision( ColliderComponent* a_other , Collision& a_collision )
 {
-  m_testedColliders[ a_other ] = true;
   switch( m_colliderType )
   {
   case EColliderType::Sphere:
@@ -97,16 +190,58 @@ bool ColliderComponent::TestCollision( ColliderComponent* a_other , Collision& a
 
 void ColliderComponent::Render( Window* a_window )
 {
+  return;
+  Camera* cam = GetParent()->GetWorld()->GetCamera().lock().get();
   if( m_colliderType == EColliderType::Sphere )
   {
     sf::CircleShape circle;
     circle.setFillColor( sf::Color::Transparent );
     circle.setOutlineColor( sf::Color::Blue );
-    circle.setOutlineThickness( 5.0f );
-    circle.setPosition( ConvertVec2( GetParent()->GetTransform().position ) );
+    circle.setOutlineThickness( 2.0f );
+    circle.setPosition( ConvertVec2( GetParent()->GetTransform().position - cam->GetPos() ) );
     circle.setRadius( m_collider.radius );
     circle.setOrigin( ConvertVec2( glm::vec2( m_collider.radius , m_collider.radius ) ) );
-    a_window->RenderDrawable( circle );
+    //a_window->RenderDrawable( circle );
+    circle.setRadius( 2.0f );
+    circle.setOrigin( 2.0f , 2.0f );
+    for( int i = 0; i < 8; i++ )
+    {
+      circle.setPosition( ConvertVec2( m_collider.testableVerts[ i ] ) );
+      a_window->RenderDrawable( circle );
+    }
+
+  }
+  else if( m_colliderType == EColliderType::Box )
+  {
+    sf::RectangleShape rect;
+    rect.setSize( ConvertVec2( m_collider.extents ) );
+    rect.setOrigin( ConvertVec2( m_collider.extents / 2.0f ) );
+    rect.setOutlineThickness( 2.0f );
+    rect.setRotation( GetParent()->GetTransform().rotation );
+    rect.setPosition( ConvertVec2( GetParent()->GetTransform().position - cam->GetPos() ) );
+    rect.setFillColor( sf::Color::Transparent );
+    rect.setOutlineColor( sf::Color::Blue );
+    //a_window->RenderDrawable( rect );
+    rect.setSize( sf::Vector2f( 2.0f , 2.0f ) );
+    rect.setOrigin( 1.0f , 1.0f );
+    //for( int i = 0; i < 8; i++ )
+    //{
+    //  rect.setPosition( ConvertVec2( m_collider.testableVerts[ i ] ) );
+    //  a_window->RenderDrawable( rect );
+    //}
+    for( int i = 0; i < 8; i++ )
+    {
+      sf::CircleShape circle;
+      circle.setRadius( 2.0f );
+      circle.setFillColor( sf::Color::Transparent );
+      circle.setOutlineColor( sf::Color::Blue );
+      circle.setOutlineThickness( 1.0f );
+      circle.setPosition( ConvertVec2( m_collider.testableVerts[ i ] ) );
+      circle.setOrigin( ConvertVec2( glm::vec2( 0.5f , 0.5f ) ) );
+      a_window->RenderDrawable( circle );
+
+    }
+
   }
 }
 
@@ -185,7 +320,7 @@ bool ColliderComponent::BoxCircleColTest( ColliderComponent* a_box , ColliderCom
   float distanceSqrd = glm::dot( vecBetween , vecBetween );
   if( distanceSqrd < circleCollider.radius * circleCollider.radius )
   {
-    LOGI( "BOX CIRCLE COLLISION" );
+    return true;
   }
 
 

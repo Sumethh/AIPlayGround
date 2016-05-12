@@ -8,6 +8,13 @@ class Component;
 class World;
 class Window;
 
+enum EGameOjbectFlags
+{
+  RenderState = 1 << 0 ,
+  PhysicsDirty = 1 << 1 ,
+  CollisionRotationDirty = 1 << 2
+};
+
 struct GameObjectConstructionDescriptor
 {
   std::vector<EComponentTypes> listOfComps;
@@ -45,48 +52,53 @@ public:
   inline void SetTransfrom( const Transform a_newTransform )
   {
     m_transform = a_newTransform;
-    m_renderStateDirty = true;
-    m_rotationMatrixDirty = true;
-    m_physicsDirty = true;
+    SetPhysicsFlagDirty();
+    SetCollisionFlagDirty();
+    SetRenderStateDirty();
   }
   inline void SetPosition( glm::vec2 a_position )
   {
     m_transform.position = a_position;
-    m_renderStateDirty = true;
-    m_physicsDirty = true;
+    SetPhysicsFlagDirty();
+    SetCollisionFlagDirty();
+    SetRenderStateDirty();
 
   }
   inline void SetScale( glm::vec2 a_scale )
   {
     m_transform.scale = a_scale;
-    m_renderStateDirty = true;
-    m_physicsDirty = true;
+    SetPhysicsFlagDirty();
+    SetRenderStateDirty();
 
   }
   inline void SetRotation( float a_angle )
   {
     m_transform.rotation = a_angle;
-    m_renderStateDirty = true;
-    m_rotationMatrixDirty = true;
-    m_physicsDirty = true;
+    SetPhysicsFlagDirty();
+    SetCollisionFlagDirty();
+    SetRenderStateDirty();
   }
 
   inline void Destroy() { m_toBeDestroyed = true; }
   inline bool HasBegunPlay() { return m_hasBegunPlay; }
   inline bool IsDestroyed() { return m_toBeDestroyed; }
-  inline void ResetRenderStateDirtyFlag() { m_renderStateDirty = false; }
-  inline bool RenderStateDirty()const { return m_renderStateDirty; }
 
+  inline int GetRenderStateDirty()const { return m_gameObjectFlags & EGameOjbectFlags::RenderState; }
+  inline void ResetRenderStateDirtyFlag() { m_gameObjectFlags &= ~EGameOjbectFlags::RenderState; }
+  inline void SetRenderStateDirty() { m_gameObjectFlags |= EGameOjbectFlags::RenderState; }
   Component* GetComponentOfType( EComponentTypes a_type );
 
   World* GetWorld() { return m_world; }
 
   inline EGameObjectType GetGoType() const { return m_goType; }
 
-  inline bool GetPhysicsDirtyFlag() { return m_physicsDirty; }
-  inline void ResetPhysicsDirtyFlag() { m_physicsDirty = false; }
+  inline int GetPhysicsDirtyFlag() const { return m_gameObjectFlags & EGameOjbectFlags::PhysicsDirty; }
+  inline void ResetPhysicsDirtyFlag() { m_gameObjectFlags &= ~EGameOjbectFlags::PhysicsDirty; }
+  inline void SetPhysicsFlagDirty() { m_gameObjectFlags |= EGameOjbectFlags::PhysicsDirty; }
 
-  inline void SetPhysicsFlagDirty() { m_physicsDirty = true; }
+  inline int GetCollisionDirtyFlag()const { return m_gameObjectFlags & EGameOjbectFlags::CollisionRotationDirty; }
+  inline void ResetCollisionDirtyFlag() { m_gameObjectFlags &= ~EGameOjbectFlags::CollisionRotationDirty; }
+  inline void SetCollisionFlagDirty() { m_gameObjectFlags |= EGameOjbectFlags::CollisionRotationDirty; }
 
 private:
   void SetWorld( World* a_newWorld ) { m_world = a_newWorld; };
@@ -103,6 +115,9 @@ private:
 
   bool m_hasBegunPlay;
   bool m_toBeDestroyed;
+
+  int m_gameObjectFlags;
+
   bool m_renderStateDirty;
   bool m_physicsDirty;
   bool m_rotationMatrixDirty;

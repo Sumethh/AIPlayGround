@@ -17,6 +17,10 @@ struct GridCell
   std::vector<ColliderComponent*> colliders;
 
   GridCell* neighbors[ 8 ];
+  GridCell* children[ 4 ];
+
+  void AddCollider( ColliderComponent* a_collider );
+  GridCell* GetCellFromPosition( glm::vec2 a_pos );
 };
 
 
@@ -46,8 +50,13 @@ private:
 
   inline GridCell* GetCell( uint index );
   inline GridCell* GetCellFromPosition( glm::vec2 a_pos );
-  PhysicsSystem::WeakPtr m_physicsSystem;
+  void AddColliderToCollidingCells( ColliderComponent* a_collider );
+  void UpdateRegisteredColliders();
 
+  void GetCollidingCells( ColliderComponent* a_collider , std::vector<GridCell*>& a_vecOut );
+
+  PhysicsSystem::WeakPtr m_physicsSystem;
+  std::vector<ColliderComponent*> m_registeredColliders;
   GridCell* m_grid;
   uint m_gridSizeX;
   uint m_gridSizeY;

@@ -20,7 +20,7 @@ void RendererComponent::PreRender()
 {
   Component::PreRender();
   GameObject* parent = GetParent();
-  if( parent && parent->RenderStateDirty() )
+  if( parent && parent->GetRenderStateDirty() )
   {
     Transform goTransform = parent->GetTransform();
     World* world = parent->GetWorld();

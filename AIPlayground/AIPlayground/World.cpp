@@ -61,43 +61,61 @@ void World::OnConstruct()
   }
   m_grid->Init();
   glm::vec2 worldSize = m_worldLimits.bottomRight - m_worldLimits.topLeft;
-  for( int i = 0; i < 10; i++ )
+#if 0
+  for( int i = 0; i < 2; i++ )
   {
-    GameObject* newGO = CreateGameObject( EGameObjectType::GOT_Unit );
+    GameObject* newGO = CreateGameObject( EGameObjectType::GOT_PhysicsTest );
     Transform transform;
-    //if( i == 0 )
-    //{
+    if( i == 0 )
+    {
       transform = newGO->GetTransform();
       transform.position = glm::vec2( 400 , 400 );
       transform.rotation = 0.0f;
 
 
-    //  auto t = (RigidbodyComponent*)m_gameObjects[ 0 ]->GetComponentOfType//( EComponentTypes::CT_RigidbodyComponent );
-    //
-    //  t->AddForce( glm::vec2( 10.0f , 0.0f ) );
-    //
-    //  auto collider = (ColliderComponent*)newGO->GetComponentOfType( EComponentTypes::CT_ColliderComponent );
-    //  Collider col;
-    //  col.radius = 32.0f/2.0f;
-    //  collider->SetCollider( col );
-    //  collider->SetColliderType( EColliderType::Sphere );
-    //}
-    //else if( i == 1 )
-    //{
-    //  transform = newGO->GetTransform();
-    //  transform.position = glm::vec2( 500 , 400 );
-    //  transform.rotation = 0.0f;
-    //
-    //  auto collider = (ColliderComponent*)newGO->GetComponentOfType( EComponentTypes::CT_ColliderComponent );
-    //  collider->SetColliderType( EColliderType::Sphere );
-    //  Collider col;
-    //  col.radius = 32.0f/2.0f;
-    //  collider->SetCollider( col );
-    //
-    //}
+      auto t = (RigidbodyComponent*)m_gameObjects[ 0 ]->GetComponentOfType( EComponentTypes::CT_RigidbodyComponent );
+
+      t->AddForce( glm::vec2( 10.0f , 0.0f ) );
+
+      auto collider = (ColliderComponent*)newGO->GetComponentOfType( EComponentTypes::CT_ColliderComponent );
+      Collider col;
+      col.radius = 32.0f / 2.0f;
+      collider->SetCollider( col );
+      collider->SetColliderType( EColliderType::Sphere );
+    }
+    else if( i == 1 )
+    {
+      transform = newGO->GetTransform();
+      transform.position = glm::vec2( 500 , 400 );
+      transform.rotation = 45.0f;
+
+      auto collider = (ColliderComponent*)newGO->GetComponentOfType( EComponentTypes::CT_ColliderComponent );
+      collider->SetColliderType( EColliderType::Box );
+      Collider col;
+      //col.radius = 32.0f / 2.0f;
+      col.extents = glm::vec2( 32.0f , 32.0f );
+      collider->SetCollider( col );
+
+    }
     newGO->SetTransfrom( transform );
   }
-
+#endif
+#if 1
+  for( int i = 0; i < 5000; i++ )
+  {
+    GameObject* newGO = CreateGameObject( EGameObjectType::GOT_Unit );
+    Transform transform;
+    transform = newGO->GetTransform();
+    transform.position = glm::vec2( 384 , 384 );
+    transform.rotation = 0.0f;
+    newGO->SetTransfrom( transform );
+    auto t = (ColliderComponent*)newGO->GetComponentOfType( EComponentTypes::CT_ColliderComponent );
+    auto collider = t->GetCollider();
+    collider.extents = glm::vec2( 32.0f , 32.0f );
+    t->SetCollider( collider );
+    t->SetColliderType( EColliderType::Box );
+  }
+#endif
 }
 
 void World::OnDestroyed()
@@ -160,7 +178,7 @@ void World::Render( Window* const a_window )
 
   m_grid->Render( a_window );
   m_playerController->Render( a_window );
-  m_physicsSystem->Render( a_window );
+ // m_physicsSystem->Render( a_window );
   for( auto gameObject : m_gameObjects )
     gameObject->Render( a_window );
 }

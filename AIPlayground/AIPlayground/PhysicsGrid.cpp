@@ -5,6 +5,17 @@
 #include "ColliderComponent.h"
 #include "Common/log.h"
 #include "DebugValues.h"
+
+void GridCell::AddCollider( ColliderComponent* a_collider )
+{
+
+}
+
+GridCell* GridCell::GetCellFromPosition( glm::vec2 a_pos )
+{
+  return nullptr;
+}
+
 PhysicsGrid::PhysicsGrid( PhysicsSystem::WeakPtr a_physicsSystem ) :
   m_physicsSystem( a_physicsSystem )
 {
@@ -99,6 +110,8 @@ void PhysicsGrid::Generate()
 
 void PhysicsGrid::Update()
 {
+  UpdateRegisteredColliders();
+
   for( uint i = 0; i < m_gridCountX * m_gridCountY; i++ )
   {
     GridCell& cell = m_grid[ i ];
@@ -112,12 +125,10 @@ void PhysicsGrid::AddCollider( ColliderComponent* a_collider )
     return;
   GameObject* colliderParent = a_collider->GetParent();
   Transform colliderTransform = colliderParent->GetTransform();
-  GridCell* cell = GetCellFromPosition( colliderTransform.position );
-  if( cell )
-  {
-    cell->colliders.push_back( a_collider );
-    a_collider->SetGridCell( cell );
-  }
+
+  //Register to Cells that it collides with  
+  AddColliderToCollidingCells( a_collider );
+  m_registeredColliders.push_back( a_collider );
 }
 
 void SwapCollisionResults( Collision& a_collision , ColliderComponent* a_component )
@@ -128,31 +139,35 @@ void SwapCollisionResults( Collision& a_collision , ColliderComponent* a_compone
   a_collision.collisionNormal *= -1;
 }
 
-
+int tests = 0;
 void PhysicsGrid::PerformCollisionTests()
 {
+  tests = 0;
   for( uint i = 0; i < m_gridCountX * m_gridCountY; i++ )
   {
     GridCell& cell = m_grid[ i ];
-    for( int collider = 0; collider < cell.colliders.size(); ++collider )
+    for( size_t collider = 0; collider < cell.colliders.size(); ++collider )
     {
       ColliderComponent* colliderPtr = cell.colliders[ collider ];
       std::map<ColliderComponent* , bool>& testedCol = colliderPtr->GetTestedColliders();
-      for( int collider2 = collider + 1; collider2 < cell.colliders.size(); ++collider2 )
+      for( size_t collider2 = collider + 1; collider2 < cell.colliders.size(); ++collider2 )
       {
         ColliderComponent* colliderPtr2 = cell.colliders[ collider2 ];
         Collision result;
-        if( !testedCol[ colliderPtr2 ] && colliderPtr != colliderPtr2 )
+        if( colliderPtr != colliderPtr2 )
+        {
+          tests++;
           if( colliderPtr->TestCollision( colliderPtr2 , result ) )
           {
             colliderPtr->GetParent()->OnCollisionEnter( result );
-            SwapCollisionResults( result , colliderPtr);
+            SwapCollisionResults( result , colliderPtr );
             colliderPtr2->GetParent()->OnCollisionEnter( result );
-
           }
+        }
       }
     }
   }
+  LOGI( "%d" , tests );
 }
 
 void PhysicsGrid::Draw( Window* a_window )
@@ -276,31 +291,31 @@ void PhysicsGrid::Draw( Window* a_window )
 
 void PhysicsGrid::UpdateCell( GridCell& a_cell )
 {
-  GameObject* parent;
-  for( auto it = a_cell.colliders.begin(); it != a_cell.colliders.end(); )
-  {
-    parent = ( *it )->GetParent();
-    if( parent->GetPhysicsDirtyFlag() )
-    {
-      parent->ResetPhysicsDirtyFlag();
-      GridCell* goCell = GetCellFromPosition( parent->GetTransform().position );
-      int index = (int)( a_cell.index.y * m_gridCountX + a_cell.index.x );
-      if( goCell == &m_grid[ index ] || !goCell )
-      {
-        it++;
-        continue;
-      }
-      else
-      {
-        goCell->colliders.push_back( ( *it ) );
-        //remove the collider form the old cell
-        it = a_cell.colliders.erase( it );
-        continue;
-      }
-    }
+  //GameObject* parent;
+  //for( auto it = a_cell.colliders.begin(); it != a_cell.colliders.end(); )
+  //{
+  //  parent = ( *it )->GetParent();
+  //  if( parent->GetPhysicsDirtyFlag() )
+  //  {
+  //    parent->ResetPhysicsDirtyFlag();
+  //    GridCell* goCell = GetCellFromPosition( parent->GetTransform().position );
+  //    int index = (int)( a_cell.index.y * m_gridCountX + a_cell.index.x );
+  //    if( goCell == &m_grid[ index ] || !goCell )
+  //    {
+  //      it++;
+  //      continue;
+  //    }
+  //    else
+  //    {
+  //      goCell->colliders.push_back( ( *it ) );
+  //      //remove the collider form the old cell
+  //      it = a_cell.colliders.erase( it );
+  //      continue;
+  //    }
+  //  }
 
-    it++;
-  }
+  //  it++;
+  //}
 }
 
 GridCell* PhysicsGrid::GetCell( uint index )
@@ -320,3 +335,77 @@ GridCell* PhysicsGrid::GetCellFromPosition( glm::vec2 a_pos )
 
   return GetCell( cellIndex );
 }
+
+void PhysicsGrid::AddColliderToCollidingCells( ColliderComponent* a_collider )
+{
+  std::vector<GridCell*> addedGridCells;
+
+  Collider collider = a_collider->GetCollider();
+
+  for( int i = 0; i < _countof( collider.testableVerts ); i++ )
+  {
+    GridCell* cell = GetCellFromPosition( collider.testableVerts[ i ] );
+    if( cell )
+      if( std::find( addedGridCells.begin() , addedGridCells.end() , cell ) != addedGridCells.end() )
+      {
+        addedGridCells.push_back( cell );
+        cell->colliders.push_back( a_collider );
+        a_collider->AddRegisteredCell( cell );
+      }
+  }
+}
+
+void PhysicsGrid::UpdateRegisteredColliders()
+{
+  std::vector<GridCell*> cells;
+  cells.reserve( 4 );
+  for( auto iter = m_registeredColliders.begin(); iter != m_registeredColliders.end(); iter++ )
+  {
+    if( !( *iter )->GetParent()->GetPhysicsDirtyFlag() )
+      return;
+    Collider& collider = ( *iter )->GetColliderRef();
+    std::vector<GridCell*>& registeredCells = ( *iter )->GetRegisteredCells();
+    GetCollidingCells( *iter , cells );
+
+    for( auto registeredCell = registeredCells.begin(); registeredCell != registeredCells.end(); )
+    {
+      if( !( *registeredCell ) )
+      {
+        registeredCell++;
+        continue;
+      }
+      auto it = std::find( cells.begin() , cells.end() , *registeredCell );
+      if( it == std::end( cells ) )
+      {
+        auto colliderIter = std::find( ( *registeredCell )->colliders.begin() , ( *registeredCell )->colliders.end() , *iter );
+        ( *registeredCell )->colliders.erase( colliderIter );
+        registeredCell = registeredCells.erase( registeredCell );
+      }
+      else
+      {
+        cells.erase( it );
+        registeredCell++;
+      }
+    }
+
+    for( auto newCell = cells.begin(); newCell != cells.end(); )
+    {
+      ( *newCell )->colliders.push_back( *iter );
+      ( *iter )->AddRegisteredCell( *newCell );
+      newCell = cells.erase( newCell );
+    }
+    ( *iter )->GetParent()->ResetPhysicsDirtyFlag();
+  }
+}
+
+void PhysicsGrid::GetCollidingCells( ColliderComponent* a_collider , std::vector<GridCell*>& a_vecOut )
+{
+  Collider& collider = a_collider->GetColliderRef();
+  for( int i = 0; i < _countof( collider.testableVerts ); i++ )
+  {
+    GridCell* cell = GetCellFromPosition( collider.testableVerts[ i ] );
+    if( std::find( a_vecOut.begin() , a_vecOut.end() , cell ) == a_vecOut.end() )
+      a_vecOut.push_back( cell );
+  }
+}
+

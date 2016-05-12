@@ -52,7 +52,7 @@ void GameObject::Update( float a_dt )
 {
   for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
     ( *itr )->Update( a_dt );
-  if( m_rotationMatrixDirty )
+  /*if( m_rotationMatrixDirty )
   {
     glm::mat2 rMatrix = m_transform.rotationMatrix;
     float cosResult = glm::cos( glm::radians( m_transform.rotation ) );
@@ -61,7 +61,7 @@ void GameObject::Update( float a_dt )
     rMatrix[ 0 ][ 1 ] = -sinResult;
     rMatrix[ 1 ][ 0 ] = sinResult;
     rMatrix[ 1 ][ 1 ] = cosResult;
-  }
+  }*/
 }
 
 void GameObject::FixedUpdate( float a_dt )

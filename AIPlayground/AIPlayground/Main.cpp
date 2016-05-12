@@ -96,7 +96,7 @@ int main()
 
 
 
-    if( frameTimer.IntervalMS() >= 100.0f )
+    if( frameTimer.IntervalMS() >= 1000.0f )
     {
       currentFPS = (float)( frames / ( frameTimer.IntervalMS() / 1000.0f ) );
       frames = 0;

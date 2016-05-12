@@ -16,6 +16,10 @@ struct Collider
   float radius;
   //Cube
   glm::vec2 extents;
+  // [0] TopLeft [1] TopRight [2] BottomLeft [3] BottomRight
+  glm::vec2 rotatedVertices[ 4 ];
+  // Vertices to test against grids
+  glm::vec2 testableVerts[ 8 ];
 };
 
 class ColliderComponent : public Component
@@ -34,8 +38,10 @@ public:
 
   inline EColliderType GetColliderType() const { return m_colliderType; }
   inline Collider GetCollider() const { return m_collider; }
+  inline Collider& GetColliderRef() { return m_collider; }
   inline void SetCollider( Collider a_collider ) { m_collider = a_collider; }
-  inline void SetGridCell( GridCell* a_gridCell ) { m_currentCell = a_gridCell; }
+  inline void AddRegisteredCell( GridCell* a_gridCell ) { m_cellsRegistered.push_back(a_gridCell); }
+  inline std::vector<GridCell*>& GetRegisteredCells() { return m_cellsRegistered; }
 
   inline void Render( Window* a_window );
   inline void SetColliderType( EColliderType a_type ) { m_colliderType = a_type; }
@@ -51,9 +57,11 @@ private:
 
   inline bool BoxCircleColTest( ColliderComponent* a_box , ColliderComponent* a_circle , Collision& a_collision );
 
+  void CalculateTestingVerts( Collider& a_collider , Transform& a_transform );
+
   std::map<ColliderComponent* , bool> m_testedColliders;
 
-  GridCell* m_currentCell;
+  std::vector<GridCell*> m_cellsRegistered;
   EColliderType m_colliderType;
   Collider m_collider;
 };
