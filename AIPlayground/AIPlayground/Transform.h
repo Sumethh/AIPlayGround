@@ -7,5 +7,5 @@ struct Transform
   glm::vec2 position;
   glm::vec2 scale;
   float rotation;
-  glm::mat2 rotationMatrix;
+  glm::mat4 transformationMatrix;
 };

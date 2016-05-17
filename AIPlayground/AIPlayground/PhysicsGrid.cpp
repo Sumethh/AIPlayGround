@@ -167,7 +167,7 @@ void PhysicsGrid::PerformCollisionTests()
       }
     }
   }
-  LOGI( "%d" , tests );
+  //LOGI( "%d" , tests );
 }
 
 void PhysicsGrid::Draw( Window* a_window )

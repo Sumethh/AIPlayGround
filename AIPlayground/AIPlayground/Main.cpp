@@ -14,6 +14,8 @@
 #include "Common/JobSystem.h"
 #include "Common/JobSystemDebugInfo.h"
 #include "TimeConsts.h"
+#define GLEW_STATIC
+#include <GL/glew.h>
 
 int32 frames;
 float currentFPS;
@@ -27,6 +29,14 @@ int main()
   std::srand( (uint)std::time( 0 ) );
   DebugOnScreenTimer::Init();
   Window mainWindow( 1280 , 720 , "AiPlayground" );
+  
+  if( glewInit() !=  GLEW_OK)
+  {
+    LOGE( "Glew failed to initiate" );
+  }
+  
+  glViewport( 0 , 0 , 1280 , 720 );
+
   std::string baseString( "FPS: " );
   fpsTimerIndex = DebugOnScreenTimer::AddNewTimer( baseString );
 
@@ -69,7 +79,6 @@ int main()
     DebugOnScreenTimer::SetTimerValue( dtTimerIndex , dt );
     deltaTime.Reset();
 
-
     mainWindow.Clear( sf::Color::Blue );
     mainWindow.Update();
 
@@ -84,7 +93,7 @@ int main()
     TimedFunctionCallManager::GI()->Update();
     DebugOnScreenTimer::SetTimerValue( updateTimerIndex , (float)updateTimer.IntervalMS() );
     DebugOnScreenTimer::SetTimerValue( physicsTimerIndex , PhysicsSystem::time );
-
+    
 
     preRenderTimer.Start();
     game.PreRender();
@@ -105,9 +114,8 @@ int main()
     }
     frames++;
 
-
-    DebugOnScreenTimer::DrawTimers( &mainWindow );
-    JobSystemDebugInfo::GI()->Render( &mainWindow );
+    //DebugOnScreenTimer::DrawTimers( &mainWindow );
+    //JobSystemDebugInfo::GI()->Render( &mainWindow );
 
     if( Input::GetKey( sf::Keyboard::Key::Escape ) )
       mainWindow.Close();

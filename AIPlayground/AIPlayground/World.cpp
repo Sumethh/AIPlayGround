@@ -46,7 +46,6 @@ World::World() :
 
 }
 
-
 World::~World()
 {
 }
@@ -101,7 +100,7 @@ void World::OnConstruct()
   }
 #endif
 #if 1
-  for( int i = 0; i < 5000; i++ )
+  for( int i = 0; i < 5; i++ )
   {
     GameObject* newGO = CreateGameObject( EGameObjectType::GOT_Unit );
     Transform transform;
@@ -215,7 +214,6 @@ GameObject* World::CreateGameObject( EGameObjectType a_type )
   }
   return newGameObject;
 }
-
 
 void World::SetGameObjectWorld( GameObject* a_gameobject )
 {
