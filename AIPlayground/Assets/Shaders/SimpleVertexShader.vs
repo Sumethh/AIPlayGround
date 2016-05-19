@@ -15,5 +15,5 @@ void main()
   //gl_Position = vec4(Position, 1.0f);
   gl_Position = Proj * Model * vec4(Position.x, Position.y, Position.z, 1.0f);
   in_color = vec4(Color,1.0f);
-  out_textCoord = TextCoord;
+  //out_textCoord = TextCoord;
 }

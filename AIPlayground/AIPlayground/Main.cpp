@@ -19,7 +19,7 @@
 
 int32 frames;
 float currentFPS;
-
+#define NVIDIADEBUG
 Timer frameTimer , deltaTime , renderTimer , updateTimer , preRenderTimer;
 int fpsTimerIndex , dtTimerIndex , renderTimerIndex , updateTimerIndex , preRenderTimerIndex , physicsTimerIndex;
 Game game;
@@ -29,8 +29,10 @@ int main()
   std::srand( (uint)std::time( 0 ) );
   DebugOnScreenTimer::Init();
   Window mainWindow( 1280 , 720 , "AiPlayground" );
-  //Window DebugWindiw( 400, 400, "AiPlaygroundDebug" );
-  //DebugWindiw.GetWindow()->setPosition( sf::Vector2i( 0 , 0 ) );
+#ifndef NVIDIADEBUG
+  Window DebugWindiw( 400, 400, "AiPlaygroundDebug" );
+  DebugWindiw.GetWindow()->setPosition( sf::Vector2i( 0 , 0 ) );
+#endif
   mainWindow.GetWindow()->setActive();
   mainWindow.GetWindow()->setPosition( sf::Vector2i( 450 , 0 ) );
   if( glewInit() !=  GLEW_OK)
@@ -96,7 +98,7 @@ int main()
     TimedFunctionCallManager::GI()->Update();
     DebugOnScreenTimer::SetTimerValue( updateTimerIndex , (float)updateTimer.IntervalMS() );
     DebugOnScreenTimer::SetTimerValue( physicsTimerIndex , PhysicsSystem::time );
-    
+
 
     preRenderTimer.Start();
     game.PreRender();
@@ -123,11 +125,14 @@ int main()
 
 
     mainWindow.Swap();
-    //DebugWindiw.GetWindow()->setActive();
-    //DebugWindiw.Clear(sf::Color::Black);
-    //DebugOnScreenTimer::DrawTimers( &DebugWindiw );
-    //JobSystemDebugInfo::GI()->Render( &DebugWindiw );
-    //DebugWindiw.Swap();
+#ifndef NVIDIADEBUG
+
+    DebugWindiw.GetWindow()->setActive();
+    DebugWindiw.Clear(sf::Color::Black);
+    DebugOnScreenTimer::DrawTimers( &DebugWindiw );
+    JobSystemDebugInfo::GI()->Render( &DebugWindiw );
+    DebugWindiw.Swap();
+#endif // NVIDIADEBUG
     mainWindow.GetWindow()->setActive();
     game.PostFrame();
     Input::Reset();

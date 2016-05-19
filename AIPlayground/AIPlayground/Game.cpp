@@ -52,27 +52,29 @@ void Game::PostFrame()
 #include "SpriteBatchRenderer.h"
 #include "Renderer2D.h"
 #include "LineRenderer.h"
-GLuint indices[] = {
-  0, 1, 3,
-  1, 2, 3
-};
-
+#include "StaticRenderer.h"
 Transform myTrans;
 glm::mat4 projection;
 int projLoc , modelLoc;
-
+GLuint VAO , VBO;
 uint textureLoc;
+
+
 
 int xCount = 1280;
 int yCount = 1080;
 std::vector<Transform> Models;
 SpriteBatchRenderer renderer;
 LineRenderer lineRenderer;
+StaticRenderer staticRenderer;
 unsigned int shaderHandle;
+Shader shader;
+
 void Game::Init()
 {
   renderer.Init();
-  //lineRenderer.Init();
+  lineRenderer.Init();
+  staticRenderer.Init();
   GLenum err = glGetError();
   sf::Image image;
   image.loadFromFile( "../Assets/Art/Unit1.png" );
@@ -93,10 +95,13 @@ void Game::Init()
   projection = glm::ortho( 0.f , 1280.0f , 720.0f , 0.0f );
   Renderer2D::SetProjectionMatrix( projection );
   myTrans.position = glm::vec2( 400.0f , 400.0f );
-  myTrans.scale = glm::vec2( 32 , 32 );
+  myTrans.scale = glm::vec2( t.x , t.y );
   myTrans.rotation = 0.0f;
 
-
+  myTrans.transformationMatrix = glm::translate( glm::mat4() , glm::vec3( myTrans.position , 0.0f ) );
+  myTrans.transformationMatrix = glm::rotate( myTrans.transformationMatrix , myTrans.rotation , glm::vec3( 0 , 0 , 1 ) );
+  myTrans.transformationMatrix = glm::scale( myTrans.transformationMatrix , glm::vec3( myTrans.scale , 1.0f ) );
+  shaderHandle = shader.GetShaderHandle();
   for( int y = 0; y < yCount * 4; y++ )
   {
     for( int x = 0; x < xCount * 4; x++ )
@@ -113,6 +118,10 @@ void Game::Init()
     }
   }
 
+  uint reg = staticRenderer.Register();
+  staticRenderer.UpdateTexCoords( reg , glm::vec4( 0 , 0 , 1 , 0 ) , glm::vec4( 0 , 1 , 1 , 1 ) );
+
+  staticRenderer.UpdatePosition( reg , myTrans.transformationMatrix );
 }
 
 void Game::FixedUpdate( float a_dt )
@@ -131,34 +140,29 @@ void Game::Update( float a_dt )
 
 
 }
-StaticTexCoordData data = {
-  glm::vec2( 1.0f, 0.0f ),
-  glm::vec2( 1.0f, 1.0f ),
-  glm::vec2( 0.0f, 0.0f ),
-  glm::vec2( 1.0f, 1.0f ),
-  glm::vec2( 0.0f, 1.0f ),
-  glm::vec2( 0.0f, 0.0f ),
-};
 void Game::PreRender()
 {
-  //lineRenderer.Begin();
+
+
+  int t = 0;
+  lineRenderer.Begin();
   renderer.Begin();
   for( auto it : Models )
   {
     it.transformationMatrix = glm::translate( glm::mat4() , glm::vec3( it.position , 0.0f ) );
     it.transformationMatrix = glm::rotate( it.transformationMatrix , Angle , glm::vec3( 0 , 0 , 1 ) );
     it.transformationMatrix = glm::scale( it.transformationMatrix , glm::vec3( it.scale , 1.0f ) );
-    renderer.Submit( it.transformationMatrix , data );
+    renderer.Submit( it.transformationMatrix , glm::vec4( 0 , 0 , 1 , 0 ) , glm::vec4( 0 , 1 , 1 , 1 ) );
   }
-
+  //
   glm::vec2 mouseLoc = Input::GetMousePosition();
   glm::vec2 prevLoc( 0 , 0 );
-  //for( auto it : Models )
-  //{
-  //  lineRenderer.Submit( prevLoc , it.position , glm::vec4( 1.0f , 0.0f , 0.0f , 1.0f ) );
-  //  prevLoc = it.position;
-  //}
-  //lineRenderer.End();
+  for( auto it : Models )
+  {
+   lineRenderer.Submit( prevLoc , it.position , glm::vec4( 1.0f , 0.0f , 0.0f , 1.0f ) );
+    prevLoc = it.position;
+  }
+  lineRenderer.End();
   renderer.End();
 
 }
@@ -167,9 +171,11 @@ void Game::Render( Window* const a_window )
 {
   glBindTexture( GL_TEXTURE_2D , textureLoc );
   renderer.Flush();
+  staticRenderer.Flush();
   glBindTexture( GL_TEXTURE_2D , 0 );
 
-  //lineRenderer.Flush();
+  lineRenderer.Flush();
+
 }
 
 void Game::PostFrame()

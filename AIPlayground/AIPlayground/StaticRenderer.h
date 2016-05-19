@@ -5,13 +5,13 @@
 #include <glm/glm.hpp>
 #include <vector>
 #define MAX_STATIC_RENDERS 20000
+
 struct StaticTexCoordData
 {
   glm::vec2 m_bottomLeft;
   glm::vec2 m_bottomRight;
   glm::vec2 m_topLeft;
   glm::vec2 m_topRight;
-
 };
 class StaticRenderer
 {
@@ -21,21 +21,25 @@ public:
 
   void Init();
   uint Register();
-  void UpdateTexCoords( uint a_index , StaticTexCoordData a_texCoords );
-  void UpdateVertices( uint a_index , glm::vec2 m_vertices[4] );
+  void UpdateTexCoords( uint a_index , glm::vec4 a_top, glm::vec4 a_bottom);
+  //TopLeft, TopRight, BottomLeft, BottomRight
+  void UpdatePosition( uint a_index , glm::mat4 a_mat);
   void UnRegister( uint a_index );
+  void Flush();
 
 private:
   GLuint m_vao , m_vbo;
   Shader m_shader;
 
-  struct Vertex 
+  struct SpriteInfo
   {
-    glm::vec3 pos;
-    glm::vec2 texCoord;
+    glm::vec4 Top;
+    glm::vec4 Bottom;
+    glm::mat4 Model;
   };
 
   std::vector<uint> m_freeIds;
   uint m_staticCount;
+  int m_projLoc;
 };
 
