@@ -49,31 +49,13 @@ void Game::PostFrame()
 #endif
 #if 1
 
-//GLfloat vertices[] = {
-//  0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // Top Right
-//  0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // Bottom Right
-//  -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // Bottom Left
-//  -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // Top Left 
-//};
-
-GLfloat quadVertices[] = {
-  // Positions     // Colors
-  -0.05f,  0.05f,  1.0f, 0.0f, 0.0f,
-  0.05f, -0.05f,  0.0f, 1.0f, 0.0f,
-  -0.05f, -0.05f,  0.0f, 0.0f, 1.0f,
-
-  -0.05f,  0.05f,  1.0f, 0.0f, 0.0f,
-  0.05f, -0.05f,  0.0f, 1.0f, 0.0f,
-  0.05f,  0.05f,  0.0f, 1.0f, 1.0f
-};
-
+#include "SpriteBatchRenderer.h"
+#include "Renderer2D.h"
+#include "LineRenderer.h"
 GLuint indices[] = {
   0, 1, 3,
   1, 2, 3
 };
-
-GLuint VBO , VAO , EBO , instanceVBO;
-sf::Shader shader;
 
 Transform myTrans;
 glm::mat4 projection;
@@ -83,56 +65,21 @@ uint textureLoc;
 
 int xCount = 1280;
 int yCount = 1080;
-std::vector<glm::mat4> tssss;
+std::vector<Transform> Models;
+SpriteBatchRenderer renderer;
+LineRenderer lineRenderer;
+unsigned int shaderHandle;
 void Game::Init()
 {
+  renderer.Init();
+  lineRenderer.Init();
+  GLenum err = glGetError();
   sf::Image image;
   image.loadFromFile( "../Assets/Art/Unit1.png" );
   const sf::Uint8* pixels = image.getPixelsPtr();
   auto t = image.getSize();
   xCount /= t.x;
   yCount /= t.y;
-  glGenBuffers( 1 , &instanceVBO );
-  glBindBuffer( GL_ARRAY_BUFFER , instanceVBO );
-  int c = sizeof( glm::mat4 ) * xCount * yCount;
-  glBufferData( GL_ARRAY_BUFFER , sizeof( glm::mat4 ) * xCount * yCount , nullptr , GL_DYNAMIC_DRAW );
-  //  GLenum err = glGetError();
-  glGenVertexArrays( 1 , &VAO );
-  glGenBuffers( 1 , &VBO );
-  glGenBuffers( 1 , &EBO );
-  glBindBuffer( GL_ARRAY_BUFFER , VBO );
-  glBufferData( GL_ARRAY_BUFFER , sizeof( quadVertices ) , quadVertices , GL_STATIC_DRAW );
-  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER , EBO );
-  glBufferData( GL_ELEMENT_ARRAY_BUFFER , sizeof( indices ) , indices , GL_STATIC_DRAW );
-
-  glBindVertexArray( VAO );
-  glBindBuffer( GL_ARRAY_BUFFER , VBO );
-  //glBindBuffer( GL_ELEMENT_ARRAY_BUFFER , EBO );
-  glEnableVertexAttribArray( 0 );
-  glVertexAttribPointer( 0 , 3 , GL_FLOAT , GL_FALSE , 6 * sizeof( GLfloat ) , (GLvoid*)0 );
-  glEnableVertexAttribArray( 1 );
-  glVertexAttribPointer( 1 , 3 , GL_FLOAT , GL_FALSE , 6 * sizeof( GLfloat ) , (GLvoid*)( 3 * sizeof( GLfloat ) ) );
-  //glEnableVertexAttribArray( 2 );
-  //glVertexAttribPointer( 2 , 2 , GL_FLOAT , GL_FALSE , 5 * sizeof( GLfloat ) , (GLvoid*)( 3 * sizeof( GLfloat ) ) );
-  glBindBuffer( GL_ARRAY_BUFFER , instanceVBO );
-  glEnableVertexAttribArray( 3 );
-  glVertexAttribPointer( 3 , 4 , GL_FLOAT , GL_FALSE , 4 * sizeof( glm::vec4 ) , 0 );
-  glEnableVertexAttribArray( 4 );
-  glVertexAttribPointer( 4 , 4 , GL_FLOAT , GL_FALSE , 4 * sizeof( glm::vec4 ) , (GLvoid*)( sizeof( glm::vec4 ) ) );
-  glEnableVertexAttribArray( 5 );
-  glVertexAttribPointer( 5 , 4 , GL_FLOAT , GL_FALSE , 4 * sizeof( glm::vec4 ) , (GLvoid*)( 2 * sizeof( glm::vec4 ) ) );
-  glEnableVertexAttribArray( 6 );
-  glVertexAttribPointer( 6 , 4 , GL_FLOAT , GL_FALSE , 4 * sizeof( glm::vec4 ) , (GLvoid*)( 3 * sizeof( glm::vec4 ) ) );
-
-  glVertexAttribDivisor( 3 , 1 );
-  glVertexAttribDivisor( 4 , 1 );
-  glVertexAttribDivisor( 5 , 1 );
-  glVertexAttribDivisor( 6 , 1 );
-
-
-
-  glBindVertexArray( 0 );
-
   glGenTextures( 1 , &textureLoc );
   glBindTexture( GL_TEXTURE_2D , textureLoc );
   glTexParameteri( GL_TEXTURE_2D , GL_TEXTURE_MIN_FILTER , GL_LINEAR );
@@ -143,16 +90,28 @@ void Game::Init()
   glGenerateMipmap( GL_TEXTURE_2D );
   glBindTexture( GL_TEXTURE_2D , 0 );
 
-  shader.loadFromFile( "../Assets/Shaders/SimpleVertexShader.vs" , "../Assets/Shaders/SimpleFragmentShader.fs" );
-  projLoc = glGetUniformLocation( shader.getNativeHandle() , "Proj" );
-  modelLoc = glGetUniformLocation( shader.getNativeHandle() , "Model" );
-
   projection = glm::ortho( 0.f , 1280.0f , 720.0f , 0.0f );
-
+  Renderer2D::SetProjectionMatrix( projection );
   myTrans.position = glm::vec2( 400.0f , 400.0f );
-  myTrans.scale = glm::vec2( t.x , t.y );
+  myTrans.scale = glm::vec2( 32 , 32 );
   myTrans.rotation = 0.0f;
 
+
+  for( int y = 0; y < yCount * 4; y++ )
+  {
+    for( int x = 0; x < xCount * 4; x++ )
+    {
+      Transform trans;
+      trans.position = glm::vec2( x * t.x + t.x / 2 , y * t.y + t.y / 2 );
+      trans.scale.x = t.x;
+      trans.scale.y = t.y;
+      trans.rotation = 0.0f;
+      trans.transformationMatrix = glm::translate( glm::mat4() , glm::vec3( trans.position , 0.0f ) );
+      trans.transformationMatrix = glm::rotate( trans.transformationMatrix , trans.rotation , glm::vec3( 0 , 0 , 1 ) );
+      trans.transformationMatrix = glm::scale( trans.transformationMatrix , glm::vec3( trans.scale , 1.0f ) );
+      Models.push_back( trans );
+    }
+  }
 
 }
 
@@ -160,48 +119,49 @@ void Game::FixedUpdate( float a_dt )
 {
 
 }
-
+float Angle = 0.0f;
 void Game::Update( float a_dt )
 {
   if( Input::GetKeyDown( sf::Keyboard::Key::A ) )
-    myTrans.rotation -= 10.0f * a_dt;
+    Angle -= 10.0f * a_dt;
 
   if( Input::GetKeyDown( sf::Keyboard::Key::D ) )
-    myTrans.rotation += 10.0f * a_dt;
+    Angle += 10.0f * a_dt;
 
 
 
 }
 void Game::PreRender()
 {
-  myTrans.transformationMatrix = glm::translate( glm::mat4() , glm::vec3( myTrans.position , 0.0f ) );
-  myTrans.transformationMatrix = glm::rotate( myTrans.transformationMatrix , myTrans.rotation , glm::vec3( 0 , 0 , 1 ) );
-  myTrans.transformationMatrix = glm::scale( myTrans.transformationMatrix , glm::vec3( myTrans.scale , 1.0f ) );
-  glBindBuffer( GL_ARRAY_BUFFER , instanceVBO );
-  glm::mat4* data = ( glm::mat4* )glMapBuffer( GL_ARRAY_BUFFER , GL_WRITE_ONLY );
-  *data = myTrans.transformationMatrix;
-  glUnmapBuffer( GL_ARRAY_BUFFER );
-  glBindBuffer( GL_ARRAY_BUFFER , 0 );
+  lineRenderer.Begin();
+  renderer.Begin();
+  for( auto it : Models )
+  {
+    it.transformationMatrix = glm::translate( glm::mat4() , glm::vec3( it.position , 0.0f ) );
+    it.transformationMatrix = glm::rotate( it.transformationMatrix , Angle , glm::vec3( 0 , 0 , 1 ) );
+    it.transformationMatrix = glm::scale( it.transformationMatrix , glm::vec3( it.scale , 1.0f ) );
+    renderer.Submit( it.transformationMatrix );
+  }
 
+  glm::vec2 mouseLoc = Input::GetMousePosition();
+  glm::vec2 prevLoc( 0 , 0 );
+  for( auto it : Models )
+  {
+    lineRenderer.Submit( prevLoc , it.position , glm::vec4( 1.0f , 0.0f , 0.0f , 1.0f ) );
+    prevLoc = it.position; 
+  }
+  lineRenderer.End();
+  renderer.End();
 
 }
 
 void Game::Render( Window* const a_window )
 {
-
-  glUseProgram( shader.getNativeHandle() );
-  glEnable( GL_BLEND );
-  glBlendFunc( GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA );
-  glBindVertexArray( VAO );
   glBindTexture( GL_TEXTURE_2D , textureLoc );
-  glUniformMatrix4fv( projLoc , 1 , GL_FALSE , glm::value_ptr( projection ) );
-  //glUniformMatrix4fv( modelLoc , 1 , GL_FALSE , glm::value_ptr( myTrans.transformationMatrix ) );
-  //glDrawElements( GL_TRIANGLES , 6 , GL_UNSIGNED_INT , 0 );
-  glDrawArraysInstanced( GL_TRIANGLES , 0 , 6 , 1 );
-  glUseProgram( 0 );
-  glBindVertexArray( 0 );
+  renderer.Flush();
   glBindTexture( GL_TEXTURE_2D , 0 );
 
+  lineRenderer.Flush();
 }
 
 void Game::PostFrame()

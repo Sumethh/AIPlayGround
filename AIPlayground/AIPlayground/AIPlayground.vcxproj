@@ -107,6 +107,7 @@
     <LibraryPath>$(ProjectDir)..\extern\lib\x86\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>\bin\$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -176,6 +177,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Basic2DRenderer.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ColliderComponent.cpp" />
     <ClCompile Include="Component.cpp" />
@@ -184,6 +186,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Grid.cpp" />
+    <ClCompile Include="LineRenderer.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Pathfinder.cpp" />
     <ClCompile Include="PathfindingAgentComponent.cpp" />
@@ -195,10 +198,13 @@
     <ClCompile Include="RendererComponent.cpp" />
     <ClCompile Include="RigidbodyComponent.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="SpriteBatchRenderer.cpp" />
+    <ClCompile Include="StaticRenderer.cpp" />
     <ClCompile Include="WanderingComponent.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Basic2DRenderer.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ColliderComponent.h" />
     <ClInclude Include="Component.h" />
@@ -209,6 +215,7 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameObjectTypes.h" />
     <ClInclude Include="Grid.h" />
+    <ClInclude Include="LineRenderer.h" />
     <ClInclude Include="Pathfinder.h" />
     <ClInclude Include="PathfindingAgentComponent.h" />
     <ClInclude Include="PhysicsComponentBase.h" />
@@ -220,6 +227,8 @@
     <ClInclude Include="RendererComponent.h" />
     <ClInclude Include="RigidbodyComponent.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="SpriteBatchRenderer.h" />
+    <ClInclude Include="StaticRenderer.h" />
     <ClInclude Include="TimeConsts.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="WanderingComponent.h" />
