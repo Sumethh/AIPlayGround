@@ -22,11 +22,15 @@ void StaticRenderer::Init()
   glBindBuffer( GL_ARRAY_BUFFER , m_vbo );
   glBufferData( GL_ARRAY_BUFFER , sizeof( Vertex ) * 4 * MAX_STATIC_RENDERS , nullptr , GL_STATIC_DRAW );
 
+  int vertCount = 0;
   for( int i = 0; i < 4 * MAX_STATIC_RENDERS; i++ )
   {
+    if( vertCount == 4 )
+      vertCount = 0;
     Vertex newVert;
     newVert.pos = glm::vec3(0,0,0);
     newVert.texCoord = glm::vec2(0,0);
+    vertCount++;
     glBufferSubData( GL_ARRAY_BUFFER , i * sizeof( Vertex ) , sizeof( Vertex ) , &newVert );
   }
   glBindBuffer( GL_ARRAY_BUFFER , 0 );
@@ -37,18 +41,14 @@ void StaticRenderer::Init()
   glBindBuffer( GL_ARRAY_BUFFER , m_vbo );
 
   glEnableVertexAttribArray( 0 );
-  glVertexAttribPointer( 0 , 3 , GL_FLOAT , GL_FALSE , sizeof( Vertex ) , 0 );
-
-  glEnableVertexAttribArray( 1 );
-  glVertexAttribPointer( 1 , 2 , GL_FLOAT , GL_FALSE , sizeof( Vertex ) , (GLvoid*)sizeof(glm::vec2) );
-
+  glVertexAttribPointer( 0 , 3 , GL_FLOAT , GL_FALSE , sizeof( glm::vec3 ) , 0 );
   glBindVertexArray( 0 );
 }
 
 
 uint StaticRenderer::Register()
 {
-
+  return 0;
 }
 
 void StaticRenderer::UpdateTexCoords( uint a_index , StaticTexCoordData a_texCoords )

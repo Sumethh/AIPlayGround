@@ -8,4 +8,5 @@ void main()
 {
   //color = in_color;
   color = texture(ourTexture, out_textCoord);
+  //color = vec4(out_textCoord.x ,out_textCoord.y,0.0f,1.0f);
 }

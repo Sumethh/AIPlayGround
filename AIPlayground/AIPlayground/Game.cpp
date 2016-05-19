@@ -72,7 +72,7 @@ unsigned int shaderHandle;
 void Game::Init()
 {
   renderer.Init();
-  lineRenderer.Init();
+  //lineRenderer.Init();
   GLenum err = glGetError();
   sf::Image image;
   image.loadFromFile( "../Assets/Art/Unit1.png" );
@@ -131,26 +131,34 @@ void Game::Update( float a_dt )
 
 
 }
+StaticTexCoordData data = {
+  glm::vec2( 1.0f, 0.0f ),
+  glm::vec2( 1.0f, 1.0f ),
+  glm::vec2( 0.0f, 0.0f ),
+  glm::vec2( 1.0f, 1.0f ),
+  glm::vec2( 0.0f, 1.0f ),
+  glm::vec2( 0.0f, 0.0f ),
+};
 void Game::PreRender()
 {
-  lineRenderer.Begin();
+  //lineRenderer.Begin();
   renderer.Begin();
   for( auto it : Models )
   {
     it.transformationMatrix = glm::translate( glm::mat4() , glm::vec3( it.position , 0.0f ) );
     it.transformationMatrix = glm::rotate( it.transformationMatrix , Angle , glm::vec3( 0 , 0 , 1 ) );
     it.transformationMatrix = glm::scale( it.transformationMatrix , glm::vec3( it.scale , 1.0f ) );
-    renderer.Submit( it.transformationMatrix );
+    renderer.Submit( it.transformationMatrix , data );
   }
 
   glm::vec2 mouseLoc = Input::GetMousePosition();
   glm::vec2 prevLoc( 0 , 0 );
-  for( auto it : Models )
-  {
-    lineRenderer.Submit( prevLoc , it.position , glm::vec4( 1.0f , 0.0f , 0.0f , 1.0f ) );
-    prevLoc = it.position; 
-  }
-  lineRenderer.End();
+  //for( auto it : Models )
+  //{
+  //  lineRenderer.Submit( prevLoc , it.position , glm::vec4( 1.0f , 0.0f , 0.0f , 1.0f ) );
+  //  prevLoc = it.position;
+  //}
+  //lineRenderer.End();
   renderer.End();
 
 }
@@ -161,7 +169,7 @@ void Game::Render( Window* const a_window )
   renderer.Flush();
   glBindTexture( GL_TEXTURE_2D , 0 );
 
-  lineRenderer.Flush();
+  //lineRenderer.Flush();
 }
 
 void Game::PostFrame()
