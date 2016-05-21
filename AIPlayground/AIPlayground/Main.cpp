@@ -14,7 +14,6 @@
 #include "Common/JobSystem.h"
 #include "Common/JobSystemDebugInfo.h"
 #include "TimeConsts.h"
-#define GLEW_STATIC
 #include <GL/glew.h>
 
 int32 frames;

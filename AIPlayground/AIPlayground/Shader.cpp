@@ -31,7 +31,7 @@ void Shader::LoadFromFile( const std::string a_vs , const std::string a_fs )
     VertexShaderStream.close();
   }
   else {
-    printf( "Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n" , a_vs );
+    printf( "Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n" , a_vs.c_str() );
     getchar();
     m_shaderHandle = 0;
     return;
@@ -125,7 +125,7 @@ void Shader::LoadFromFile( const std::string a_vs , const std::string a_fs , con
     VertexShaderStream.close();
   }
   else {
-    printf( "Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n" , a_vs );
+    printf( "Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n" , a_vs.c_str() );
     getchar();
     m_shaderHandle = 0;
     return;

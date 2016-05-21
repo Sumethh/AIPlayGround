@@ -1,5 +1,5 @@
 #include "LineRenderer.h"
-#include "Renderer2D.h";
+#include "Renderer2D.h"
 #include "ShaderManager.h"
 #include <glm/gtc/type_ptr.hpp>
 
