@@ -18,7 +18,7 @@ public:
   void Flush();
 private:
   GLuint m_vao , m_vbo;
-  Shader m_shader;
+  Shader* m_shader;
 
   struct LineRenderData
   {
@@ -30,4 +30,3 @@ private:
   unsigned int m_lineRenderCount;
   unsigned int m_projLocation;
 };
-

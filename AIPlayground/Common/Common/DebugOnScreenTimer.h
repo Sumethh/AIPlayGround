@@ -45,9 +45,7 @@ public:
     {
       m_text.setFont( m_font );
       m_text.setCharacterSize( FONT_SIZE );
-
     }
-
   }
 
   inline static int32 AddNewTimer( std::string& a_baseText )
@@ -60,12 +58,10 @@ public:
         returnValue = i;
         break;
       }
-
     }
     if( returnValue == m_timers.size() )
     {
       m_timers.push_back( OnScreenTimer() );
-
     }
     OnScreenTimer* timer = &m_timers[ returnValue ];
     timer->baseText = a_baseText;
@@ -80,7 +76,6 @@ public:
       m_timers[ a_timerIndex ].value = a_newValue;
       m_timers[ a_timerIndex ].displayingText = m_timers[ a_timerIndex ].baseText +
         std::to_string( a_newValue ) + m_timers[ a_timerIndex ].trailingText;
-
     }
   }
 
@@ -96,7 +91,6 @@ public:
   {
     if( (size_t)a_timerIndex < m_timers.size() )
       m_timers[ a_timerIndex ].active = false;
-
   }
 
   inline static void DrawTimers( Window* a_window )
@@ -119,7 +113,6 @@ private:
   static sf::Text m_text;
   static sf::Font m_font;
   static std::vector<OnScreenTimer> m_timers;
-
 };
 
 sf::Text DebugOnScreenTimer::m_text;

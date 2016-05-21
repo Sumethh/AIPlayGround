@@ -21,7 +21,6 @@ public:
   void RequestPath( glm::vec2 a_start , glm::vec2 a_end );
   void ClearPath();
 
-
   std::weak_ptr<Grid> GetGrid() const;
 private:
   void SetPath( Path* a_path ) { m_path = a_path; }
@@ -30,4 +29,3 @@ private:
   std::weak_ptr<Pathfinder> m_pathfinder;
   Path* m_path;
 };
-

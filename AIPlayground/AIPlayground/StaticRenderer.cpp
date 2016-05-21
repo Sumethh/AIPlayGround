@@ -2,23 +2,21 @@
 #include "Common/log.h"
 #include "Renderer2D.h"
 #include <glm/gtc/type_ptr.hpp>
-
+#include "ShaderManager.h"
+#include "TextureManager.h"
 StaticRenderer::StaticRenderer()
 {
 }
-
 
 StaticRenderer::~StaticRenderer()
 {
 }
 
-
-
 void StaticRenderer::Init()
 {
   m_freeIds.reserve( 100 );
-  m_shader.LoadFromFile( "../Assets/Shaders/SpriteShader.vs" , "../Assets/Shaders/SpriteShader.fs" , "../Assets/Shaders/SpriteGeometryShader.gs" );
-  m_projLoc = glGetUniformLocation( m_shader.GetShaderHandle() , "Proj" );
+  m_shader = ShaderManager::GI()->GetShader( EShaderID::SpriteBatch );
+  m_texture = TextureManager::GI()->GetTexture( ETextureID::StaticSpriteSheet );
   glGenBuffers( 1 , &m_vbo );
   glBindBuffer( GL_ARRAY_BUFFER , m_vbo );
   glBufferData( GL_ARRAY_BUFFER , sizeof( SpriteInfo ) * MAX_STATIC_RENDERS , NULL , GL_STATIC_DRAW );
@@ -48,9 +46,7 @@ void StaticRenderer::Init()
   glVertexAttribPointer( 5 , 4 , GL_FLOAT , GL_FALSE , sizeof( SpriteInfo ) , (GLvoid*)( offsetof( SpriteInfo , Model ) + sizeof( glm::vec4 ) * 3 ) );
 
   glBindVertexArray( 0 );
-
 }
-
 
 uint StaticRenderer::Register()
 {
@@ -78,16 +74,13 @@ void StaticRenderer::UpdateTexCoords( uint a_index , glm::vec4 a_top , glm::vec4
   glm::vec4 data[ 2 ] = { a_top, a_bottom };
   glBufferSubData( GL_ARRAY_BUFFER , (GLintptr)( sizeof( SpriteInfo ) * a_index ) , sizeof( glm::vec4 ) * 2 , data );
   glBindBuffer( GL_ARRAY_BUFFER , 0 );
-
 }
-
 
 void StaticRenderer::UpdatePosition( uint a_index , glm::mat4 a_model )
 {
   glBindBuffer( GL_ARRAY_BUFFER , m_vbo );
   glBufferSubData( GL_ARRAY_BUFFER , (GLintptr)( sizeof( SpriteInfo ) * a_index + offsetof( SpriteInfo , Model ) ) , sizeof( glm::mat4 ) , glm::value_ptr( a_model ) );
   glBindBuffer( GL_ARRAY_BUFFER , 0 );
-
 }
 
 void StaticRenderer::UnRegister( uint a_index )
@@ -103,13 +96,14 @@ void StaticRenderer::UnRegister( uint a_index )
 
 void StaticRenderer::Flush()
 {
-
   glEnable( GL_BLEND );
   glBlendFunc( GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA );
-  m_shader.Bind();
-  glUniformMatrix4fv( m_projLoc , 1 , GL_FALSE , glm::value_ptr( Renderer2D::GetProjection() ) );
+  m_shader->Bind();
+  glUniformMatrix4fv( m_shader->GetProjectionUniformLoc() , 1 , GL_FALSE , glm::value_ptr( Renderer2D::GetProjection() ) );
+  m_texture->Bind();
   glBindVertexArray( m_vao );
   glDrawArrays( GL_POINTS , 0 , m_staticCount );
+  m_texture->UnBind();
   glBindVertexArray( 0 );
-  m_shader.UnBind();
+  m_shader->UnBind();
 }

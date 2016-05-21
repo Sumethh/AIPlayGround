@@ -31,7 +31,6 @@ public:
   typedef std::shared_ptr<ColliderComponent> SharedPtr;
   typedef std::weak_ptr<ColliderComponent> WeakPtr;
 
-
   void Update( float a_dt ) override;
 
   bool TestCollision( ColliderComponent* a_other , Collision& a_collision );
@@ -40,7 +39,7 @@ public:
   inline Collider GetCollider() const { return m_collider; }
   inline Collider& GetColliderRef() { return m_collider; }
   inline void SetCollider( Collider a_collider ) { m_collider = a_collider; }
-  inline void AddRegisteredCell( GridCell* a_gridCell ) { m_cellsRegistered.push_back(a_gridCell); }
+  inline void AddRegisteredCell( GridCell* a_gridCell ) { m_cellsRegistered.push_back( a_gridCell ); }
   inline std::vector<GridCell*>& GetRegisteredCells() { return m_cellsRegistered; }
 
   inline void Render( Window* a_window );

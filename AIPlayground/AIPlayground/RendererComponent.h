@@ -8,7 +8,6 @@ public:
   RendererComponent( GameObject::SharedPtr , EComponentTypes a_type );
   ~RendererComponent();
 
-
   void PreRender() override;
   void Render( Window* a_window ) override;
 
@@ -19,4 +18,3 @@ private:
   sf::Texture* m_texture;
   glm::vec2 m_dimensions;
 };
-

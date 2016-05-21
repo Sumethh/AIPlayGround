@@ -27,7 +27,6 @@ ColliderComponent::ColliderComponent( GameObject::SharedPtr a_go , EComponentTyp
 
 ColliderComponent::~ColliderComponent()
 {
-
 }
 
 void CalculateRotatedVerts( Collider& a_collider , Transform& a_transform )
@@ -65,15 +64,11 @@ void CalculateRotatedVerts( Collider& a_collider , Transform& a_transform )
   a_collider.rotatedVertices[ 1 ] = glm::vec2( xFinalPosition[ 2 ] + position.x , yFinalPosition[ 2 ] + position.y );
   a_collider.rotatedVertices[ 2 ] = glm::vec2( xFinalPosition[ 1 ] + position.x , yFinalPosition[ 1 ] + position.y );
   a_collider.rotatedVertices[ 3 ] = glm::vec2( xFinalPosition[ 3 ] + position.x , yFinalPosition[ 3 ] + position.y );
-
-
-
 }
 
 void ColliderComponent::CalculateTestingVerts( Collider& a_collider , Transform& a_transform )
 {
   static glm::vec2 circleTests[ 4 ] = { glm::normalize( glm::vec2( -1.0f , 1.0f ) ) , glm::normalize( glm::vec2( 1.0f , -1.0f ) ), glm::normalize( glm::vec2( 1.0f , 1.0f ) ),glm::normalize( glm::vec2( -1.0f , -1.0f ) ) };
-
 
   switch( m_colliderType )
   {
@@ -124,7 +119,6 @@ void ColliderComponent::Update( float a_dt )
     {
       CalculateTestingVerts( m_collider , parent->GetTransform() );
       parent->ResetCollisionDirtyFlag();
-
     }
   }
   ResetTestedColliders();
@@ -209,7 +203,6 @@ void ColliderComponent::Render( Window* a_window )
       circle.setPosition( ConvertVec2( m_collider.testableVerts[ i ] ) );
       a_window->RenderDrawable( circle );
     }
-
   }
   else if( m_colliderType == EColliderType::Box )
   {
@@ -239,9 +232,7 @@ void ColliderComponent::Render( Window* a_window )
       circle.setPosition( ConvertVec2( m_collider.testableVerts[ i ] ) );
       circle.setOrigin( ConvertVec2( glm::vec2( 0.5f , 0.5f ) ) );
       a_window->RenderDrawable( circle );
-
     }
-
   }
 }
 
@@ -258,7 +249,6 @@ bool ColliderComponent::CircleCircleColTest( ColliderComponent* a_collider1 , Co
   Collider collider1 = a_collider1->GetCollider();
   Collider collider2 = a_collider2->GetCollider();
 
-
   glm::vec2 diff = transform2.position - transform1.position;
   float radisqrd = collider1.radius + collider2.radius;
   radisqrd *= radisqrd;
@@ -272,7 +262,6 @@ bool ColliderComponent::CircleCircleColTest( ColliderComponent* a_collider1 , Co
     return true;
   }
   return false;
-
 }
 
 bool ColliderComponent::BoxBoxColTest( ColliderComponent* a_collider1 , ColliderComponent* a_collider2 , Collision& a_collision )
@@ -282,7 +271,6 @@ bool ColliderComponent::BoxBoxColTest( ColliderComponent* a_collider1 , Collider
 
 bool ColliderComponent::BoxCircleColTest( ColliderComponent* a_box , ColliderComponent* a_circle , Collision& a_collision )
 {
-
   Transform boxTransform = a_box->GetParent()->GetTransform();
   Transform circleTransform = a_circle->GetParent()->GetTransform();
   Collider boxCollider = a_box->GetCollider();
@@ -322,7 +310,6 @@ bool ColliderComponent::BoxCircleColTest( ColliderComponent* a_box , ColliderCom
   {
     return true;
   }
-
 
   return false;
 }

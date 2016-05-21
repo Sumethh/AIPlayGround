@@ -23,10 +23,6 @@ public:
   virtual void OnCollisionLeave( Collision& a_collision );
   virtual void OnCollisionStay( Collision& a_collision );
 
-
-
-
-
   inline bool IsComponentOfType( EComponentTypes a_type ) { return a_type == m_componentType; }
   inline GameObject* GetParent()const { return m_parent.get(); }
   inline std::shared_ptr<GameObject> GetParentShared()const { return m_parent; }
@@ -37,4 +33,3 @@ private:
   EComponentTypes m_componentType;
   bool m_hasBegunPlay;
 };
-

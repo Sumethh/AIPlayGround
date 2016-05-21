@@ -40,7 +40,7 @@ public:
   inline std::weak_ptr<PlayerController> GetPlayerController()const { return m_playerController; }
   inline std::weak_ptr<Pathfinder> GetPathfinder()const { return m_pathfinder; }
   inline std::weak_ptr<Camera> GetCamera()const { return m_camera; }
-  inline Grid::WeakPtr GetGrid() const{ return m_grid; }
+  inline Grid::WeakPtr GetGrid() const { return m_grid; }
   inline WorldLimits GetWorldLimits()const { return m_worldLimits; }
   inline std::weak_ptr<PhysicsSystem> GetPhysicsSystem()const { return m_physicsSystem; }
 
@@ -60,4 +60,3 @@ private:
   std::shared_ptr<Pathfinder> m_pathfinder;
   std::shared_ptr<PhysicsSystem> m_physicsSystem;
 };
-

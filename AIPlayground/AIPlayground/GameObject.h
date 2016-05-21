@@ -20,7 +20,6 @@ struct GameObjectConstructionDescriptor
   std::vector<EComponentTypes> listOfComps;
 };
 
-
 class GameObject
 {
   friend class World;
@@ -43,8 +42,6 @@ public:
   virtual void OnCollisionLeave( Collision a_collision );
   virtual void OnCollisionStay( Collision a_collision );
 
-
-
   void AddComponent( EComponentTypes a_componentType );
 
   inline World* GetWorld() const { return m_world; }
@@ -62,14 +59,12 @@ public:
     SetPhysicsFlagDirty();
     SetCollisionFlagDirty();
     SetRenderStateDirty();
-
   }
   inline void SetScale( glm::vec2 a_scale )
   {
     m_transform.scale = a_scale;
     SetPhysicsFlagDirty();
     SetRenderStateDirty();
-
   }
   inline void SetRotation( float a_angle )
   {
@@ -121,6 +116,4 @@ private:
   bool m_renderStateDirty;
   bool m_physicsDirty;
   bool m_rotationMatrixDirty;
-
 };
-

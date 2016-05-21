@@ -4,8 +4,8 @@
 #include <glm/glm.hpp>
 #include "Shader.h"
 
-#define MAX_SPRITE_RENDERS 20000
-
+#define MAX_SPRITE_RENDERS 30000
+class Texture;
 class SpriteBatchRenderer
 {
 public:
@@ -16,13 +16,12 @@ public:
   void Submit( glm::mat4& a_mat , glm::vec4 a_top , glm::vec4 a_bottom );
   void End();
   void Flush();
-  Shader& GetShader() { return m_shader; }
 private:
   GLuint m_vao;
   GLuint m_vbo;
   uint m_spriteCount;
-  Shader m_shader;
-
+  Shader* m_shader;
+  Texture* m_texture;
   struct SpriteInfo
   {
     glm::vec4 Top;
@@ -33,6 +32,4 @@ private:
   SpriteInfo* m_data;
 
   GLint m_projUniformLoc;
-
 };
-

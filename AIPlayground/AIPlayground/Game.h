@@ -14,8 +14,7 @@ public:
   void PreRender();
   void Render( Window* const a_window );
   void PostFrame();
-  
+
 private:
   World::SharedPtr m_world;
 };
-

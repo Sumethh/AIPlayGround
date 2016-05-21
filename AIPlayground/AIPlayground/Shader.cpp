@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <glm/gtc/type_ptr.hpp>
 
 Shader::~Shader()
 {
@@ -49,7 +50,6 @@ void Shader::LoadFromFile( const std::string a_vs , const std::string a_fs )
   GLint Result = GL_FALSE;
   int InfoLogLength;
 
-
   // Compile Vertex Shader
   printf( "Compiling shader : %s\n" , a_vs.c_str() );
   char const * VertexSourcePointer = VertexShaderCode.c_str();
@@ -65,8 +65,6 @@ void Shader::LoadFromFile( const std::string a_vs , const std::string a_fs )
     printf( "%s\n" , &VertexShaderErrorMessage[ 0 ] );
   }
 
-
-
   // Compile Fragment Shader
   printf( "Compiling shader : %s\n" , a_fs.c_str() );
   char const * FragmentSourcePointer = FragmentShaderCode.c_str();
@@ -81,8 +79,6 @@ void Shader::LoadFromFile( const std::string a_vs , const std::string a_fs )
     glGetShaderInfoLog( FragmentShaderID , InfoLogLength , NULL , &FragmentShaderErrorMessage[ 0 ] );
     printf( "%s\n" , &FragmentShaderErrorMessage[ 0 ] );
   }
-
-
 
   // Link the program
   printf( "Linking program\n" );
@@ -100,13 +96,13 @@ void Shader::LoadFromFile( const std::string a_vs , const std::string a_fs )
     printf( "%s\n" , &ProgramErrorMessage[ 0 ] );
   }
 
-
   glDetachShader( ProgramID , VertexShaderID );
   glDetachShader( ProgramID , FragmentShaderID );
 
   glDeleteShader( VertexShaderID );
   glDeleteShader( FragmentShaderID );
   m_shaderHandle = ProgramID;
+  Finalize();
 }
 
 void Shader::LoadFromFile( const std::string a_vs , const std::string a_fs , const std::string a_gs )
@@ -118,7 +114,6 @@ void Shader::LoadFromFile( const std::string a_vs , const std::string a_fs , con
   GLuint VertexShaderID = glCreateShader( GL_VERTEX_SHADER );
   GLuint FragmentShaderID = glCreateShader( GL_FRAGMENT_SHADER );
   GLuint GeometryShaderID = glCreateShader( GL_GEOMETRY_SHADER );
-
 
   // Read the Vertex Shader code from the file
   std::string VertexShaderCode;
@@ -158,7 +153,6 @@ void Shader::LoadFromFile( const std::string a_vs , const std::string a_fs , con
   GLint Result = GL_FALSE;
   int InfoLogLength;
 
-
   // Compile Vertex Shader
   printf( "Compiling shader : %s\n" , a_vs.c_str() );
   char const * VertexSourcePointer = VertexShaderCode.c_str();
@@ -173,8 +167,6 @@ void Shader::LoadFromFile( const std::string a_vs , const std::string a_fs , con
     glGetShaderInfoLog( VertexShaderID , InfoLogLength , NULL , &VertexShaderErrorMessage[ 0 ] );
     printf( "%s\n" , &VertexShaderErrorMessage[ 0 ] );
   }
-
-
 
   // Compile Fragment Shader
   printf( "Compiling shader : %s\n" , a_fs.c_str() );
@@ -223,7 +215,6 @@ void Shader::LoadFromFile( const std::string a_vs , const std::string a_fs , con
     printf( "%s\n" , &ProgramErrorMessage[ 0 ] );
   }
 
-
   glDetachShader( ProgramID , VertexShaderID );
   glDetachShader( ProgramID , FragmentShaderID );
 
@@ -232,14 +223,38 @@ void Shader::LoadFromFile( const std::string a_vs , const std::string a_fs , con
   glDeleteShader( GeometryShaderID );
 
   m_shaderHandle = ProgramID;
+  Finalize();
 }
 
 void Shader::Bind()
 {
   glUseProgram( m_shaderHandle );
+  for( auto i : m_OnBindCallBacks )
+    i( this );
 }
 
 void Shader::UnBind()
 {
   glUseProgram( 0 );
+}
+
+void Shader::SetUniform( EUniformId a_id , float a_value )
+{
+  glUniform1f( m_uniformLocations[ a_id ] , a_value );
+}
+
+void Shader::SetUniform( EUniformId a_id , glm::vec2 a_value )
+{
+  glUniform2f( m_uniformLocations[ a_id ] , a_value.x , a_value.y );
+}
+
+void Shader::SetUniform( EUniformId a_id , glm::vec3 a_value )
+{
+  glUniform3f( m_uniformLocations[ a_id ] , a_value.x , a_value.y , a_value.z );
+}
+
+void Shader::Finalize()
+{
+  m_projectionLocation = glGetUniformLocation( m_shaderHandle , "Proj" );
+  m_modelLocation = glGetUniformLocation( m_shaderHandle , "Model" );
 }

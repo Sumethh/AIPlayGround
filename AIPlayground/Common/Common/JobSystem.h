@@ -14,11 +14,10 @@
 
 enum class JobCondition : int
 {
-  NONE,
-  ONE_AT_A_TIME,
+  NONE ,
+  ONE_AT_A_TIME ,
   COUNT
 };
-
 
 struct JobParametersBase
 {};
@@ -28,7 +27,7 @@ struct Job
 private:
   typedef std::function<void( JobParametersBase* )> JobFunction;
 public:
-  Job() :threadCleanUpJob( true ), jobCondition( JobCondition::NONE), typeHashCode(0) {};
+  Job() :threadCleanUpJob( true ) , jobCondition( JobCondition::NONE ) , typeHashCode( 0 ) {};
   ~Job() { delete jobParams; }
   JobFunction taskFunction;
   JobParametersBase* jobParams;
@@ -44,7 +43,6 @@ struct LinkedListEntry
   Job* job;
 };
 
-
 struct WorkerThread
 {
   WorkerThread( uint a_threadID );
@@ -56,7 +54,6 @@ struct WorkerThread
 
   Timer jobTimer;
   uint threadID;
-
 
   std::mutex jobQueueLock;
   std::vector<Job*> jobQueue;
@@ -75,7 +72,6 @@ public:
   static uint32 ScheduleJobWithoutLock( Job* a_jobToAdd );
   static std::mutex& GetLock() { return m_jobsMutex; }
 
-
 private:
   JobSystem& operator = ( JobSystem& a_right );
   JobSystem( const JobSystem& );
@@ -87,7 +83,7 @@ private:
 
   static std::condition_variable m_jobCondition;
 
-  static std::map<uint32, Job*> m_activeJobs;
+  static std::map<uint32 , Job*> m_activeJobs;
   static std::mutex m_activeJobsMutex;
 
   static std::atomic_int m_jobCount;
@@ -100,7 +96,6 @@ private:
   static std::vector<WorkerThread*> m_workerThreads;
   static uint32 m_currentMaxID;
   static bool m_hasInitBeenCalled;
-
 
   static SLIST_HEADER m_jobList;
 };

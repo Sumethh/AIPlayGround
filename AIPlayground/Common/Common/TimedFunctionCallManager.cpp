@@ -5,13 +5,11 @@ TimedFunctionCallManager::TimedFunctionCallManager()
 {
 }
 
-
 TimedFunctionCallManager::~TimedFunctionCallManager()
 {
 }
 TimedFunctionCallManager* TimedFunctionCallManager::GI()
 {
-
   {
     if( !m_instance )
       m_instance = new TimedFunctionCallManager();
@@ -39,7 +37,6 @@ bool TimedFunctionCallManager::RemoveTimer( TimedFunctionCall* a_timer )
   }
   else
     return false;
-
 }
 
 bool TimedFunctionCallManager::AddTimer( TimedFunctionCall* a_timer )

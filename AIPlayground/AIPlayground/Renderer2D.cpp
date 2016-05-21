@@ -8,13 +8,10 @@ glm::mat4 Renderer2D::GetProjection()
   return m_projection;
 }
 
-
 Renderer2D::Renderer2D()
 {
 }
 
-
 Renderer2D::~Renderer2D()
 {
-
 }

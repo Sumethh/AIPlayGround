@@ -31,7 +31,6 @@ void JobSystemDebugInfo::Render( Window* a_window )
   jobTimeAvg.setCharacterSize( m_fontSize );
   jobTotal.setCharacterSize( m_fontSize );
 
-
   sf::Vector2f renderPosition;
   renderPosition.x = (float)m_xSpacing;
   renderPosition.y = (float)m_ySpacing + (float)m_startingYPos;
@@ -57,14 +56,12 @@ void JobSystemDebugInfo::Render( Window* a_window )
     jobTimeAvg.setPosition( renderPosition.x , renderPosition.y );
     a_window->RenderDrawable( jobTimeAvg );
 
-
     renderPosition.y += m_ySpacing;
     rect = jobTotal.getLocalBounds();
     jobTotal.setPosition( renderPosition.x , renderPosition.y );
     a_window->RenderDrawable( jobTotal );
 
     renderPosition.y += m_ySpacing * 2;
-
   }
 }
 
@@ -100,8 +97,6 @@ void JobSystemDebugInfo::SetDebugInfo( TimeFunctionCallArgument a_argument )
     threadInfo->jobTimeTotal = 0;
     threadInfo->jobTimeSamplesCount = 0;
 
-
     threadInfo->infoLock.unlock();
   }
 }
-

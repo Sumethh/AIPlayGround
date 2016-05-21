@@ -6,14 +6,10 @@
 #include <ctime>
 #include <glm/glm.hpp>
 
-
-
-WanderingComponent::WanderingComponent( GameObject::SharedPtr a_go, EComponentTypes a_type ) :
+WanderingComponent::WanderingComponent( GameObject::SharedPtr a_go , EComponentTypes a_type ) :
   Component( a_go , a_type )
 {
-
 }
-
 
 WanderingComponent::~WanderingComponent()
 {
@@ -24,7 +20,7 @@ void WanderingComponent::BeginPlay()
   std::shared_ptr<GameObject> owner = GetParentShared();
   if( owner )
   {
-    m_pathfindingComp =  (PathfindingAgentComponent*)owner->GetComponentOfType( EComponentTypes::CT_PathfindingAgentComponent );
+    m_pathfindingComp = (PathfindingAgentComponent*)owner->GetComponentOfType( EComponentTypes::CT_PathfindingAgentComponent );
   }
 }
 
@@ -53,7 +49,6 @@ void WanderingComponent::Update( float a_dt )
           Node* currentNode = grid->GetNode( parentTransform.position );
           /*while( !node->bwalkable && node != currentNode );
           {
-
             destination.x = (float)( std::rand() % (int)limits.bottomRight.x ) + limits.topLeft.x;
             destination.y = (float)( std::rand() % (int)limits.bottomRight.y ) + limits.topLeft.y;
             node = grid->GetNode( destination );
@@ -89,6 +84,5 @@ void WanderingComponent::Update( float a_dt )
       else
         m_pathfindingComp->ClearPath();
     }
-
   }
 }

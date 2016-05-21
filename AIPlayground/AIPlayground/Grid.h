@@ -48,7 +48,6 @@ public:
   void PreRender( const glm::vec2 a_cameraPo );
   void Render( Window* const a_windowToDrawTo );
 
-
   inline int GetTileSizeX() const { return m_tileSizeX; }
   inline int GetTileSizeY() const { return m_tileSizeY; }
 
@@ -59,8 +58,6 @@ public:
     if( (size_t)( indexX + indexY * m_tileCountX ) < m_nodes.size() )
       return &m_nodes[ indexY* m_tileCountX + indexX ];
     return nullptr;
-
-
   }
 
   inline Node* GetNode( const int a_indexX , const int a_indexY )
@@ -133,4 +130,3 @@ private:
   glm::vec2 m_gridOrigin;
   std::vector<Node> m_nodes;
 };
-

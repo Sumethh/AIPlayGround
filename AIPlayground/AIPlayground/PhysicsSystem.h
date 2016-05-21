@@ -24,21 +24,18 @@ public:
   void SetWorld( World* a_world );
   std::weak_ptr<World> GetWorld() const { return m_world; }
 
-
   void Render( Window* a_window );
   static float time;;
 private:
   std::vector<PhysicsComponentBase*> m_physicsObjects;
   std::weak_ptr<World> m_world;
 
-
   //inline bool BoxCollisionTest( ColliderComponent::SharedPtr  a_boxCollider, ColliderComponent::SharedPtr a_other , Collision& a_collision);
   //inline bool SphereCollisionTest( ColliderComponent::SharedPtr a_sphereCollider , ColliderComponent::SharedPtr a_other , Collision& a_collision);
 
   void PerformCollisionTests();
-  
+
   PhysicsGrid* m_grid;
   const double m_timeStep;
   const double m_timeStepMS;
 };
-

@@ -14,7 +14,7 @@ Window::Window( const int a_width , const int a_height , const char* a_windowNam
   settings.antialiasingLevel = 0;
   m_window = new sf::RenderWindow(
     sf::VideoMode( a_width , a_height ) , a_windowName , sf::Style::Default , settings
-    );
+  );
   //m_window->setFramerateLimit( 120 );
 }
 
@@ -33,7 +33,6 @@ void Window::Close()
 {
   m_closeRequested = true;
 }
-
 
 void Window::Update()
 {
@@ -59,7 +58,6 @@ void Window::Update()
     if( windowEvent.type == sf::Event::MouseButtonPressed )
     {
       Input::SetMouseButtons( windowEvent.mouseButton.button );
-
     }
     if( windowEvent.type == sf::Event::MouseButtonReleased )
     {
@@ -88,7 +86,6 @@ void Window::Clear( sf::Color a_color )
 {
   m_window->clear( a_color );
 }
-
 
 void Window::SetWindowName( std::string a_newName )
 {

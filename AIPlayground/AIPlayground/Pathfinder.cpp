@@ -9,14 +9,12 @@ Pathfinder::Pathfinder( std::shared_ptr<Grid>& a_grid ) :
 {
 }
 
-
 Pathfinder::~Pathfinder()
 {
 }
 
 int GetDistance( Node* a_node , Node* a_otherNode )
 {
-
   int dstX = (int)abs( a_node->pos.x - a_otherNode->pos.x );
   int dstY = (int)abs( a_node->pos.y - a_otherNode->pos.y );
   return ( dstX * 10 ) + dstY * 10;
@@ -88,7 +86,6 @@ void Pathfinder::GetPath( JobParametersBase* a_params )
 
   if( startNode == endNode )
   {
-
     params->callback( nullptr );
     return;
   }
@@ -102,7 +99,6 @@ void Pathfinder::GetPath( JobParametersBase* a_params )
 
   if( !endNode || !startNode )
   {
-
     LOGW( "Got a path requested with end node or start node being nullptr" );
     params->callback( nullptr );
     return;
@@ -154,7 +150,6 @@ void Pathfinder::GetPath( JobParametersBase* a_params )
         currentNeighbor->GetFCost();
         if( std::find( openSet.begin() , openSet.end() , neighbours[ i ] ) == openSet.end() )
           openSet.push_back( currentNeighbor );
-
       }
     }
   }

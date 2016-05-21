@@ -11,7 +11,7 @@
 struct DebugThreadInfo
 {
   uint32 threadID;
-  
+
   double jobTimeTotal;
   uint32 jobTimeSamplesCount;
   float jobTimeAverage;
@@ -20,14 +20,13 @@ struct DebugThreadInfo
   uint32 jobsCompletedLast5Seconds;
 
   std::mutex infoLock;
-
 };
 class Window;
 class JobSystemDebugInfo
 {
 public:
   void Init();
-  
+
   std::shared_ptr<DebugThreadInfo> registerThread();
 
   static inline JobSystemDebugInfo* GI()
@@ -40,7 +39,7 @@ public:
     return m_instance;
   }
 
-  void Render(Window* a_window);
+  void Render( Window* a_window );
 private:
   JobSystemDebugInfo() {};
 
@@ -49,7 +48,7 @@ private:
 
   static JobSystemDebugInfo* m_instance;
 
-  void SetTextStrings( sf::Text& a_threadID , sf::Text& a_jobTimeAvg , sf::Text& a_jobsCompletedText, uint32& a_id, float& a_time, uint32& a_jobsCompleted );
+  void SetTextStrings( sf::Text& a_threadID , sf::Text& a_jobTimeAvg , sf::Text& a_jobsCompletedText , uint32& a_id , float& a_time , uint32& a_jobsCompleted );
 
   void SetDebugInfo( TimeFunctionCallArgument a_argument );
 

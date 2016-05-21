@@ -4,7 +4,7 @@
 #include <memory>
 class Camera;
 class PlayerController
-  {
+{
 public:
   PlayerController( std::shared_ptr<Grid>& a_grid , std::shared_ptr<Camera>& a_camera );
   ~PlayerController();
@@ -24,4 +24,3 @@ private:
   std::weak_ptr<Grid> const  m_grid;
   std::weak_ptr<Camera> const m_camera;
 };
-

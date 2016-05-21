@@ -42,6 +42,4 @@ private:
   std::vector<Job*> m_jobsToSchedule;
   std::weak_ptr<Grid> m_grid;
   Timer m_timer;
-
 };
-

@@ -12,7 +12,7 @@ public:
 
   void Invoke( T a_t );
   uint RegisterToEvent( std::function<void( T )> );
-  void DeRegisterToEvent( uint a_index);
+  void DeRegisterToEvent( uint a_index );
 
 private:
   std::vector < std::function<void( T )>> m_callbacks;
@@ -38,7 +38,7 @@ void InvokableEvent<T>::Invoke( T a_t )
 }
 
 template <class T>
-uint InvokableEvent<T>::RegisterToEvent( std::function<void( T )> a_func)
+uint InvokableEvent<T>::RegisterToEvent( std::function<void( T )> a_func )
 {
   m_callbacks.push_back( a_func );
   return m_callbacks.size() - 1;

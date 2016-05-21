@@ -198,8 +198,11 @@
     <ClCompile Include="RendererComponent.cpp" />
     <ClCompile Include="RigidbodyComponent.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="SpriteBatchRenderer.cpp" />
     <ClCompile Include="StaticRenderer.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="WanderingComponent.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
@@ -227,8 +230,11 @@
     <ClInclude Include="RendererComponent.h" />
     <ClInclude Include="RigidbodyComponent.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="SpriteBatchRenderer.h" />
     <ClInclude Include="StaticRenderer.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="TextureManager.h" />
     <ClInclude Include="TimeConsts.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="WanderingComponent.h" />

@@ -9,7 +9,6 @@
 ComponentFactory* ComponentFactory::m_instance;
 sf::Texture t;
 
-
 Component* MakeRenderComponent( GameObject::SharedPtr  a_go )
 {
   RendererComponent* comp = new RendererComponent( a_go , EComponentTypes::CT_RenderComponent );
@@ -35,7 +34,7 @@ Component* MakeRigidbodyComponent( GameObject::SharedPtr a_go )
 
 Component* MakeColliderComponent( GameObject::SharedPtr   a_go )
 {
-  return new ColliderComponent( a_go , EComponentTypes::CT_ColliderComponent, EColliderType::Sphere);
+  return new ColliderComponent( a_go , EComponentTypes::CT_ColliderComponent , EColliderType::Sphere );
 }
 
 ComponentFactory::ComponentFactory()
@@ -48,7 +47,6 @@ ComponentFactory::ComponentFactory()
   m_functionMap[ EComponentTypes::CT_RigidbodyComponent ] = &MakeRigidbodyComponent;
   m_functionMap[ EComponentTypes::CT_ColliderComponent ] = &MakeColliderComponent;
 }
-
 
 ComponentFactory::~ComponentFactory()
 {

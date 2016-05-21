@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #define MAX_STATIC_RENDERS 20000
-
+class Texture;
 struct StaticTexCoordData
 {
   glm::vec2 m_bottomLeft;
@@ -21,16 +21,16 @@ public:
 
   void Init();
   uint Register();
-  void UpdateTexCoords( uint a_index , glm::vec4 a_top, glm::vec4 a_bottom);
+  void UpdateTexCoords( uint a_index , glm::vec4 a_top , glm::vec4 a_bottom );
   //TopLeft, TopRight, BottomLeft, BottomRight
-  void UpdatePosition( uint a_index , glm::mat4 a_mat);
+  void UpdatePosition( uint a_index , glm::mat4 a_mat );
   void UnRegister( uint a_index );
   void Flush();
 
 private:
   GLuint m_vao , m_vbo;
-  Shader m_shader;
-
+  Shader* m_shader;
+  Texture* m_texture;
   struct SpriteInfo
   {
     glm::vec4 Top;
@@ -42,4 +42,3 @@ private:
   uint m_staticCount;
   int m_projLoc;
 };
-

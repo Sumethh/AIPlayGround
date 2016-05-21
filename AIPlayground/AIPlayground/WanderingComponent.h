@@ -10,6 +10,4 @@ public:
   void Update( float a_dt ) override;
 private:
   PathfindingAgentComponent* m_pathfindingComp;
-
 };
-

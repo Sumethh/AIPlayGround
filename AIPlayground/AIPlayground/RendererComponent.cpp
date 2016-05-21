@@ -10,11 +10,9 @@ RendererComponent::RendererComponent( GameObject::SharedPtr  a_gameObject , ECom
 {
 }
 
-
 RendererComponent::~RendererComponent()
 {
 }
-
 
 void RendererComponent::PreRender()
 {

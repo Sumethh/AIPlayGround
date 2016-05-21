@@ -1,13 +1,11 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-
 class Window
 {
 public:
   Window( const int a_width , const int a_height , const char* a_windowName );
   ~Window();
-
 
   void Swap();
   void Update();
@@ -27,7 +25,6 @@ public:
   inline int GetWidth() const { return m_width; }
 
   bool IsCloseRequested() { return m_closeRequested; }
-
 
 private:
 

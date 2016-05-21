@@ -10,7 +10,6 @@ PathfindingAgentComponent::PathfindingAgentComponent( GameObject::SharedPtr a_go
 {
 }
 
-
 PathfindingAgentComponent::~PathfindingAgentComponent()
 {
 }
@@ -28,7 +27,6 @@ void PathfindingAgentComponent::OnCosntruct()
 
 void PathfindingAgentComponent::Render( Window* a_window )
 {
-
   if( m_path )
   {
     World* world = GetParentShared()->GetWorld();

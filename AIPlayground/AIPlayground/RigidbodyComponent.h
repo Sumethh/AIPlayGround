@@ -16,7 +16,6 @@ public:
   void BeginPlay() override;
   void PhysicsUpdate( float a_fixedDt ) override;
 
-
   void OnCollisionEnter( Collision& a_collision ) override;
 
   inline void SetDrag( const float a_drag ) { m_drag = a_drag; }
@@ -26,7 +25,6 @@ public:
   inline glm::vec2 GetVelocity()const { return m_velocity; }
   inline float GetMass()const { return m_mass; }
   inline float GetDrag()const { return m_drag; }
-
 
   inline void AddForce( glm::vec2& a_force )
   {
@@ -41,4 +39,3 @@ private:
   float m_drag;
   float m_mass;
 };
-

@@ -12,7 +12,6 @@ RigidbodyComponent::RigidbodyComponent( GameObject::SharedPtr a_go , EComponentT
   m_drag( 1.0f ) ,
   m_mass( 1.f )
 {
-
 }
 
 RigidbodyComponent::~RigidbodyComponent()
@@ -59,7 +58,7 @@ void RigidbodyComponent::PhysicsUpdate( float a_dt )
     m_velocity += m_acceleration;
     m_velocity *= drag;
 
-    //Reset Force 
+    //Reset Force
     m_force *= 0.0f;
   }
 }

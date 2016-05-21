@@ -11,6 +11,4 @@ public:
 private:
 
   static glm::mat4 m_projection;
-
 };
-

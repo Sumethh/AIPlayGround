@@ -4,8 +4,6 @@
 #include "Common/log.h"
 #include "Camera.h"
 
-
-
 PlayerController::PlayerController( std::shared_ptr<Grid>& a_grid , std::shared_ptr<Camera>& a_camera ) :
   m_grid( a_grid ) ,
   m_camera( a_camera )
@@ -14,9 +12,7 @@ PlayerController::PlayerController( std::shared_ptr<Grid>& a_grid , std::shared_
   {
     m_selectionSprite.setTexture( m_selectionTexture );
   }
-
 }
-
 
 PlayerController::~PlayerController()
 {
@@ -24,7 +20,6 @@ PlayerController::~PlayerController()
 
 void PlayerController::Init()
 {
-
 }
 
 void PlayerController::Update( float a_dt )
@@ -34,7 +29,6 @@ void PlayerController::Update( float a_dt )
   {
     std::shared_ptr<Grid> grid = m_grid.lock();
     std::shared_ptr<Camera> camera = m_camera.lock();
-
 
     tileSizeX = grid->GetTileSizeX();
     tileSizeY = grid->GetTileSizeY();
@@ -81,7 +75,6 @@ void PlayerController::Update( float a_dt )
 
 void PlayerController::PreRender()
 {
-
 }
 
 void PlayerController::Render( Window* const a_window )

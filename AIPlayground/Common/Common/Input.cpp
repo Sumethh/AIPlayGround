@@ -12,7 +12,6 @@ glm::vec2 Input::m_mousePosition;
 
 std::string Input::m_inputString;
 
-
 void Input::AddToInputString( char a_c )
 {
   m_inputString += a_c;
@@ -22,7 +21,6 @@ std::string Input::GetInputString()
 {
   return m_inputString;
 }
-
 
 void Input::SetKeys( const int a_key )
 {
@@ -82,6 +80,6 @@ void Input::ResetMouseButton( const int a_mouseButton )
 void Input::Reset()
 {
   memset( m_keys , 0 , _countof( m_keys ) * sizeof( bool ) );
-  memset( m_mouseButtons , 0 , _countof( m_mouseButtons ) *sizeof( bool ) );
+  memset( m_mouseButtons , 0 , _countof( m_mouseButtons ) * sizeof( bool ) );
   m_inputString.clear();
 }

@@ -5,6 +5,6 @@ enum class EComponentTypes : unsigned short
   CT_PathfindingAgentComponent ,
   CT_WanderingComponent ,
   CT_RigidbodyComponent ,
-  CT_ColliderComponent,
+  CT_ColliderComponent ,
   CT_ComponentCount
 };

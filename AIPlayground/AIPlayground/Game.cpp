@@ -10,7 +10,6 @@ Game::Game() :
     m_world->SetWorldShared( m_world );
 }
 
-
 Game::~Game()
 {
   m_world->OnDestroyed();
@@ -53,13 +52,15 @@ void Game::PostFrame()
 #include "Renderer2D.h"
 #include "LineRenderer.h"
 #include "StaticRenderer.h"
+#include "Texture.h"
+#include "ShaderManager.h"
+#include "TextureManager.h"
+#include "Basic2DRenderer.h"
 Transform myTrans;
 glm::mat4 projection;
 int projLoc , modelLoc;
 GLuint VAO , VBO;
 uint textureLoc;
-
-
 
 int xCount = 1280;
 int yCount = 1080;
@@ -67,35 +68,27 @@ std::vector<Transform> Models;
 SpriteBatchRenderer renderer;
 LineRenderer lineRenderer;
 StaticRenderer staticRenderer;
+Basic2DRenderer basicRenderer;
 unsigned int shaderHandle;
 Shader shader;
 
 void Game::Init()
 {
+  ShaderManager::GI()->Init();
+  TextureManager::GI()->Init();
   renderer.Init();
   lineRenderer.Init();
   staticRenderer.Init();
+  basicRenderer.Init();
   GLenum err = glGetError();
-  sf::Image image;
-  image.loadFromFile( "../Assets/Art/Unit1.png" );
-  const sf::Uint8* pixels = image.getPixelsPtr();
-  auto t = image.getSize();
-  xCount /= t.x;
-  yCount /= t.y;
-  glGenTextures( 1 , &textureLoc );
-  glBindTexture( GL_TEXTURE_2D , textureLoc );
-  glTexParameteri( GL_TEXTURE_2D , GL_TEXTURE_MIN_FILTER , GL_LINEAR );
-  glTexParameteri( GL_TEXTURE_2D , GL_TEXTURE_MAG_FILTER , GL_LINEAR );
-  glTexParameteri( GL_TEXTURE_2D , GL_TEXTURE_WRAP_S , GL_CLAMP_TO_BORDER );
-  glTexParameteri( GL_TEXTURE_2D , GL_TEXTURE_WRAP_T , GL_CLAMP_TO_BORDER );
-  glTexImage2D( GL_TEXTURE_2D , 0 , GL_RGBA , t.x , t.y , 0 , GL_RGBA , GL_UNSIGNED_BYTE , pixels );
-  glGenerateMipmap( GL_TEXTURE_2D );
-  glBindTexture( GL_TEXTURE_2D , 0 );
+
+  xCount /= 32;
+  yCount /= 32;
 
   projection = glm::ortho( 0.f , 1280.0f , 720.0f , 0.0f );
   Renderer2D::SetProjectionMatrix( projection );
   myTrans.position = glm::vec2( 400.0f , 400.0f );
-  myTrans.scale = glm::vec2( t.x , t.y );
+  myTrans.scale = glm::vec2( 32 , 32 );
   myTrans.rotation = 0.0f;
 
   myTrans.transformationMatrix = glm::translate( glm::mat4() , glm::vec3( myTrans.position , 0.0f ) );
@@ -107,9 +100,9 @@ void Game::Init()
     for( int x = 0; x < xCount * 4; x++ )
     {
       Transform trans;
-      trans.position = glm::vec2( x * t.x + t.x / 2 , y * t.y + t.y / 2 );
-      trans.scale.x = t.x;
-      trans.scale.y = t.y;
+      trans.position = glm::vec2( x * 32 + 32 / 2 , y * 32 + 32 / 2 );
+      trans.scale.x = 32;
+      trans.scale.y = 32;
       trans.rotation = 0.0f;
       trans.transformationMatrix = glm::translate( glm::mat4() , glm::vec3( trans.position , 0.0f ) );
       trans.transformationMatrix = glm::rotate( trans.transformationMatrix , trans.rotation , glm::vec3( 0 , 0 , 1 ) );
@@ -126,7 +119,6 @@ void Game::Init()
 
 void Game::FixedUpdate( float a_dt )
 {
-
 }
 float Angle = 0.0f;
 void Game::Update( float a_dt )
@@ -136,50 +128,48 @@ void Game::Update( float a_dt )
 
   if( Input::GetKeyDown( sf::Keyboard::Key::D ) )
     Angle += 10.0f * a_dt;
-
-
-
 }
 void Game::PreRender()
 {
-
-
   int t = 0;
-  lineRenderer.Begin();
-  renderer.Begin();
-  for( auto it : Models )
-  {
-    it.transformationMatrix = glm::translate( glm::mat4() , glm::vec3( it.position , 0.0f ) );
-    it.transformationMatrix = glm::rotate( it.transformationMatrix , Angle , glm::vec3( 0 , 0 , 1 ) );
-    it.transformationMatrix = glm::scale( it.transformationMatrix , glm::vec3( it.scale , 1.0f ) );
-    renderer.Submit( it.transformationMatrix , glm::vec4( 0 , 0 , 1 , 0 ) , glm::vec4( 0 , 1 , 1 , 1 ) );
-  }
-  //
-  glm::vec2 mouseLoc = Input::GetMousePosition();
-  glm::vec2 prevLoc( 0 , 0 );
-  for( auto it : Models )
-  {
-   lineRenderer.Submit( prevLoc , it.position , glm::vec4( 1.0f , 0.0f , 0.0f , 1.0f ) );
-    prevLoc = it.position;
-  }
-  lineRenderer.End();
-  renderer.End();
-
+  //lineRenderer.Begin();
+  //renderer.Begin();
+  //for( auto it : Models )
+  //{
+  //  it.transformationMatrix = glm::translate( glm::mat4() , glm::vec3( it.position , 0.0f ) );
+  //  it.transformationMatrix = glm::rotate( it.transformationMatrix , Angle , glm::vec3( 0 , 0 , 1 ) );
+  //  it.transformationMatrix = glm::scale( it.transformationMatrix , glm::vec3( it.scale , 1.0f ) );
+  //  renderer.Submit( it.transformationMatrix , glm::vec4( 0 , 0 , 1 , 0 ) , glm::vec4( 0 , 1 , 1 , 1 ) );
+  //}
+  ////
+  //glm::vec2 mouseLoc = Input::GetMousePosition();
+  //glm::vec2 prevLoc( 0 , 0 );
+  //for( auto it : Models )
+  //{
+  // lineRenderer.Submit( prevLoc , it.position , glm::vec4( 1.0f , 0.0f , 0.0f , 1.0f ) );
+  //  prevLoc = it.position;
+  //}
+  //lineRenderer.End();
+  //renderer.End();
+  RenderInfo info;
+  info.mat = Models[ 0 ].transformationMatrix;
+  info.shader = ShaderManager::GI()->GetShader( EShaderID::BasicRender );
+  std::pair<uint , Texture*> texture;
+  texture.first = 0;
+  texture.second = TextureManager::GI()->GetTexture( ETextureID::DynamicSpriteSheet );
+  info.textures.push_back( texture );
+  basicRenderer.Submit( info );
 }
 
 void Game::Render( Window* const a_window )
 {
-  glBindTexture( GL_TEXTURE_2D , textureLoc );
-  renderer.Flush();
-  staticRenderer.Flush();
-  glBindTexture( GL_TEXTURE_2D , 0 );
-
-  lineRenderer.Flush();
-
+  //renderer.Flush();
+  //staticRenderer.Flush();
+  //lineRenderer.Flush();
+  basicRenderer.Flush();
 }
 
 void Game::PostFrame()
 {
-
 }
 #endif // 1

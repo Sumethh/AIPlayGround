@@ -4,7 +4,6 @@
 
 typedef std::vector<std::shared_ptr<Component>>::iterator ComponentItr;
 
-
 GameObject::GameObject( EGameObjectType a_type ) :
   m_goType( a_type ) ,
   m_hasBegunPlay( false ) ,
@@ -15,9 +14,8 @@ GameObject::GameObject( EGameObjectType a_type ) :
 {
   SetScale( glm::vec2( 1.0f , 1.0f ) );
   SetRotation( 0 );
-  SetPosition( glm::vec2( 0.0f , 0.0f ));
+  SetPosition( glm::vec2( 0.0f , 0.0f ) );
 }
-
 
 GameObject::~GameObject()
 {
@@ -72,7 +70,6 @@ void GameObject::FixedUpdate( float a_dt )
 
 void GameObject::PreRender()
 {
-
   for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
     ( *itr )->PreRender();
 }
@@ -121,9 +118,7 @@ void GameObject::AddComponent( EComponentTypes a_componentType )
   std::shared_ptr<Component> newComp( ComponentFactory::GI()->MakeComponent( a_componentType , m_thisSharedPtr ) );
   if( !nullptr )
     m_componentsToAdd.push_back( newComp );
-
 }
-
 
 Component* GameObject::GetComponentOfType( EComponentTypes a_type )
 {

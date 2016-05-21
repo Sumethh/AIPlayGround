@@ -1,7 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
 
-
 class Camera
 {
 public:
@@ -17,4 +16,3 @@ public:
 private:
   glm::vec2 m_pos;
 };
-

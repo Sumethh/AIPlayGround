@@ -61,10 +61,8 @@ void WorkerThread::WorkerMainFunction()
           threadInfo->jobTimeTotal += time;
           threadInfo->jobTimeSamplesCount++;
           threadInfo->jobsCompleted++;
-
         }
       }
-
     }
     else
       std::this_thread::yield();
@@ -82,11 +80,7 @@ void JobSystem::Init( uint a_threadCount )
   m_currentMaxID = 1;
 
   InitializeSListHead( &m_jobList );
-
 }
-
-
-
 
 bool JobSystem::CheckJobConditions( Job* a_job )
 {
@@ -165,7 +159,6 @@ void JobSystem::AddActiveJob( Job* a_job )
     m_activeJobs[ a_job->jobID ] = a_job;
     //This is a test
   }
-
 }
 void JobSystem::JobCompleted( Job* a_job )
 {
@@ -176,7 +169,6 @@ void JobSystem::JobCompleted( Job* a_job )
     m_activeJobs.erase( a_job->jobID );
   }
   m_activeJobsMutex.unlock();
-
 }
 
 void JobSystem::UnInit()
@@ -266,4 +258,3 @@ uint32 JobSystem::ScheduleJobWithoutLock( Job* a_jobToAdd )
     LOGE( "Tried to schedule job but jobsystem has not be initialized" );
   return jobID;
 }
-

@@ -11,11 +11,9 @@ PhysicsSystem::PhysicsSystem() :
   m_timeStepMS( m_timeStep * 1000 )
 {}
 
-
 PhysicsSystem::~PhysicsSystem()
 {
 }
-
 
 void PhysicsSystem::SetWorld( World* a_world )
 {
@@ -40,7 +38,7 @@ void PhysicsSystem::Update( float a_dt )
   }
   m_grid->Update();
   m_grid->PerformCollisionTests();
- time = (float)myTime.IntervalMS();
+  time = (float)myTime.IntervalMS();
 }
 
 void PhysicsSystem::Render( Window* a_window )
@@ -123,7 +121,6 @@ void PhysicsSystem::PerformCollisionTests()
         {
           if( BoxCollisionTest( collider1 , collider2 , resultingCollision ) )
           {
-            
           }
           break;
         }

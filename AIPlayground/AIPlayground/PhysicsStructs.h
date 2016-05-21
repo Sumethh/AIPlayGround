@@ -1,8 +1,7 @@
 #pragma once
 
-
 class GameObject;
-class ColliderComponent; 
+class ColliderComponent;
 class Component;
 struct Collision
 {
@@ -11,4 +10,3 @@ struct Collision
   ColliderComponent*  othercollider;
   glm::vec2 collisionNormal;
 };
-

@@ -8,7 +8,6 @@
 
 void GridCell::AddCollider( ColliderComponent* a_collider )
 {
-
 }
 
 GridCell* GridCell::GetCellFromPosition( glm::vec2 a_pos )
@@ -21,11 +20,9 @@ PhysicsGrid::PhysicsGrid( PhysicsSystem::WeakPtr a_physicsSystem ) :
 {
 }
 
-
 PhysicsGrid::~PhysicsGrid()
 {
 }
-
 
 void PhysicsGrid::Generate()
 {
@@ -72,7 +69,6 @@ void PhysicsGrid::Generate()
         gridcell->index.x = (float)x;
         gridcell->index.y = (float)y;
         std::memset( gridcell->neighbors , 0 , sizeof( int ) * 8 );
-
       }
     }
     m_grid = (GridCell*)data;
@@ -126,7 +122,7 @@ void PhysicsGrid::AddCollider( ColliderComponent* a_collider )
   GameObject* colliderParent = a_collider->GetParent();
   Transform colliderTransform = colliderParent->GetTransform();
 
-  //Register to Cells that it collides with  
+  //Register to Cells that it collides with
   AddColliderToCollidingCells( a_collider );
   m_registeredColliders.push_back( a_collider );
 }
@@ -203,7 +199,6 @@ void PhysicsGrid::Draw( Window* a_window )
           };
           a_window->GetWindow()->draw( line , 2 , sf::PrimitiveType::Lines );
         }
-
     }
   }
 }
@@ -408,4 +403,3 @@ void PhysicsGrid::GetCollidingCells( ColliderComponent* a_collider , std::vector
       a_vecOut.push_back( cell );
   }
 }
-

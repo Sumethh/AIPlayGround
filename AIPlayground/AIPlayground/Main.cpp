@@ -19,7 +19,7 @@
 
 int32 frames;
 float currentFPS;
-#define NVIDIADEBUG
+//#define NVIDIADEBUG
 Timer frameTimer , deltaTime , renderTimer , updateTimer , preRenderTimer;
 int fpsTimerIndex , dtTimerIndex , renderTimerIndex , updateTimerIndex , preRenderTimerIndex , physicsTimerIndex;
 Game game;
@@ -30,16 +30,16 @@ int main()
   DebugOnScreenTimer::Init();
   Window mainWindow( 1280 , 720 , "AiPlayground" );
 #ifndef NVIDIADEBUG
-  Window DebugWindiw( 400, 400, "AiPlaygroundDebug" );
+  Window DebugWindiw( 400 , 400 , "AiPlaygroundDebug" );
   DebugWindiw.GetWindow()->setPosition( sf::Vector2i( 0 , 0 ) );
 #endif
   mainWindow.GetWindow()->setActive();
   mainWindow.GetWindow()->setPosition( sf::Vector2i( 450 , 0 ) );
-  if( glewInit() !=  GLEW_OK)
+  if( glewInit() != GLEW_OK )
   {
     LOGE( "Glew failed to initiate" );
   }
-  
+
   glViewport( 0 , 0 , 1280 , 720 );
 
   std::string baseString( "FPS: " );
@@ -56,8 +56,6 @@ int main()
   baseString = "Game::PhysicsUpdate: ";
   physicsTimerIndex = DebugOnScreenTimer::AddNewTimer( baseString );
   DebugOnScreenTimer::SetTimerTrailingText( updateTimerIndex , " ms" );
-
-
 
   baseString = "Game::PrRender: ";
   preRenderTimerIndex = DebugOnScreenTimer::AddNewTimer( baseString );
@@ -99,7 +97,6 @@ int main()
     DebugOnScreenTimer::SetTimerValue( updateTimerIndex , (float)updateTimer.IntervalMS() );
     DebugOnScreenTimer::SetTimerValue( physicsTimerIndex , PhysicsSystem::time );
 
-
     preRenderTimer.Start();
     game.PreRender();
     DebugOnScreenTimer::SetTimerValue( preRenderTimerIndex , (float)preRenderTimer.IntervalMS() );
@@ -107,8 +104,6 @@ int main()
     renderTimer.Start();
     game.Render( &mainWindow );
     DebugOnScreenTimer::SetTimerValue( renderTimerIndex , (float)renderTimer.IntervalMS() );
-
-
 
     if( frameTimer.IntervalMS() >= 1000.0f )
     {
@@ -119,16 +114,14 @@ int main()
     }
     frames++;
 
-
     if( Input::GetKey( sf::Keyboard::Key::Escape ) )
       mainWindow.Close();
-
 
     mainWindow.Swap();
 #ifndef NVIDIADEBUG
 
     DebugWindiw.GetWindow()->setActive();
-    DebugWindiw.Clear(sf::Color::Black);
+    DebugWindiw.Clear( sf::Color::Black );
     DebugOnScreenTimer::DrawTimers( &DebugWindiw );
     JobSystemDebugInfo::GI()->Render( &DebugWindiw );
     DebugWindiw.Swap();

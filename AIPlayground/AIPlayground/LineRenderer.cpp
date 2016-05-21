@@ -1,23 +1,19 @@
 #include "LineRenderer.h"
 #include "Renderer2D.h";
-
+#include "ShaderManager.h"
 #include <glm/gtc/type_ptr.hpp>
-
 
 LineRenderer::LineRenderer()
 {
 }
 
-
 LineRenderer::~LineRenderer()
 {
 }
 
-
-
 void LineRenderer::Init()
 {
-  m_shader.LoadFromFile( "../Assets/Shaders/LineVertexShader.vs" , "../Assets/Shaders/LineFragmentShader.fs" );
+  m_shader = ShaderManager::GI()->GetShader( EShaderID::LineRender );
 
   glGenBuffers( 1 , &m_vbo );
   glBindBuffer( GL_ARRAY_BUFFER , m_vbo );
@@ -74,19 +70,17 @@ void LineRenderer::End()
   glBindBuffer( GL_ARRAY_BUFFER , 0 );
   m_data = nullptr;
   GLenum err = glGetError();
-
 }
 
 void LineRenderer::Flush()
 {
   glEnable( GL_BLEND );
   glBlendFunc( GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA );
-  m_shader.Bind();
-  glUniformMatrix4fv( m_projLocation , 1 , GL_FALSE , glm::value_ptr( Renderer2D::GetProjection() ) );
+  m_shader->Bind();
+  glUniformMatrix4fv( m_shader->GetProjectionUniformLoc() , 1 , GL_FALSE , glm::value_ptr( Renderer2D::GetProjection() ) );
   glBindVertexArray( m_vao );
   glDrawArrays( GL_LINES , 0 , m_lineRenderCount );
   m_lineRenderCount = 0;
   glBindVertexArray( 0 );
-  m_shader.UnBind();
-
+  m_shader->UnBind();
 }

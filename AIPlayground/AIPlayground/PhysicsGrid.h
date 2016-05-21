@@ -3,7 +3,6 @@
 #include "Grid.h"
 #include "PhysicsSystem.h"
 
-
 #define TILE_COUNT_X_PER_CELL 6;
 #define TILE_COUNT_Y_PER_CELL 6;
 #define COLLIDERS_PER_CELL 10
@@ -23,13 +22,12 @@ struct GridCell
   GridCell* GetCellFromPosition( glm::vec2 a_pos );
 };
 
-
 class PhysicsGrid
 {
 public:
-  PhysicsGrid(PhysicsSystem::WeakPtr a_physicsSystem);
+  PhysicsGrid( PhysicsSystem::WeakPtr a_physicsSystem );
   ~PhysicsGrid();
-  
+
   void Generate();
 
   void Update();
@@ -38,9 +36,8 @@ public:
 
   void PerformCollisionTests();
 
-  void Draw(Window* a_window);
+  void Draw( Window* a_window );
 private:
-   
 
   //void SplitCell(GridCell* a_cell);
   //void AddColliderToCell( GridCell* a_cell , ColliderComponent* a_component );
@@ -63,4 +60,3 @@ private:
   uint m_gridCountX;
   uint m_gridCountY;
 };
-

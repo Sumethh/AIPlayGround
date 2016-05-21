@@ -26,24 +26,19 @@ World::World() :
   for( unsigned short i = 0; i < (unsigned int)EGameObjectType::GOT_Max; ++i )
     m_gameObjectDescriptors[ (EGameObjectType)i ] = {};
 
-
   GameObjectConstructionDescriptor& descriptor = m_gameObjectDescriptors[ EGameObjectType::GOT_Unit ];
   descriptor.listOfComps.push_back( EComponentTypes::CT_RenderComponent );
   descriptor.listOfComps.push_back( EComponentTypes::CT_PathfindingAgentComponent );
   descriptor.listOfComps.push_back( EComponentTypes::CT_WanderingComponent );
   descriptor.listOfComps.push_back( EComponentTypes::CT_ColliderComponent );
 
-
   GameObjectConstructionDescriptor& physicsDescriptor = m_gameObjectDescriptors[ EGameObjectType::GOT_PhysicsTest ];
   physicsDescriptor.listOfComps.push_back( EComponentTypes::CT_RenderComponent );
   physicsDescriptor.listOfComps.push_back( EComponentTypes::CT_RigidbodyComponent );
   physicsDescriptor.listOfComps.push_back( EComponentTypes::CT_ColliderComponent );
 
-
   m_worldLimits.topLeft = g_gridOrigin;
   m_worldLimits.bottomRight = g_gridOrigin + glm::vec2( g_tileSizeX * g_tileCountX , g_tileSizeY * g_tileCountY );
-
-
 }
 
 World::~World()
@@ -71,7 +66,6 @@ void World::OnConstruct()
       transform.position = glm::vec2( 400 , 400 );
       transform.rotation = 0.0f;
 
-
       auto t = (RigidbodyComponent*)m_gameObjects[ 0 ]->GetComponentOfType( EComponentTypes::CT_RigidbodyComponent );
 
       t->AddForce( glm::vec2( 10.0f , 0.0f ) );
@@ -94,7 +88,6 @@ void World::OnConstruct()
       //col.radius = 32.0f / 2.0f;
       col.extents = glm::vec2( 32.0f , 32.0f );
       collider->SetCollider( col );
-
     }
     newGO->SetTransfrom( transform );
   }
@@ -119,7 +112,6 @@ void World::OnConstruct()
 
 void World::OnDestroyed()
 {
-
 }
 
 void World::BeginPlay()
@@ -143,13 +135,11 @@ void World::Update( float a_dt )
   {
     DebugValues::GI()->RenderGrid = !DebugValues::GI()->RenderGrid;
   }
-
 }
 
 void World::FixedUpdate( float a_dt )
 {
   m_physicsSystem->Update( a_dt );
-
 }
 
 void World::PreRender()
@@ -172,12 +162,11 @@ glm::vec2 RotatePoint( glm::vec2 vec , float radians )
 
 void World::Render( Window* const a_window )
 {
-
   //
 
   m_grid->Render( a_window );
   m_playerController->Render( a_window );
- // m_physicsSystem->Render( a_window );
+  // m_physicsSystem->Render( a_window );
   for( auto gameObject : m_gameObjects )
     gameObject->Render( a_window );
 }
@@ -199,7 +188,6 @@ void World::PostFrame()
     }
     else
       ++gameObject;
-
   }
 }
 
