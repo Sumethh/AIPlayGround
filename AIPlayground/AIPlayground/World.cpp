@@ -165,7 +165,7 @@ void World::Render()
   //
 
  // m_grid->Render();
-  m_playerController->Render();
+  m_playerController->Render(&m_renderer);
   // m_physicsSystem->Render( a_window );
   for( auto gameObject : m_gameObjects )
     gameObject->Render(&m_renderer);

@@ -80,6 +80,6 @@ void Texture::LoadFromFile( std::string a_file )
     glBindTexture( GL_TEXTURE_2D , 0 );
     m_init = true;
     m_size.x = image.getSize().x;
-    m_size.Y = image.getSize().y;
+    m_size.y = image.getSize().y;
   }
 }

@@ -36,10 +36,10 @@ void RendererComponent::PreRender()
   }
 }
 
-void RendererComponent::Render( Window* a_window )
+void RendererComponent::Render( Renderer2D* a_window )
 {
-  Component::Render( a_window );
-  a_window->RenderDrawable( m_sprite );
+  //Component::Render( a_window );
+  //a_window->RenderDrawable( m_sprite );
 }
 
 void RendererComponent::SetTexture( sf::Texture* a_texture )

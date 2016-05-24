@@ -37,16 +37,19 @@ void SpriteBatchRenderer::Init()
   glVertexAttribPointer( 1 , 4 , GL_FLOAT , GL_FALSE , sizeof( SpriteInfo ) , (GLvoid*)offsetof( SpriteInfo , Bottom ) );
 
   glEnableVertexAttribArray( 2 );
-  glVertexAttribPointer( 2 , 4 , GL_FLOAT , GL_FALSE , sizeof( SpriteInfo ) , (GLvoid*)offsetof( SpriteInfo , Model ) );
+  glVertexAttribPointer( 2 , 3 , GL_FLOAT , GL_FALSE , sizeof( SpriteInfo ) , (GLvoid*)offsetof( SpriteInfo , Position ) );
+  //glVertexAttribPointer( 2 , 4 , GL_FLOAT , GL_FALSE , sizeof( SpriteInfo ) , (GLvoid*)offsetof( SpriteInfo , Model ) );
 
   glEnableVertexAttribArray( 3 );
-  glVertexAttribPointer( 3 , 4 , GL_FLOAT , GL_FALSE , sizeof( SpriteInfo ) , (GLvoid*)( offsetof( SpriteInfo , Model ) + sizeof( glm::vec4 ) ) );
+  glVertexAttribPointer( 3 , 2 , GL_FLOAT , GL_FALSE , sizeof( SpriteInfo ) , (GLvoid*)offsetof( SpriteInfo , Scale ) );
+  //glVertexAttribPointer( 3 , 4 , GL_FLOAT , GL_FALSE , sizeof( SpriteInfo ) , (GLvoid*)( offsetof( SpriteInfo , Model ) + sizeof( glm::vec4 ) ) );
 
   glEnableVertexAttribArray( 4 );
-  glVertexAttribPointer( 4 , 4 , GL_FLOAT , GL_FALSE , sizeof( SpriteInfo ) , (GLvoid*)( offsetof( SpriteInfo , Model ) + sizeof( glm::vec4 ) * 2 ) );
+  glVertexAttribPointer( 4 , 1 , GL_FLOAT , GL_FALSE , sizeof( SpriteInfo ) , (GLvoid*)offsetof( SpriteInfo , Rotation ) );
+ // glVertexAttribPointer( 4 , 4 , GL_FLOAT , GL_FALSE , sizeof( SpriteInfo ) , (GLvoid*)( offsetof( SpriteInfo , Model ) + sizeof( glm::vec4 ) * 2 ) );
 
-  glEnableVertexAttribArray( 5 );
-  glVertexAttribPointer( 5 , 4 , GL_FLOAT , GL_FALSE , sizeof( SpriteInfo ) , (GLvoid*)( offsetof( SpriteInfo , Model ) + sizeof( glm::vec4 ) * 3 ) );
+  //glEnableVertexAttribArray( 5 );
+ // glVertexAttribPointer( 5 , 4 , GL_FLOAT , GL_FALSE , sizeof( SpriteInfo ) , (GLvoid*)( offsetof( SpriteInfo , Model ) + sizeof( glm::vec4 ) * 3 ) );
 
   glBindVertexArray( 0 );
 }
@@ -57,13 +60,15 @@ void SpriteBatchRenderer::Begin()
   glBindBuffer( GL_ARRAY_BUFFER , 0 );
 }
 
-void SpriteBatchRenderer::Submit( glm::mat4& a_mat , glm::vec4 a_top , glm::vec4 a_bottom )
+void SpriteBatchRenderer::Submit( glm::vec3 a_pos , glm::vec2 a_scale , float a_rotation , glm::vec4 a_top , glm::vec4 a_bottom )
 {
   if( m_spriteCount < MAX_SPRITE_RENDERS )
   {
     m_data->Bottom = a_bottom;
     m_data->Top = a_top;
-    m_data->Model = a_mat;
+    m_data->Position = a_pos;
+    m_data->Scale = a_scale;
+    m_data->Rotation = a_rotation;
     m_data++;
     m_spriteCount++;
   }
@@ -72,7 +77,8 @@ void SpriteBatchRenderer::Submit( glm::mat4& a_mat , glm::vec4 a_top , glm::vec4
     End();
     Flush();
     Begin();
-    Submit( a_mat , a_top , a_bottom );
+//    Submit( a_mat , a_top , a_bottom );
+    Submit( a_pos , a_scale , a_rotation , a_top , a_bottom );
   }
 }
 

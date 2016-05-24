@@ -13,7 +13,8 @@ public:
   ~SpriteBatchRenderer();
   void Init();
   void Begin();
-  void Submit( glm::mat4& a_mat , glm::vec4 a_top , glm::vec4 a_bottom );
+  //void Submit( glm::mat4& a_mat , glm::vec4 a_top , glm::vec4 a_bottom );
+  void Submit( glm::vec3 a_pos , glm::vec2 a_scale , float a_rotation , glm::vec4 a_top , glm::vec4 a_bottom );
   void End();
   void Flush();
 private:
@@ -26,7 +27,9 @@ private:
   {
     glm::vec4 Top;
     glm::vec4 Bottom;
-    glm::mat4 Model;
+    glm::vec3 Position;
+    glm::vec2 Scale;
+    float Rotation;
   };
 
   SpriteInfo* m_data;

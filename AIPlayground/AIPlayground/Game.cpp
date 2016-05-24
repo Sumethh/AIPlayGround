@@ -15,7 +15,7 @@ Game::~Game()
   m_world->OnDestroyed();
 }
 
-#if 1
+#if 0
 void Game::Init()
 {
   m_world->OnConstruct();
@@ -46,7 +46,7 @@ void Game::PostFrame()
   m_world->PostFrame();
 }
 #endif
-#if 0
+#if 1
 
 #include "SpriteBatchRenderer.h"
 #include "Renderer2D.h"
@@ -95,9 +95,9 @@ void Game::Init()
   myTrans.transformationMatrix = glm::rotate( myTrans.transformationMatrix , myTrans.rotation , glm::vec3( 0 , 0 , 1 ) );
   myTrans.transformationMatrix = glm::scale( myTrans.transformationMatrix , glm::vec3( myTrans.scale , 1.0f ) );
   shaderHandle = shader.GetShaderHandle();
-  for( int y = 0; y < yCount * 4; y++ )
+  for( int y = 0; y < yCount * 8; y++ )
   {
-    for( int x = 0; x < xCount * 4; x++ )
+    for( int x = 0; x < xCount * 8; x++ )
     {
       Transform trans;
       trans.position = glm::vec2( x * 32 + 32 / 2 , y * 32 + 32 / 2 );
@@ -133,24 +133,24 @@ void Game::PreRender()
 {
   int t = 0;
   //lineRenderer.Begin();
-  //renderer.Begin();
-  //for( auto it : Models )
-  //{
-  //  it.transformationMatrix = glm::translate( glm::mat4() , glm::vec3( it.position , 0.0f ) );
-  //  it.transformationMatrix = glm::rotate( it.transformationMatrix , Angle , glm::vec3( 0 , 0 , 1 ) );
-  //  it.transformationMatrix = glm::scale( it.transformationMatrix , glm::vec3( it.scale , 1.0f ) );
-  //  renderer.Submit( it.transformationMatrix , glm::vec4( 0 , 0 , 1 , 0 ) , glm::vec4( 0 , 1 , 1 , 1 ) );
-  //}
-  ////
-  //glm::vec2 mouseLoc = Input::GetMousePosition();
-  //glm::vec2 prevLoc( 0 , 0 );
-  //for( auto it : Models )
-  //{
-  // lineRenderer.Submit( prevLoc , it.position , glm::vec4( 1.0f , 0.0f , 0.0f , 1.0f ) );
-  //  prevLoc = it.position;
-  //}
-  //lineRenderer.End();
-  //renderer.End();
+  renderer.Begin();
+  for( auto it : Models )
+  {
+    //it.transformationMatrix = glm::translate( glm::mat4() , glm::vec3( it.position , 0.0f ) );
+    //it.transformationMatrix = glm::rotate( it.transformationMatrix , Angle , glm::vec3( 0 , 0 , 1 ) );
+    //it.transformationMatrix = glm::scale( it.transformationMatrix , glm::vec3( it.scale , 1.0f ) );
+    renderer.Submit( glm::vec3( it.position , 1.0f ) , it.scale , Angle , glm::vec4( 0 , 0 , 1 , 0 ) , glm::vec4( 0 , 1 , 1 , 1 ) );
+  }
+  //
+ // glm::vec2 mouseLoc = Input::GetMousePosition();
+ // glm::vec2 prevLoc( 0 , 0 );
+ // for( auto it : Models )
+ // {
+ //  lineRenderer.Submit( prevLoc , it.position , glm::vec4( 1.0f , 0.0f , 0.0f , 1.0f ) );
+ //   prevLoc = it.position;
+ // }
+ // lineRenderer.End();
+  renderer.End();
   RenderInfo info;
   info.mat = Models[ 0 ].transformationMatrix;
   info.shader = ShaderManager::GI()->GetShader( EShaderID::BasicRender );
@@ -161,12 +161,12 @@ void Game::PreRender()
   basicRenderer.Submit( info );
 }
 
-void Game::Render( Window* const a_window )
+void Game::Render()
 {
-  //renderer.Flush();
+  renderer.Flush();
   //staticRenderer.Flush();
   //lineRenderer.Flush();
-  basicRenderer.Flush();
+  //basicRenderer.Flush();
 }
 
 void Game::PostFrame()
