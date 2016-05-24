@@ -2,6 +2,7 @@
 #include "ComponentTypes.h"
 #include "GameObject.h"
 #include <memory>
+class Renderer2D;
 class Window;
 class Component
 {
@@ -16,7 +17,7 @@ public:
   virtual void Update( float a_dt );
   virtual void FixedUpdate( float a_dt );
   virtual void PreRender();
-  virtual void Render( Window* a_window );
+  virtual void Render( Renderer2D* a_window );
   virtual void PostFrame();
 
   virtual void OnCollisionEnter( Collision& a_collision );

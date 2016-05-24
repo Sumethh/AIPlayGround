@@ -7,7 +7,7 @@
 class Component;
 class World;
 class Window;
-
+class Renderer2D;
 enum EGameOjbectFlags
 {
   RenderState = 1 << 0 ,
@@ -35,7 +35,7 @@ public:
   virtual void Update( float a_dt );
   virtual void FixedUpdate( float a_dt );
   virtual void PreRender();
-  virtual void Render( Window* a_windows );
+  virtual void Render( Renderer2D* a_windows );
   virtual void PostFrame();
 
   virtual void OnCollisionEnter( Collision a_collision );

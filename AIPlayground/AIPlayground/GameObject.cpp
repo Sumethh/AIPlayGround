@@ -74,7 +74,7 @@ void GameObject::PreRender()
     ( *itr )->PreRender();
 }
 
-void GameObject::Render( Window* a_window )
+void GameObject::Render( Renderer2D* a_window )
 {
   for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
     ( *itr )->Render( a_window );

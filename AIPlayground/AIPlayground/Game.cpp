@@ -15,7 +15,7 @@ Game::~Game()
   m_world->OnDestroyed();
 }
 
-#if 0
+#if 1
 void Game::Init()
 {
   m_world->OnConstruct();
@@ -36,9 +36,9 @@ void Game::PreRender()
   m_world->PreRender();
 }
 
-void Game::Render( Window* const a_window )
+void Game::Render()
 {
-  m_world->Render( a_window );
+  m_world->Render();
 }
 
 void Game::PostFrame()
@@ -46,7 +46,7 @@ void Game::PostFrame()
   m_world->PostFrame();
 }
 #endif
-#if 1
+#if 0
 
 #include "SpriteBatchRenderer.h"
 #include "Renderer2D.h"

@@ -9,7 +9,7 @@ public:
   ~RendererComponent();
 
   void PreRender() override;
-  void Render( Window* a_window ) override;
+  void Render( Renderer2D* a_window ) override;
 
   void SetTexture( sf::Texture* a_texture );
 

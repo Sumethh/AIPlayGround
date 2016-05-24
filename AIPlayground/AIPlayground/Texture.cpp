@@ -79,5 +79,7 @@ void Texture::LoadFromFile( std::string a_file )
     glGenerateMipmap( GL_TEXTURE_2D );
     glBindTexture( GL_TEXTURE_2D , 0 );
     m_init = true;
+    m_size.x = image.getSize().x;
+    m_size.Y = image.getSize().y;
   }
 }

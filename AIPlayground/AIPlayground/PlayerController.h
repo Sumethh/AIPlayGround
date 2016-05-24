@@ -1,7 +1,8 @@
 #pragma once
 #include "Grid.h"
-
+#include "GameObject.h"
 #include <memory>
+class Renderer2D;
 class Camera;
 class PlayerController
 {
@@ -12,7 +13,7 @@ public:
   void Init();
   void Update( float a_dt );
   void PreRender();
-  void Render( Window* const a_window );
+  void Render( Renderer2D* a_renderer);
 
 private:
 
@@ -23,4 +24,5 @@ private:
 
   std::weak_ptr<Grid> const  m_grid;
   std::weak_ptr<Camera> const m_camera;
+  Transform m_selectionTransform;
 };

@@ -101,7 +101,7 @@ int main()
     DebugOnScreenTimer::SetTimerValue( preRenderTimerIndex , (float)preRenderTimer.IntervalMS() );
 
     renderTimer.Start();
-    game.Render( &mainWindow );
+    game.Render();
     DebugOnScreenTimer::SetTimerValue( renderTimerIndex , (float)renderTimer.IntervalMS() );
 
     if( frameTimer.IntervalMS() >= 1000.0f )

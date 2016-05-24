@@ -35,7 +35,7 @@ void Component::PreRender()
 {
 }
 
-void Component::Render( Window* a_window )
+void Component::Render( Renderer2D* a_window )
 {
 }
 

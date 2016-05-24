@@ -160,15 +160,15 @@ glm::vec2 RotatePoint( glm::vec2 vec , float radians )
   return newVec;
 }
 
-void World::Render( Window* const a_window )
+void World::Render()
 {
   //
 
-  m_grid->Render( a_window );
-  m_playerController->Render( a_window );
+ // m_grid->Render();
+  m_playerController->Render();
   // m_physicsSystem->Render( a_window );
   for( auto gameObject : m_gameObjects )
-    gameObject->Render( a_window );
+    gameObject->Render(&m_renderer);
 }
 
 void World::PostFrame()

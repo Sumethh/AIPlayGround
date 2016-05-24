@@ -8,7 +8,7 @@
 #include "GameObjectTypes.h"
 #include "GameObject.h"
 #include "PhysicsSystem.h"
-
+#include "Renderer2D.h"
 #include <memory.h>
 class GameObject;
 class Window;
@@ -33,7 +33,7 @@ public:
   virtual void Update( float a_dt );
   virtual void FixedUpdate( float a_dt );
   virtual void PreRender();
-  virtual void Render( Window* const a_window );
+  virtual void Render();
   virtual void PostFrame();
 
   GameObject* CreateGameObject( EGameObjectType a_type = EGameObjectType::GOT_Generic );
@@ -59,4 +59,5 @@ private:
   std::shared_ptr<PlayerController> m_playerController;
   std::shared_ptr<Pathfinder> m_pathfinder;
   std::shared_ptr<PhysicsSystem> m_physicsSystem;
+  Renderer2D m_renderer;
 };
