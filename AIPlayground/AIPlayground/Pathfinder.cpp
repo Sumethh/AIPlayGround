@@ -13,17 +13,22 @@ Pathfinder::Pathfinder( std::shared_ptr<Grid>& a_grid ) :
 Pathfinder::~Pathfinder()
 {
 }
-
+int GetH( Node* a_node , Node* a_otherNode )
+{
+  int dstX = (int)abs( a_node->pos.x - a_otherNode->pos.x );
+  int dstY = (int)abs( a_node->pos.y - a_otherNode->pos.y );
+  return ( dstX * 10 ) + dstY * 10;
+}
 int GetDistance( Node* a_node , Node* a_otherNode )
 {
 
   int dstX = (int)abs( a_node->pos.x - a_otherNode->pos.x );
   int dstY = (int)abs( a_node->pos.y - a_otherNode->pos.y );
-  return ( dstX * 10 ) + dstY * 10;
-  //if( dstX > dstY )
-  //  return 14 * dstY + 10 * ( dstX - dstY );
-  //else
-  //  return 14 * dstX + 10 * ( dstY - dstX );
+  //return ( dstX * 10 ) + dstY * 10;
+  if( dstX > dstY )
+    return 14 * dstY + 10 * ( dstX - dstY );
+  else
+    return 14 * dstX + 10 * ( dstY - dstX );
 }
 
 void Pathfinder::AddPathfindingJob( std::function<void( Path* )> a_callback , glm::vec2 a_startPos , glm::vec2 a_endPos )
@@ -70,7 +75,7 @@ void Pathfinder::GetPath( JobParametersBase* a_params )
   {
     LOGE( "I got a path request however i dont have a grid" );
     params->callback( nullptr );
-    return ;
+    return;
   }
 
   if( startNode == endNode )
@@ -133,21 +138,33 @@ void Pathfinder::GetPath( JobParametersBase* a_params )
       if( closedSet.find( currentNeighbor ) != closedSet.end() || !currentNeighbor->bwalkable )
         continue;
 
-      float newMoveCost = currentNode->gCost + GetDistance( currentNode , currentNeighbor);
-      if( newMoveCost < currentNeighbor->gCost || ( std::find( openSet.begin() , openSet.end() , currentNeighbor ) == openSet.end() ) )
+
+      //TODO: Redo this
+      float newMoveCost = currentNode->gCost + GetDistance( currentNode , currentNeighbor );
+      if( std::find( openSet.begin() , openSet.end() , currentNeighbor ) == openSet.end() )
       {
         currentNeighbor->gCost = newMoveCost;
-        currentNeighbor->hCost = (float)GetDistance( currentNeighbor , endNode );
+        currentNeighbor->hCost = (float)GetH( currentNeighbor , endNode );
         currentNeighbor->parent = currentNode;
         currentNeighbor->GetFCost();
-        if( std::find( openSet.begin() , openSet.end() , neighbours[ i ] ) == openSet.end() )
-          openSet.push_back( currentNeighbor );
+        openSet.push_back( currentNeighbor );
 
+      }
+      else
+      {
+        auto t = GetDistance( currentNode , currentNeighbor );
+        if( currentNeighbor->gCost > currentNode->gCost +  t)
+        {
+          currentNeighbor->parent = currentNode;
+          currentNeighbor->gCost = currentNode->gCost + t;
+          currentNeighbor->hCost = GetH( currentNeighbor , endNode );
+          currentNeighbor->fCost = currentNeighbor->gCost + currentNeighbor->hCost;
+        }
       }
     }
   }
 
-  params->callback( RetracePath( startNode , endNode ));
+  params->callback( RetracePath( startNode , endNode ) );
 }
 
 Path* Pathfinder::RetracePath( Node* a_start , Node* a_end )
