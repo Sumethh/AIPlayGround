@@ -15,10 +15,12 @@
 #include "Common/JobSystemDebugInfo.h"
 #include "TimeConsts.h"
 #include <GL/glew.h>
+#include <Common/imgui.h>
+#include "ImGuiImplementation.h"
 
 int32 frames;
 float currentFPS;
-//#define NVIDIADEBUG
+#define NVIDIADEBUG
 Timer frameTimer , deltaTime , renderTimer , updateTimer , preRenderTimer;
 int fpsTimerIndex , dtTimerIndex , renderTimerIndex , updateTimerIndex , preRenderTimerIndex , physicsTimerIndex;
 Game game;
@@ -40,7 +42,8 @@ int main()
   }
 
   glViewport( 0 , 0 , 1280 , 720 );
-
+  ImGui_ImplGlfwGL3_Init( &mainWindow );
+  //ImGui_ImplGlfwGL3_CreateDeviceObjects();
   std::string baseString( "FPS: " );
   fpsTimerIndex = DebugOnScreenTimer::AddNewTimer( baseString );
 
@@ -73,9 +76,13 @@ int main()
 
   JobSystem::Init( 4 );
   float fixedUpdateAccum = 0.0f;
+  bool t = true;
   while( !mainWindow.IsCloseRequested() )
   {
     float dt = (float)deltaTime.IntervalS();
+    if( dt > 1.0f )
+      dt = 1.0f;
+    ImGui_ImplGlfwGL3_NewFrame( dt );
     fixedUpdateAccum += dt;
     TimeConsts::DeltaTime = dt;
     DebugOnScreenTimer::SetTimerValue( dtTimerIndex , dt );
@@ -83,13 +90,19 @@ int main()
 
     mainWindow.Clear( sf::Color::Black );
     mainWindow.Update();
-
+    ImGui_ImplGlfwGL3_NewFrame( dt );
     if( fixedUpdateAccum >= TimeConsts::fixedUpdateTimeStep )
     {
       fixedUpdateAccum -= TimeConsts::fixedUpdateTimeStep;
       game.FixedUpdate( TimeConsts::fixedUpdateTimeStep );
     }
-
+    bool t;
+    //ImGui::SetNextWindowSize( ImVec2( 100 , 100 ) , ImGuiSetCond_FirstUseEver );
+    //ImGui::SetNextWindowCollapsed( true );
+    //ImGui::SetNextWindowPos( ImVec2(0 , 0 ));
+    //ImGui::Begin( "This is a test", &t );
+    ImGui::ShowTestWindow();
+    //ImGui::End();
     updateTimer.Start();
     game.Update( dt );
     TimedFunctionCallManager::GI()->Update();
@@ -112,10 +125,10 @@ int main()
       frameTimer.Reset();
     }
     frames++;
+    ImGui::Render();
 
     if( Input::GetKey( sf::Keyboard::Key::Escape ) )
       mainWindow.Close();
-
     mainWindow.Swap();
 #ifndef NVIDIADEBUG
 

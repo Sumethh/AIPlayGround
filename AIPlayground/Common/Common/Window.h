@@ -26,6 +26,8 @@ public:
 
   bool IsCloseRequested() { return m_closeRequested; }
 
+
+  void( *MouseButtonCallback )( Window* , int , int , int );
 private:
 
   sf::RenderWindow* m_window;

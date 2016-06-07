@@ -115,6 +115,16 @@ void Game::Init()
   staticRenderer.UpdateTexCoords( reg , glm::vec4( 0 , 0 , 1 , 0 ) , glm::vec4( 0 , 1 , 1 , 1 ) );
 
   staticRenderer.UpdatePosition( reg , myTrans.transformationMatrix );
+
+
+  //ImGUI init
+
+
+
+
+
+
+
 }
 
 void Game::FixedUpdate( float a_dt )
@@ -163,10 +173,11 @@ void Game::PreRender()
 
 void Game::Render()
 {
-  renderer.Flush();
+  //renderer.Flush();
   //staticRenderer.Flush();
   //lineRenderer.Flush();
   //basicRenderer.Flush();
+  //ImGui::Render();
 }
 
 void Game::PostFrame()

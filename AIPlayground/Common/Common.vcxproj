@@ -29,19 +29,29 @@
   <ItemGroup>
     <ClInclude Include="Common\DebugOnScreenTimer.h" />
     <ClInclude Include="Common\HelperFunctions.h" />
+    <ClInclude Include="Common\imconfig.h" />
+    <ClInclude Include="Common\imgui.h" />
+    <ClInclude Include="Common\imgui_internal.h" />
     <ClInclude Include="Common\Input.h" />
     <ClInclude Include="Common\InvokableEvent.h" />
     <ClInclude Include="Common\JobSystem.h" />
     <ClInclude Include="Common\JobSystemDebugInfo.h" />
     <ClInclude Include="Common\log.h" />
+    <ClInclude Include="Common\stb_rect_pack.h" />
+    <ClInclude Include="Common\stb_textedit.h" />
+    <ClInclude Include="Common\stb_truetype.h" />
     <ClInclude Include="Common\TimedFunctionCall.h" />
     <ClInclude Include="Common\TimedFunctionCallManager.h" />
     <ClInclude Include="Common\timer.h" />
     <ClInclude Include="Common\Types.h" />
     <ClInclude Include="Common\Window.h" />
     <ClInclude Include="Common\WindowManager.h" />
+    <ClInclude Include="ImGuiImplementation.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Common\imgui.cpp" />
+    <ClCompile Include="Common\imgui_demo.cpp" />
+    <ClCompile Include="Common\imgui_draw.cpp" />
     <ClCompile Include="Common\Input.cpp" />
     <ClCompile Include="Common\JobSystem.cpp" />
     <ClCompile Include="Common\JobSystemDebugInfo.cpp" />
@@ -49,6 +59,7 @@
     <ClCompile Include="Common\TimedFunctionCallManager.cpp" />
     <ClCompile Include="Common\Window.cpp" />
     <ClCompile Include="Common\WindowManager.cpp" />
+    <ClCompile Include="ImGuiImplementation.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D27DD046-29D3-4050-859D-78C52795CB7D}</ProjectGuid>

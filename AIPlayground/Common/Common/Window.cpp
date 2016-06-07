@@ -1,7 +1,7 @@
 #include "Window.h"
 #include "Input.h"
 #include "log.h"
-
+#include "../ImGuiImplementation.h"
 Window::Window( const int a_width , const int a_height , const char* a_windowName ) :
   m_width( a_width ) ,
   m_height( a_height ) ,
@@ -58,6 +58,8 @@ void Window::Update()
     if( windowEvent.type == sf::Event::MouseButtonPressed )
     {
       Input::SetMouseButtons( windowEvent.mouseButton.button );
+      //ImGui_ImplGlfwGL3_MouseButtonCallback( this , windowEvent.mouseButton.button , windowEvent.type , 0 );
+      MouseButtonCallback( this , windowEvent.mouseButton.button , windowEvent.type , 0 );
     }
     if( windowEvent.type == sf::Event::MouseButtonReleased )
     {
@@ -67,6 +69,7 @@ void Window::Update()
     if( windowEvent.type == sf::Event::KeyPressed )
     {
       Input::SetKeys( windowEvent.key.code );
+      ImGui_ImplGlfwGL3_KeyCallback( this , windowEvent.key.code , windowEvent.type , 0 );
     }
     if( windowEvent.type == sf::Event::KeyReleased )
     {
