@@ -138,7 +138,7 @@ void ImGui_ImplGlfwGL3_KeyCallback( Window* , int key , int action , int mods )
   io.KeyCtrl = io.KeysDown[ sf::Keyboard::LControl ] || io.KeysDown[ sf::Keyboard::RControl ];
   io.KeyShift = io.KeysDown[ sf::Keyboard::LShift] || io.KeysDown[ sf::Keyboard::RShift];
   io.KeyAlt = io.KeysDown[ sf::Keyboard::LAlt ] || io.KeysDown[ sf::Keyboard::RAlt];
-  //io.KeySuper = io.KeysDown[ GLFW_KEY_LEFT_SUPER ] || io.KeysDown[ GLFW_KEY_RIGHT_SUPER ];
+//  io.KeySuper = io.KeysDown[ sf::Keyboard:: ] || io.KeysDown[ GLFW_KEY_RIGHT_SUPER ];
 }
 
 void ImGui_ImplGlfwGL3_CharCallback( Window* , unsigned int c )
@@ -301,12 +301,11 @@ bool    ImGui_ImplGlfwGL3_Init( Window* window )
   io.KeyMap[ ImGuiKey_X ] = sf::Keyboard::X;
   io.KeyMap[ ImGuiKey_Y ] = sf::Keyboard::Y;
   io.KeyMap[ ImGuiKey_Z ] = sf::Keyboard::Z;
-
+  
   io.RenderDrawListsFn = ImGui_ImplGlfwGL3_RenderDrawLists;       // Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
 #ifdef _WIN32
   io.ImeWindowHandle = g_Window->GetWindow()->getSystemHandle();
 #endif
-  g_Window->MouseButtonCallback = &ImGui_ImplGlfwGL3_MouseButtonCallback;
   return true;
 }
 
@@ -314,6 +313,31 @@ void ImGui_ImplGlfwGL3_Shutdown()
 {
   ImGui_ImplGlfwGL3_InvalidateDeviceObjects();
   ImGui::Shutdown();
+}
+
+void Imgui_HandleEvents( void* a_event )
+{
+  sf::Event* newEvent = ( sf::Event* )a_event;
+  switch( newEvent->type )
+  {
+  case sf::Event::MouseButtonPressed:
+  {
+    ImGui_ImplGlfwGL3_MouseButtonCallback( nullptr , newEvent->mouseButton.button , sf::Event::MouseButtonPressed,0 );
+    break;
+  }
+  case sf::Event::KeyPressed:
+  {
+    ImGui_ImplGlfwGL3_KeyCallback( nullptr , newEvent->key.code , sf::Event::KeyPressed ,0);
+    break;
+  }
+  case sf::Event::TextEntered:
+  {
+    ImGui_ImplGlfwGL3_CharCallback( nullptr , (char)newEvent->text.unicode );
+    break;
+  }
+  default:
+    break;
+  }
 }
 
 void ImGui_ImplGlfwGL3_NewFrame( float a_dt )
@@ -329,7 +353,7 @@ void ImGui_ImplGlfwGL3_NewFrame( float a_dt )
   w = g_Window->GetWidth();
   h = g_Window->GetHeight();
   io.DisplaySize = ImVec2( (float)w , (float)h );
-  io.DisplayFramebufferScale = ImVec2( w > 0 ? ( (float)w / w ) : 0 , h > 0 ? ( (float)h / h ) : 0 );
+  io.DisplayFramebufferScale = ImVec2(1,1);
 
   // Setup time step
   io.DeltaTime = a_dt;
@@ -347,11 +371,10 @@ void ImGui_ImplGlfwGL3_NewFrame( float a_dt )
   {
     io.MousePos = ImVec2( -1 , -1 );
   }
-
   for( int i = 0; i < 3; i++ )
   {
-    io.MouseDown[ i ] = g_MousePressed[ i ] || Input::GetMouseButtonDown( i );    // If a mouse press event came, always pass it as "mouse held this frame", so we don't miss click-release events that are shorter than 1 frame.
-    g_MousePressed[ i ] = false;
+    io.MouseDown[ i ] = Input::GetMouseButtonDown( i );    // If a mouse press event came, always pass it as "mouse held this frame", so we don't miss click-release events that are shorter than 1 frame.
+    //g_MousePressed[ i ] = false;
   }
 
   io.MouseWheel = g_MouseWheel;

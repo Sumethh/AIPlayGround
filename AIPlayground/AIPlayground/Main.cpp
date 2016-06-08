@@ -89,22 +89,28 @@ int main()
     deltaTime.Reset();
 
     mainWindow.Clear( sf::Color::Black );
-    mainWindow.Update();
-    ImGui_ImplGlfwGL3_NewFrame( dt );
     if( fixedUpdateAccum >= TimeConsts::fixedUpdateTimeStep )
     {
       fixedUpdateAccum -= TimeConsts::fixedUpdateTimeStep;
       game.FixedUpdate( TimeConsts::fixedUpdateTimeStep );
+    mainWindow.Update();
+    ImGui_ImplGlfwGL3_NewFrame( fixedUpdateAccum );
     }
     bool t;
     //ImGui::SetNextWindowSize( ImVec2( 100 , 100 ) , ImGuiSetCond_FirstUseEver );
     //ImGui::SetNextWindowCollapsed( true );
     //ImGui::SetNextWindowPos( ImVec2(0 , 0 ));
     //ImGui::Begin( "This is a test", &t );
-    ImGui::ShowTestWindow();
+    //ImGui::ShowTestWindow();
     //ImGui::End();
+    if( ImGui::Button( "What" , ImVec2( 400 , 400 ) ) )
+    {
+      LOGI( "Testing" );
+    }
+    char buf[ 512 ];
+    ImGui::InputText( "This is a test" , buf , 512 );
     updateTimer.Start();
-    game.Update( dt );
+    //game.Update( dt );
     TimedFunctionCallManager::GI()->Update();
     DebugOnScreenTimer::SetTimerValue( updateTimerIndex , (float)updateTimer.IntervalMS() );
     DebugOnScreenTimer::SetTimerValue( physicsTimerIndex , PhysicsSystem::time );
@@ -138,7 +144,7 @@ int main()
     JobSystemDebugInfo::GI()->Render( &DebugWindiw );
     DebugWindiw.Swap();
 #endif // NVIDIADEBUG
-    mainWindow.GetWindow()->setActive();
+    //mainWindow.GetWindow()->setActive();
     game.PostFrame();
     Input::Reset();
   }
