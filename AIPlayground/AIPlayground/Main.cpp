@@ -28,21 +28,16 @@ int main()
 {
   LOGI( "Application starting" );
   std::srand( (uint)std::time( 0 ) );
-  DebugOnScreenTimer::Init();
   Window mainWindow( 1280 , 720 , "AiPlayground" );
-#ifndef NVIDIADEBUG
-  Window DebugWindiw( 400 , 400 , "AiPlaygroundDebug" );
-  DebugWindiw.GetWindow()->setPosition( sf::Vector2i( 0 , 0 ) );
-#endif
   mainWindow.GetWindow()->setActive();
-  mainWindow.GetWindow()->setPosition( sf::Vector2i( 450 , 0 ) );
+  mainWindow.GetWindow()->setPosition( sf::Vector2i( 600 , 0 ) );
   if( glewInit() != GLEW_OK )
   {
     LOGE( "Glew failed to initiate" );
   }
 
   glViewport( 0 , 0 , 1280 , 720 );
-  ImGui_ImplGlfwGL3_Init( &mainWindow );
+  ImGui_Init( &mainWindow );
   //ImGui_ImplGlfwGL3_CreateDeviceObjects();
   std::string baseString( "FPS: " );
   fpsTimerIndex = DebugOnScreenTimer::AddNewTimer( baseString );
@@ -86,31 +81,17 @@ int main()
     TimeConsts::DeltaTime = dt;
     DebugOnScreenTimer::SetTimerValue( dtTimerIndex , dt );
     deltaTime.Reset();
-
+    
     mainWindow.Clear( sf::Color::Black );
     if( fixedUpdateAccum >= TimeConsts::fixedUpdateTimeStep )
     {
       fixedUpdateAccum -= TimeConsts::fixedUpdateTimeStep;
       game.FixedUpdate( TimeConsts::fixedUpdateTimeStep );
+      mainWindow.Update();
     }
-    mainWindow.Update();
-    ImGui_ImplGlfwGL3_NewFrame( dt );
-    bool t;
-    //ImGui::SetNextWindowSize( ImVec2( 100 , 100 ) , ImGuiSetCond_FirstUseEver );
-    //ImGui::SetNextWindowPos( ImVec2(0 , 0 ));
-    ImGui::SetNextWindowCollapsed( false );
-    ImGui::Begin( "This is a test", &t );
-    //ImGui::ShowTestWindow();
-    ImGui::Button( "What" , ImVec2( 400 , 400 ) );
-    ImGui::End();
-    if( ImGui::Button( "UU" , ImVec2( 400 , 400 ) ) )
-    {
-      LOGI( "Testing" );
-    }
-    char buf[ 512 ];
-    ImGui::InputText( "This is a test" , buf , 512 );
+    ImGui_NewFrame( dt );
     updateTimer.Start();
-    //game.Update( dt );
+    game.Update( dt );
     TimedFunctionCallManager::GI()->Update();
     DebugOnScreenTimer::SetTimerValue( updateTimerIndex , (float)updateTimer.IntervalMS() );
     DebugOnScreenTimer::SetTimerValue( physicsTimerIndex , PhysicsSystem::time );
@@ -131,20 +112,12 @@ int main()
       frameTimer.Reset();
     }
     frames++;
+    DebugOnScreenTimer::DrawTimers();
     ImGui::Render();
 
     if( Input::GetKey( sf::Keyboard::Key::Escape ) )
       mainWindow.Close();
     mainWindow.Swap();
-#ifndef NVIDIADEBUG
-
-    DebugWindiw.GetWindow()->setActive();
-    DebugWindiw.Clear( sf::Color::Black );
-    DebugOnScreenTimer::DrawTimers( &DebugWindiw );
-    JobSystemDebugInfo::GI()->Render( &DebugWindiw );
-    DebugWindiw.Swap();
-#endif // NVIDIADEBUG
-    //mainWindow.GetWindow()->setActive();
     game.PostFrame();
     Input::Reset();
   }

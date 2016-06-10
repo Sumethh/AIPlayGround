@@ -163,11 +163,11 @@ void Game::PreRender()
 
 void Game::Render()
 {
-  //renderer.Flush();
-  //staticRenderer.Flush();
-  //lineRenderer.Flush();
-  //basicRenderer.Flush();
-  //ImGui::Render();
+  renderer.Flush();
+  staticRenderer.Flush();
+  lineRenderer.Flush();
+  basicRenderer.Flush();
+
 }
 
 void Game::PostFrame()

@@ -4,10 +4,7 @@
 
 #include <vector>
 #include <string.h>
-#include <mutex>
-
-#include <SFML/Graphics.hpp>
-
+#include "imgui.h"
 #define FONT_SIZE 8
 
 class DebugOnScreenTimer
@@ -21,12 +18,8 @@ public:
       baseText( a_copyingTimer.baseText ) ,
       trailingText( a_copyingTimer.trailingText ) ,
       displayingText( a_copyingTimer.displayingText ) ,
-      timerMutex() ,
       active( a_copyingTimer.active )
-    {
-      active = !active;
-      active = !active;
-    }
+    {}
     OnScreenTimer()
     {
     }
@@ -35,18 +28,9 @@ public:
     std::string baseText;
     std::string trailingText;
     std::string displayingText;
-    std::mutex timerMutex;
+    
     bool active;
   };
-
-  inline static void Init()
-  {
-    if( m_font.loadFromFile( "../Assets/Fonts/KenPixel.ttf" ) )
-    {
-      m_text.setFont( m_font );
-      m_text.setCharacterSize( FONT_SIZE );
-    }
-  }
 
   inline static int32 AddNewTimer( std::string& a_baseText )
   {
@@ -93,28 +77,20 @@ public:
       m_timers[ a_timerIndex ].active = false;
   }
 
-  inline static void DrawTimers( Window* a_window )
+  inline static void DrawTimers()
   {
-    if( m_text.getFont() != nullptr )
-    {
-      for( size_t i = 0; i < m_timers.size(); i++ )
+    ImGui::Begin("Debug Timers",nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse |
+    ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
+    for( size_t i = 0; i < m_timers.size(); i++ )
       {
         if( m_timers[ i ].active == false )
           continue;
-        float yPos = 5.0f + ( FONT_SIZE + 2 ) * (float)i;
-        m_text.setPosition( sf::Vector2f( 5.0f , yPos ) );
-        m_text.setString( m_timers[ i ].displayingText );
-        a_window->RenderDrawable( m_text );
+        ImGui::Text( m_timers[ i ].displayingText.c_str() );
       }
-    }
+    ImGui::End();
   }
 
 private:
-  static sf::Text m_text;
-  static sf::Font m_font;
   static std::vector<OnScreenTimer> m_timers;
 };
-
-sf::Text DebugOnScreenTimer::m_text;
-sf::Font DebugOnScreenTimer::m_font;
 std::vector<DebugOnScreenTimer::OnScreenTimer> DebugOnScreenTimer::m_timers;

@@ -115,18 +115,18 @@ void ImGui_ImplGlfwGL3_RenderDrawLists( ImDrawData* draw_data )
   glViewport( last_viewport[ 0 ] , last_viewport[ 1 ] , (GLsizei)last_viewport[ 2 ] , (GLsizei)last_viewport[ 3 ] );
 }
 
-void ImGui_ImplGlfwGL3_MouseButtonCallback( Window* , int button , int action , int /*mods*/ )
+void ImGui_MouseButtonCallback( Window* , int button , int action , int /*mods*/ )
 {
   if( action == sf::Event::EventType::MouseButtonPressed && button >= 0 && button < 3 )
     g_MousePressed[ button ] = true;
 }
 
-void ImGui_ImplGlfwGL3_ScrollCallback( Window* , double /*xoffset*/ , double yoffset )
+void ImGui_ScrollCallback( Window* , double /*xoffset*/ , double yoffset )
 {
   g_MouseWheel += (float)yoffset; // Use fractional mouse wheel, 1.0 unit 5 lines.
 }
 
-void ImGui_ImplGlfwGL3_KeyCallback( Window* , int key , int action , int mods )
+void ImGui_KeyCallback( Window* , int key , int action , int mods )
 {
   ImGuiIO& io = ImGui::GetIO();
   if( action == sf::Event::EventType::KeyPressed )
@@ -141,7 +141,7 @@ void ImGui_ImplGlfwGL3_KeyCallback( Window* , int key , int action , int mods )
 //  io.KeySuper = io.KeysDown[ sf::Keyboard:: ] || io.KeysDown[ GLFW_KEY_RIGHT_SUPER ];
 }
 
-void ImGui_ImplGlfwGL3_CharCallback( Window* , unsigned int c )
+void ImGui_CharCallback( Window* , unsigned int c )
 {
   ImGuiIO& io = ImGui::GetIO();
   if( c > 0 && c < 0x10000 )
@@ -174,7 +174,7 @@ bool ImGui_ImplGlfwGL3_CreateFontsTexture()
   return true;
 }
 
-bool ImGui_ImplGlfwGL3_CreateDeviceObjects()
+bool ImGui_CreateDeviceObjects()
 {
   // Backup GL state
   GLint last_texture , last_array_buffer , last_vertex_array;
@@ -251,7 +251,7 @@ bool ImGui_ImplGlfwGL3_CreateDeviceObjects()
   return true;
 }
 
-void    ImGui_ImplGlfwGL3_InvalidateDeviceObjects()
+void    ImGui_InvalidateDeviceObjects()
 {
   if( g_VaoHandle ) glDeleteVertexArrays( 1 , &g_VaoHandle );
   if( g_VboHandle ) glDeleteBuffers( 1 , &g_VboHandle );
@@ -277,7 +277,7 @@ void    ImGui_ImplGlfwGL3_InvalidateDeviceObjects()
   }
 }
 
-bool    ImGui_ImplGlfwGL3_Init( Window* window )
+bool    ImGui_Init( Window* window )
 {
   g_Window = window;
 
@@ -309,9 +309,9 @@ bool    ImGui_ImplGlfwGL3_Init( Window* window )
   return true;
 }
 
-void ImGui_ImplGlfwGL3_Shutdown()
+void ImGui_Shutdown()
 {
-  ImGui_ImplGlfwGL3_InvalidateDeviceObjects();
+  ImGui_InvalidateDeviceObjects();
   ImGui::Shutdown();
 }
 
@@ -322,28 +322,32 @@ void Imgui_HandleEvents( void* a_event )
   {
   case sf::Event::MouseButtonPressed:
   {
-    ImGui_ImplGlfwGL3_MouseButtonCallback( nullptr , newEvent->mouseButton.button , sf::Event::MouseButtonPressed,0 );
+    ImGui_MouseButtonCallback( nullptr , newEvent->mouseButton.button , sf::Event::MouseButtonPressed,0 );
     break;
   }
   case sf::Event::KeyPressed:
   {
-    ImGui_ImplGlfwGL3_KeyCallback( nullptr , newEvent->key.code , sf::Event::KeyPressed ,0);
+    ImGui_KeyCallback( nullptr , newEvent->key.code , sf::Event::KeyPressed ,0);
     break;
   }
   case sf::Event::TextEntered:
   {
-    ImGui_ImplGlfwGL3_CharCallback( nullptr , (char)newEvent->text.unicode );
+    ImGui_CharCallback( nullptr , (char)newEvent->text.unicode );
     break;
+  }
+  case sf::Event::MouseWheelMoved:
+  {
+    g_MouseWheel = newEvent->mouseWheel.delta;
   }
   default:
     break;
   }
 }
 
-void ImGui_ImplGlfwGL3_NewFrame( float a_dt )
+void ImGui_NewFrame( float a_dt )
 {
   if( !g_FontTexture )
-    ImGui_ImplGlfwGL3_CreateDeviceObjects();
+    ImGui_CreateDeviceObjects();
 
   ImGuiIO& io = ImGui::GetIO();
 
@@ -377,8 +381,8 @@ void ImGui_ImplGlfwGL3_NewFrame( float a_dt )
     //g_MousePressed[ i ] = false;
   }
 
-  LOGI( "%d" , io.MouseDown[ 0 ] );
-
+  Input::SetMouseCapture( io.WantCaptureMouse );
+  Input::SetKeyboardCapture( io.WantCaptureKeyboard );
   io.MouseWheel = g_MouseWheel;
   g_MouseWheel = 0.0f;
 
