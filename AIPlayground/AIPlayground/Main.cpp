@@ -82,7 +82,6 @@ int main()
     float dt = (float)deltaTime.IntervalS();
     if( dt > 1.0f )
       dt = 1.0f;
-    ImGui_ImplGlfwGL3_NewFrame( dt );
     fixedUpdateAccum += dt;
     TimeConsts::DeltaTime = dt;
     DebugOnScreenTimer::SetTimerValue( dtTimerIndex , dt );
@@ -93,17 +92,18 @@ int main()
     {
       fixedUpdateAccum -= TimeConsts::fixedUpdateTimeStep;
       game.FixedUpdate( TimeConsts::fixedUpdateTimeStep );
-    mainWindow.Update();
-    ImGui_ImplGlfwGL3_NewFrame( fixedUpdateAccum );
     }
+    mainWindow.Update();
+    ImGui_ImplGlfwGL3_NewFrame( dt );
     bool t;
     //ImGui::SetNextWindowSize( ImVec2( 100 , 100 ) , ImGuiSetCond_FirstUseEver );
-    //ImGui::SetNextWindowCollapsed( true );
     //ImGui::SetNextWindowPos( ImVec2(0 , 0 ));
-    //ImGui::Begin( "This is a test", &t );
+    ImGui::SetNextWindowCollapsed( false );
+    ImGui::Begin( "This is a test", &t );
     //ImGui::ShowTestWindow();
-    //ImGui::End();
-    if( ImGui::Button( "What" , ImVec2( 400 , 400 ) ) )
+    ImGui::Button( "What" , ImVec2( 400 , 400 ) );
+    ImGui::End();
+    if( ImGui::Button( "UU" , ImVec2( 400 , 400 ) ) )
     {
       LOGI( "Testing" );
     }
