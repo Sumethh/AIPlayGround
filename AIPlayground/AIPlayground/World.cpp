@@ -2,7 +2,12 @@
 #include "GameObject.h"
 #include "RendererComponent.h"
 #include <Common/log.h>
-
+#include "glm/gtx/rotate_vector.hpp"
+#include "Common/HelperFunctions.h"
+#include "RigidbodyComponent.h"
+#include "Common/Input.h"
+#include "DebugValues.h"
+#include "ColliderComponent.h"
 const int g_tileSizeX = 32; //Tile Size X in pixels
 const int g_tileSizeY = 32; //Tile Size Y in pixels
 
@@ -13,9 +18,10 @@ const glm::vec2 g_gridOrigin( 0 , 0 );
 
 World::World() :
   m_grid( new Grid( g_gridOrigin , g_tileCountX , g_tileCountY , g_tileSizeX , g_tileSizeY ) ) ,
-  m_camera(new Camera()), 
-  m_playerController( new PlayerController( m_grid , m_camera ) ),
-  m_pathfinder( new Pathfinder( m_grid) )
+  m_camera( new Camera() ) ,
+  m_playerController( new PlayerController( m_grid , m_camera ) ) ,
+  m_pathfinder( new Pathfinder( m_grid ) ) ,
+  m_physicsSystem( new PhysicsSystem() )
 {
   for( unsigned short i = 0; i < (unsigned int)EGameObjectType::GOT_Max; ++i )
     m_gameObjectDescriptors[ (EGameObjectType)i ] = {};
@@ -24,12 +30,16 @@ World::World() :
   descriptor.listOfComps.push_back( EComponentTypes::CT_RenderComponent );
   descriptor.listOfComps.push_back( EComponentTypes::CT_PathfindingAgentComponent );
   descriptor.listOfComps.push_back( EComponentTypes::CT_WanderingComponent );
+  descriptor.listOfComps.push_back( EComponentTypes::CT_ColliderComponent );
+
+  GameObjectConstructionDescriptor& physicsDescriptor = m_gameObjectDescriptors[ EGameObjectType::GOT_PhysicsTest ];
+  physicsDescriptor.listOfComps.push_back( EComponentTypes::CT_RenderComponent );
+  physicsDescriptor.listOfComps.push_back( EComponentTypes::CT_RigidbodyComponent );
+  physicsDescriptor.listOfComps.push_back( EComponentTypes::CT_ColliderComponent );
 
   m_worldLimits.topLeft = g_gridOrigin;
   m_worldLimits.bottomRight = g_gridOrigin + glm::vec2( g_tileSizeX * g_tileCountX , g_tileSizeY * g_tileCountY );
-
 }
-
 
 World::~World()
 {
@@ -38,40 +48,51 @@ World::~World()
 RendererComponent* comp;
 void World::OnConstruct()
 {
-
-  m_grid->Init();
-  for( int i = 0; i < 30000; i++ )
+  m_begunPlay = false;
+  if( m_physicsSystem )
   {
-    GameObject* newGO = CreateGameObject( EGameObjectType::GOT_Unit );
-    Transform transform = newGO->GetTransform();
-    transform.position = glm::vec2( 320 , 320 );
-    transform.scale = glm::vec2( 1 , 1 );
-    transform.rotation = 0.0f;
-    newGO->SetTransfrom( transform );
+    m_physicsSystem->SetWorld( this );
+    m_physicsSystem->Construct();
   }
+  m_grid->Init();
 }
 
 void World::OnDestroyed()
 {
-
 }
 
 void World::BeginPlay()
 {
   for( auto gameObject : m_gameObjects )
     gameObject->BeginPlay();
+  m_begunPlay = true;
 }
-
+#include "Common/imgui.h"
+#include <string>
 void World::Update( float a_dt )
 {
-
+  ImGui::Begin("World Info");
+  ImGui::Text("GO count");
+  ImGui::Text(std::to_string(m_gameObjects.size()).c_str());
   m_playerController->Update( a_dt );
-
   for( auto gameObject : m_gameObjects )
   {
     if( !gameObject->IsDestroyed() )
       gameObject->Update( a_dt );
   }
+  Timer t;
+  t.Start();
+  m_pathfinder->ScheduleJobs();
+  if( Input::GetKey( sf::Keyboard::Key::P ) )
+  {
+    DebugValues::GI()->RenderGrid = !DebugValues::GI()->RenderGrid;
+  }
+  ImGui::End();
+}
+
+void World::FixedUpdate( float a_dt )
+{
+  m_physicsSystem->Update( a_dt );
 }
 
 void World::PreRender()
@@ -81,14 +102,26 @@ void World::PreRender()
     gameObject->PreRender();
 }
 
-void World::Render( Window* const a_window )
+glm::vec2 RotatePoint( glm::vec2 vec , float radians )
 {
+  glm::vec2 newVec;
+  float Cos = glm::cos( radians );
+  float Sin = glm::sin( radians );
+  newVec.x = vec.x * Cos - vec.y * Sin;
+  newVec.y = vec.x * Sin + vec.y * Cos;
 
-  m_grid->Render( a_window );
-  m_playerController->Render( a_window );
+  return newVec;
+}
 
+void World::Render(Renderer2D* a_renderer)
+{
+  //
+
+  m_grid->Render(a_renderer);
+  m_playerController->Render(a_renderer);
+   m_physicsSystem->Render( a_renderer );
   for( auto gameObject : m_gameObjects )
-    gameObject->Render( a_window );
+    gameObject->Render(a_renderer);
 }
 
 void World::PostFrame()
@@ -108,7 +141,6 @@ void World::PostFrame()
     }
     else
       ++gameObject;
-
   }
 }
 
@@ -120,12 +152,14 @@ GameObject* World::CreateGameObject( EGameObjectType a_type )
     m_gameObjects.push_back( newGameObject );
     newGameObject->SetWorld( this );
     newGameObject->OnCosntruct( &m_gameObjectDescriptors[ a_type ] );
+    if (m_begunPlay)
+      newGameObject->BeginPlay();
   }
   return newGameObject;
 }
 
 
-void World::SetGameObjectWorld( GameObject* a_gameobject )
+void World::SetGameObjectWorld(GameObject* a_gameobject)
 {
   if( a_gameobject )
     a_gameobject->SetWorld( this );

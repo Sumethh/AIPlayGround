@@ -5,12 +5,11 @@
 class RendererComponent : public Component
 {
 public:
-  RendererComponent( GameObject* a_gameObject , EComponentTypes a_type );
+  RendererComponent( GameObject::SharedPtr , EComponentTypes a_type );
   ~RendererComponent();
 
-
   void PreRender() override;
-  void Render( Window* a_window ) override;
+  void Render( Renderer2D* a_window ) override;
 
   void SetTexture( sf::Texture* a_texture );
 
@@ -19,4 +18,3 @@ private:
   sf::Texture* m_texture;
   glm::vec2 m_dimensions;
 };
-

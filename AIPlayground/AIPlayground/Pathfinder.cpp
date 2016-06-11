@@ -1,7 +1,7 @@
 #include "Pathfinder.h"
 #include "Grid.h"
 #include <Common/log.h>
-
+#include <future>
 #include <map>
 
 Pathfinder::Pathfinder( std::shared_ptr<Grid>& a_grid ) :
@@ -9,14 +9,12 @@ Pathfinder::Pathfinder( std::shared_ptr<Grid>& a_grid ) :
 {
 }
 
-
 Pathfinder::~Pathfinder()
 {
 }
 
 int GetDistance( Node* a_node , Node* a_otherNode )
 {
-
   int dstX = (int)abs( a_node->pos.x - a_otherNode->pos.x );
   int dstY = (int)abs( a_node->pos.y - a_otherNode->pos.y );
   return ( dstX * 10 ) + dstY * 10;
@@ -50,7 +48,20 @@ void Pathfinder::AddPathfindingJob( std::function<void( Path* )> a_callback , No
   newJob->jobParams = params;
   newJob->threadCleanUpJob = true;
   newJob->typeHashCode = typeid( params ).hash_code();
-  JobSystem::ScheduleJob( newJob );
+  m_jobsToSchedule.push_back( newJob );
+}
+
+void Pathfinder::ScheduleJobs()
+{
+  //std::mutex& lock = JobSystem::GetLock();
+  //lock.lock();
+  for( auto it = m_jobsToSchedule.begin(); it != m_jobsToSchedule.end(); )
+  {
+    JobSystem::ScheduleJob( *it );
+    ++it;
+  }
+  //lock.unlock();
+  m_jobsToSchedule.clear();
 }
 
 void Pathfinder::GetPath( JobParametersBase* a_params )
@@ -70,12 +81,11 @@ void Pathfinder::GetPath( JobParametersBase* a_params )
   {
     LOGE( "I got a path request however i dont have a grid" );
     params->callback( nullptr );
-    return ;
+    return;
   }
 
   if( startNode == endNode )
   {
-    LOGW( "Got a path requested with the same start and end positions " );
     params->callback( nullptr );
     return;
   }
@@ -83,14 +93,12 @@ void Pathfinder::GetPath( JobParametersBase* a_params )
 
   if( endNode && !endNode->bwalkable )
   {
-    LOGW( "Got a path requested with end node being unwalkable" );
     params->callback( nullptr );
     return;
   }
 
   if( !endNode || !startNode )
   {
-
     LOGW( "Got a path requested with end node or start node being nullptr" );
     params->callback( nullptr );
     return;
@@ -133,7 +141,7 @@ void Pathfinder::GetPath( JobParametersBase* a_params )
       if( closedSet.find( currentNeighbor ) != closedSet.end() || !currentNeighbor->bwalkable )
         continue;
 
-      float newMoveCost = currentNode->gCost + GetDistance( currentNode , currentNeighbor);
+      float newMoveCost = currentNode->gCost + GetDistance( currentNode , currentNeighbor );
       if( newMoveCost < currentNeighbor->gCost || ( std::find( openSet.begin() , openSet.end() , currentNeighbor ) == openSet.end() ) )
       {
         currentNeighbor->gCost = newMoveCost;
@@ -142,12 +150,11 @@ void Pathfinder::GetPath( JobParametersBase* a_params )
         currentNeighbor->GetFCost();
         if( std::find( openSet.begin() , openSet.end() , neighbours[ i ] ) == openSet.end() )
           openSet.push_back( currentNeighbor );
-
       }
     }
   }
 
-  params->callback( RetracePath( startNode , endNode ));
+  params->callback( RetracePath( startNode , endNode ) );
 }
 
 Path* Pathfinder::RetracePath( Node* a_start , Node* a_end )
@@ -155,7 +162,7 @@ Path* Pathfinder::RetracePath( Node* a_start , Node* a_end )
   Path* newPath = new Path();
 
   Node* currentNode = a_end;
-  while( currentNode->parent != a_start )
+  while( currentNode->parent && currentNode->parent != a_start)
   {
     newPath->nodes.push_back( currentNode->center );
     currentNode = currentNode->parent;

@@ -26,6 +26,13 @@ public:
 
   static void Reset();
 
+  static bool IsMouseOverUI();
+  static bool IsKeyboardCapturedByUI();
+
+  static void SetMouseCapture( bool a_capt );
+  static void SetKeyboardCapture( bool a_capt );
+
+
 private:
   static bool m_keys[ sf::Keyboard::KeyCount ];
   static bool m_heldKeys[ sf::Keyboard::KeyCount ];
@@ -37,4 +44,6 @@ private:
   static glm::vec2 m_mousePosition;
 
   static std::string m_inputString;
+
+  static bool m_UiCaptureMouse, m_UiCaptureKeyboard;
 };

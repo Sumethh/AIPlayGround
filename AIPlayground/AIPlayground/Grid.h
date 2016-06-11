@@ -3,9 +3,11 @@
 #include <queue>
 #include <SFML/Graphics.hpp>
 #include <glm/glm.hpp>
-
+#include <memory>
+#include "Texture.h"
+#include "Transform.h"
 class Window;
-
+class Renderer2D;
 struct Node
 {
   enum Neighbors
@@ -42,11 +44,11 @@ class Grid
 public:
   Grid( glm::vec2 m_gridOrigin , int a_tileCountX , int a_tileCountY , int a_tileSizeX , int a_tileSizeY );
   ~Grid();
-
+  typedef std::weak_ptr<Grid> WeakPtr;
+  typedef std::shared_ptr<Grid> SharedPtr;
   void Init();
   void PreRender( const glm::vec2 a_cameraPo );
-  void Render( Window* const a_windowToDrawTo );
-
+  void Render( Renderer2D* a_renderer);
 
   inline int GetTileSizeX() const { return m_tileSizeX; }
   inline int GetTileSizeY() const { return m_tileSizeY; }
@@ -58,8 +60,6 @@ public:
     if( (size_t)( indexX + indexY * m_tileCountX ) < m_nodes.size() )
       return &m_nodes[ indexY* m_tileCountX + indexX ];
     return nullptr;
-
-
   }
 
   inline Node* GetNode( const int a_indexX , const int a_indexY )
@@ -117,10 +117,8 @@ private:
   void CalculateTileIndex( Node* a_node );
 
   void UpdateImage();
-
-  sf::Sprite m_gridSprite;
-  sf::Texture m_gridTexture;
-
+  Texture m_gridTexture;
+  Transform m_gridTransform;
   sf::Image m_spriteSheet;
   sf::Image m_gridImage;
 
@@ -132,4 +130,3 @@ private:
   glm::vec2 m_gridOrigin;
   std::vector<Node> m_nodes;
 };
-

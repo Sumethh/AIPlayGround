@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AIPlayground", "AIPlayground\AIPlayground.vcxproj", "{FDB36745-3B43-4161-8612-4753D77AA90A}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -11,14 +11,13 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Common\Common.vcxproj", "{D27DD046-29D3-4050-859D-78C52795CB7D}"
 EndProject
 Global
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
+		ReleaseDebug|x64 = ReleaseDebug|x64
+		ReleaseDebug|x86 = ReleaseDebug|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{FDB36745-3B43-4161-8612-4753D77AA90A}.Debug|x64.ActiveCfg = Debug|x64
@@ -29,6 +28,10 @@ Global
 		{FDB36745-3B43-4161-8612-4753D77AA90A}.Release|x64.Build.0 = Release|x64
 		{FDB36745-3B43-4161-8612-4753D77AA90A}.Release|x86.ActiveCfg = Release|Win32
 		{FDB36745-3B43-4161-8612-4753D77AA90A}.Release|x86.Build.0 = Release|Win32
+		{FDB36745-3B43-4161-8612-4753D77AA90A}.ReleaseDebug|x64.ActiveCfg = ReleaseDebug|x64
+		{FDB36745-3B43-4161-8612-4753D77AA90A}.ReleaseDebug|x64.Build.0 = ReleaseDebug|x64
+		{FDB36745-3B43-4161-8612-4753D77AA90A}.ReleaseDebug|x86.ActiveCfg = Release|Win32
+		{FDB36745-3B43-4161-8612-4753D77AA90A}.ReleaseDebug|x86.Build.0 = Release|Win32
 		{D27DD046-29D3-4050-859D-78C52795CB7D}.Debug|x64.ActiveCfg = Debug|x64
 		{D27DD046-29D3-4050-859D-78C52795CB7D}.Debug|x64.Build.0 = Debug|x64
 		{D27DD046-29D3-4050-859D-78C52795CB7D}.Debug|x86.ActiveCfg = Debug|Win32
@@ -37,6 +40,10 @@ Global
 		{D27DD046-29D3-4050-859D-78C52795CB7D}.Release|x64.Build.0 = Release|x64
 		{D27DD046-29D3-4050-859D-78C52795CB7D}.Release|x86.ActiveCfg = Release|Win32
 		{D27DD046-29D3-4050-859D-78C52795CB7D}.Release|x86.Build.0 = Release|Win32
+		{D27DD046-29D3-4050-859D-78C52795CB7D}.ReleaseDebug|x64.ActiveCfg = ReleaseDebug|x64
+		{D27DD046-29D3-4050-859D-78C52795CB7D}.ReleaseDebug|x64.Build.0 = ReleaseDebug|x64
+		{D27DD046-29D3-4050-859D-78C52795CB7D}.ReleaseDebug|x86.ActiveCfg = ReleaseDebug|Win32
+		{D27DD046-29D3-4050-859D-78C52795CB7D}.ReleaseDebug|x86.Build.0 = ReleaseDebug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

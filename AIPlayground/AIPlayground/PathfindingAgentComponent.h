@@ -9,18 +9,17 @@ struct Path;
 class PathfindingAgentComponent :public Component
 {
 public:
-  PathfindingAgentComponent( GameObject* a_go , EComponentTypes a_type );
+  PathfindingAgentComponent( GameObject::SharedPtr a_gameObject , EComponentTypes a_type );
   ~PathfindingAgentComponent();
 
   void OnCosntruct() override;
-  void Render( Window* a_window );
+  void Render( Renderer2D* a_renderer) override;
 
   bool HasPathBeenRequested() { return m_pathRequested; }
   Path* GetPath() { return m_path; }
 
   void RequestPath( glm::vec2 a_start , glm::vec2 a_end );
   void ClearPath();
-
 
   std::weak_ptr<Grid> GetGrid() const;
 private:
@@ -30,4 +29,3 @@ private:
   std::weak_ptr<Pathfinder> m_pathfinder;
   Path* m_path;
 };
-

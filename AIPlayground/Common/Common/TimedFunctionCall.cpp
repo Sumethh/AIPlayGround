@@ -1,7 +1,6 @@
 #include "TimedFunctionCall.h"
 #include "TimedFunctionCallManager.h"
 
-
 TimedFunctionCall::TimedFunctionCall( float a_timeToWaitFor ,
   std::function<void( TimeFunctionCallArgument )> a_funcToCall ,
   TimeFunctionCallArgument a_argument , bool a_looping ) :
@@ -13,7 +12,6 @@ TimedFunctionCall::TimedFunctionCall( float a_timeToWaitFor ,
   m_timer.Start();
   TimedFunctionCallManager::GI()->AddTimer( this );
 }
-
 
 TimedFunctionCall::~TimedFunctionCall()
 {

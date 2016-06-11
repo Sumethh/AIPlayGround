@@ -2,6 +2,9 @@
 #include "Common/Types.h"
 #include "Common/Window.h"
 #include "Common/Log.h"
+#include "Renderer2D.h"
+#include "ShaderManager.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <fstream>
 #include <string>
@@ -11,28 +14,7 @@ sf::IntRect tiles[] =
 {
   sf::IntRect( 0,0, 32,32 ),
   sf::IntRect( 32,0, 32,32 ),
-  //sf::IntRect( 64,0, 32,32 ),
-  //sf::IntRect( 96,0, 32,32 ),
-  //sf::IntRect( 128,0, 32,32 ),
-
-  //sf::IntRect( 0,32, 32,32 ),
-  //sf::IntRect( 128,32, 32,32 ),
-
-  //sf::IntRect( 0,64, 32,32 ),
-  //sf::IntRect( 32,64, 32,32 ),
-  //sf::IntRect( 64,64, 32,32 ),
-  //sf::IntRect( 96,64, 32,32 ),
-  //sf::IntRect( 128,64, 32,32 ),
-
-
-  //sf::IntRect( 0,96, 32,32 ),
-  //sf::IntRect( 32,96, 32,32 ),
-  //sf::IntRect( 64,96, 32,32 ),
-  //sf::IntRect( 96,96, 32,32 ),
-  //sf::IntRect( 128,96, 32,32 ),
-
 };
-
 
 Grid::Grid( glm::vec2 a_gridOrigin , int a_tileCountX , int a_tileCountY , int a_tileSizeX , int a_tileSizeY ) :
   m_gridOrigin( a_gridOrigin ) ,
@@ -43,11 +25,9 @@ Grid::Grid( glm::vec2 a_gridOrigin , int a_tileCountX , int a_tileCountY , int a
 {
   if( !m_spriteSheet.loadFromFile( "../Assets/Art/TileSheet.png" ) )
     LOGE( "Could not load Sprite Sheet" );
-
-  m_gridSprite.setPosition( sf::Vector2f( m_gridOrigin.x , m_gridOrigin.y ) );
-
+  m_gridTransform.position = a_gridOrigin;
+  m_gridTransform.scale = glm::vec2( 1 , 1 );
 }
-
 
 Grid::~Grid()
 {
@@ -68,20 +48,28 @@ void Grid::PreRender( const glm::vec2 a_cameraPos )
     UpdateImage();
     m_bImageDirty = false;
   }
+  glm::vec2 newPos;
+  newPos.x = -a_cameraPos.x  + m_gridImage.getSize().x/2;
+  newPos.y = -a_cameraPos.y+ m_gridImage.getSize().x/2;
 
-  sf::Vector2f newPos;
-  newPos.x = -a_cameraPos.x;
-  newPos.y = -a_cameraPos.y;
-
-  m_gridSprite.setPosition( newPos );
-
+  m_gridTransform.position =  newPos;
 }
 
-void Grid::Render( Window* const a_windowToDrawTo )
+void Grid::Render(Renderer2D* a_renderer )
 {
-
-  a_windowToDrawTo->RenderDrawable( m_gridSprite );
-
+  Basic2DRenderer& basicRender = a_renderer->GetBasicRenderer();
+  RenderInfo renderInfo;
+  renderInfo.shader = ShaderManager::GI()->GetShader( EShaderID::BasicRender );
+  renderInfo.textures.push_back( std::pair<uint , Texture*>(0, &m_gridTexture) );
+  glm::mat4 renderMat;
+  renderMat = glm::translate( renderMat , glm::vec3( m_gridTransform.position , 1.0f ) );
+  renderMat = glm::rotate( renderMat , m_gridTransform.rotation , glm::vec3( 0 , 0 , 1 ) );
+  glm::vec3 scale = glm::vec3(m_gridTransform.scale,1.0f);
+  scale.x *= m_gridImage.getSize().x;
+  scale.y *= m_gridImage.getSize().y;
+  renderMat = glm::scale( renderMat , scale );
+  renderInfo.mat = renderMat;
+  basicRender.Submit( renderInfo );
 }
 
 bool Grid::SaveToDisk()
@@ -184,8 +172,7 @@ void Grid::CreateGrid()
       currentNode.bwalkable = true;
       currentNode.tileIndex = 1;
       currentNode.indexSingle = yIndex + x;
-
-
+      currentNode.parent = nullptr;
       currentNode.index.x = (float)x;
       currentNode.index.y = (float)y;
       m_dirtyTileIndiciesQueue.push( yIndex + x );
@@ -216,7 +203,6 @@ void Grid::CalculateNeighbors()
         i.neighbors[ Node::Neighbors::NE ] = GetNode( nodeIndexX + 1 , nodeIndexY - 1 );
       else
         i.neighbors[ Node::Neighbors::NE ] = nullptr;
-
     }
     else
     {
@@ -229,7 +215,6 @@ void Grid::CalculateNeighbors()
       i.neighbors[ Node::Neighbors::W ] = GetNode( nodeIndexX - 1 , nodeIndexY );
     else
       i.neighbors[ Node::Neighbors::W ] = nullptr;
-
 
     if( nodeIndexX + 1 < m_tileCountX )
       i.neighbors[ Node::Neighbors::E ] = GetNode( nodeIndexX + 1 , nodeIndexY );
@@ -247,14 +232,10 @@ void Grid::CalculateNeighbors()
 
       if( nodeIndexX + 1 < m_tileCountX )
       {
-
         i.neighbors[ Node::Neighbors::SE ] = GetNode( nodeIndexX + 1 , nodeIndexY + 1 );
-
-
       }
       else
         i.neighbors[ Node::Neighbors::SE ] = nullptr;
-
     }
     else
     {
@@ -267,23 +248,18 @@ void Grid::CalculateNeighbors()
       i.neighbors[ Node::Neighbors::E ] && !i.neighbors[ Node::Neighbors::E ]->bwalkable )
       i.neighbors[ Node::Neighbors::SE ] = nullptr;
 
-
     if( i.neighbors[ Node::Neighbors::N ] && !i.neighbors[ Node::Neighbors::N ]->bwalkable ||
       i.neighbors[ Node::Neighbors::E ] && !i.neighbors[ Node::Neighbors::E ]->bwalkable )
       i.neighbors[ Node::Neighbors::NE ] = nullptr;
-
 
     if( i.neighbors[ Node::Neighbors::N ] && !i.neighbors[ Node::Neighbors::N ]->bwalkable ||
       i.neighbors[ Node::Neighbors::W ] && !i.neighbors[ Node::Neighbors::W ]->bwalkable )
       i.neighbors[ Node::Neighbors::NW ] = nullptr;
 
-
     if( i.neighbors[ Node::Neighbors::S ] && !i.neighbors[ Node::Neighbors::S ]->bwalkable ||
       i.neighbors[ Node::Neighbors::W ] && !i.neighbors[ Node::Neighbors::W ]->bwalkable )
       i.neighbors[ Node::Neighbors::SW ] = nullptr;
-
   }
-
 }
 
 void SetBoolsFromNeighborWalkable( bool& n , bool& w ,
@@ -300,8 +276,6 @@ void SetBoolsFromNeighborWalkable( bool& n , bool& w ,
 
   if( a_node->neighbors[ Node::Neighbors::S ] )
     s = a_node->neighbors[ Node::Neighbors::S ]->bwalkable;
-
-
 }
 
 void Grid::CalculateTileIndex( Node* a_node )
@@ -372,8 +346,7 @@ void Grid::CalculateTileIndex( Node* a_node )
     }
   }
 
-
-  if( n && w && e  && !s )
+  if( n && w && e && !s )
   {
     a_node->tileIndex = 6;
     if( !a_node->neighbors[ Node::Neighbors::S ]->btoBeProcessed )
@@ -392,8 +365,6 @@ void Grid::CalculateTileIndex( Node* a_node )
       a_node->neighbors[ Node::Neighbors::N ]->btoBeProcessed = true;
     }
   }
-
-
 
   if( !n && !w && !e  && s )
   {
@@ -416,7 +387,7 @@ void Grid::CalculateTileIndex( Node* a_node )
     }
   }
 
-  if( n && !w && !e  && !s )
+  if( n && !w && !e && !s )
   {
     a_node->tileIndex = 15;
     if( !a_node->neighbors[ Node::Neighbors::W ]->btoBeProcessed )
@@ -434,10 +405,9 @@ void Grid::CalculateTileIndex( Node* a_node )
       m_dirtyTileIndiciesQueue.push( a_node->neighbors[ Node::Neighbors::S ]->indexSingle );
       a_node->neighbors[ Node::Neighbors::S ]->btoBeProcessed = true;
     }
-
   }
 
-  if( n && w && e  && !s )
+  if( n && w && e && !s )
   {
     a_node->tileIndex = 6;
 
@@ -448,7 +418,7 @@ void Grid::CalculateTileIndex( Node* a_node )
     }
   }
 
-  if( !n && w && e  && !s )
+  if( !n && w && e && !s )
   {
     a_node->tileIndex = 11;
     if( !a_node->neighbors[ Node::Neighbors::S ]->btoBeProcessed )
@@ -463,7 +433,7 @@ void Grid::CalculateTileIndex( Node* a_node )
     }
   }
 
-  if( n && w && !e  && !s )
+  if( n && w && !e && !s )
   {
     a_node->tileIndex = 7;
     if( !a_node->neighbors[ Node::Neighbors::S ]->btoBeProcessed )
@@ -478,7 +448,7 @@ void Grid::CalculateTileIndex( Node* a_node )
     }
   }
 
-  if( n && !w && e  && !s )
+  if( n && !w && e && !s )
   {
     a_node->tileIndex = 8;
     if( !a_node->neighbors[ Node::Neighbors::S ]->btoBeProcessed )
@@ -493,7 +463,7 @@ void Grid::CalculateTileIndex( Node* a_node )
     }
   }
 
-  if( !n && !w && !e  && !s )
+  if( !n && !w && !e && !s )
   {
     a_node->tileIndex = 5;
     if( !a_node->neighbors[ Node::Neighbors::W ]->btoBeProcessed )
@@ -519,7 +489,6 @@ void Grid::CalculateTileIndex( Node* a_node )
   }
 }
 
-
 void Grid::UpdateImage()
 {
   int index;
@@ -535,8 +504,7 @@ void Grid::UpdateImage()
     m_gridImage.copy( m_spriteSheet , xPixelCoord , yPixelCoord , tiles[ currentNode.tileIndex ] );
     nodesProcessed.push_back( &m_nodes[ index ] );
   }
-  m_gridTexture.loadFromImage( m_gridImage );
-  m_gridSprite.setTexture( m_gridTexture , true );
+  m_gridTexture.LoadFromImage( m_gridImage );
   for( auto i : nodesProcessed )
     i->btoBeProcessed = false;
 }

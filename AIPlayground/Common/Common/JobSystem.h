@@ -10,13 +10,14 @@
 #include <mutex>
 #include <typeinfo>
 #include <map>
+#include <windows.h>
+
 enum class JobCondition : int
 {
-  NONE,
-  ONE_AT_A_TIME,
+  NONE ,
+  ONE_AT_A_TIME ,
   COUNT
 };
-
 
 struct JobParametersBase
 {};
@@ -26,7 +27,7 @@ struct Job
 private:
   typedef std::function<void( JobParametersBase* )> JobFunction;
 public:
-  Job() :threadCleanUpJob( true ), jobCondition( JobCondition::NONE), typeHashCode(0) {};
+  Job() :threadCleanUpJob( true ) , jobCondition( JobCondition::NONE ) , typeHashCode( 0 ) {};
   ~Job() { delete jobParams; }
   JobFunction taskFunction;
   JobParametersBase* jobParams;
@@ -36,6 +37,11 @@ public:
   uint32 jobID;
 };
 
+struct LinkedListEntry
+{
+  SLIST_ENTRY entry;
+  Job* job;
+};
 
 struct WorkerThread
 {
@@ -48,7 +54,6 @@ struct WorkerThread
 
   Timer jobTimer;
   uint threadID;
-
 
   std::mutex jobQueueLock;
   std::vector<Job*> jobQueue;
@@ -64,8 +69,8 @@ public:
   static void Init( uint a_threadCount );
   static void UnInit();
   static uint32 ScheduleJob( Job* a_jobToAdd );
-
-
+  static uint32 ScheduleJobWithoutLock( Job* a_jobToAdd );
+  static std::mutex& GetLock() { return m_jobsMutex; }
 
 private:
   JobSystem& operator = ( JobSystem& a_right );
@@ -76,7 +81,9 @@ private:
   static void AddActiveJob( Job* a_job );
   static bool CheckJobConditions( Job* a_job );
 
-  static std::map<uint32, Job*> m_activeJobs;
+  static std::condition_variable m_jobCondition;
+
+  static std::map<uint32 , Job*> m_activeJobs;
   static std::mutex m_activeJobsMutex;
 
   static std::atomic_int m_jobCount;
@@ -89,4 +96,6 @@ private:
   static std::vector<WorkerThread*> m_workerThreads;
   static uint32 m_currentMaxID;
   static bool m_hasInitBeenCalled;
+
+  static SLIST_HEADER m_jobList;
 };

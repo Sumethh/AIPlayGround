@@ -16,4 +16,3 @@ private:
   std::vector<TimedFunctionCall*> m_timers;
   static TimedFunctionCallManager* m_instance;
 };
-
