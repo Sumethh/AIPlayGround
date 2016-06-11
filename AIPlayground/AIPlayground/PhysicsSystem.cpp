@@ -15,7 +15,17 @@ PhysicsSystem::~PhysicsSystem()
 {
 }
 
-void PhysicsSystem::SetWorld( World* a_world )
+std::vector<GameObject*> PhysicsSystem::GetCollidiongGameObjects(glm::vec2 point)
+{
+  return m_grid->GetCollidiongGameObjects(point);
+}
+
+std::vector<GameObject*> PhysicsSystem::GetCollidiongGameObjects(TestableCollider* a_testableCollider)
+{
+  return m_grid->GetCollidiongGameObjects(a_testableCollider);
+}
+
+void PhysicsSystem::SetWorld(World* a_world)
 {
   if( a_world )
   {

@@ -6,6 +6,7 @@ class PhysicsGrid;
 class World;
 class Window;
 class ColliderComponent;
+struct TestableCollider;
 class PhysicsSystem
 {
 public:
@@ -20,6 +21,10 @@ public:
 
   void RegisterRigidbody( PhysicsComponentBase* a_rigidbody );
   void RegisterCollider( ColliderComponent* a_collider );
+
+
+  std::vector<GameObject*> GetCollidiongGameObjects(glm::vec2 point);
+  std::vector<GameObject*> GetCollidiongGameObjects(TestableCollider* a_testableCollider);
 
   void SetWorld( World* a_world );
   std::weak_ptr<World> GetWorld() const { return m_world; }

@@ -22,6 +22,12 @@ struct Collider
   glm::vec2 testableVerts[ 8 ];
 };
 
+struct TestableCollider
+{
+  glm::vec2 position;
+  float radius;
+};
+
 class ColliderComponent : public Component
 {
 public:
@@ -49,6 +55,10 @@ public:
   inline void ResetTestedColliders() { m_testedColliders.clear(); }
 
   void OnCollisionEnter( Collision& a_collision ) override;
+
+  bool CollidesWithPoint(glm::vec2 a_point);
+  bool CollidesWithTestableCollider(TestableCollider a_collider);
+
 private:
 
   inline bool CircleCircleColTest( ColliderComponent* a_collider1 , ColliderComponent* a_collider2 , Collision& a_collision );

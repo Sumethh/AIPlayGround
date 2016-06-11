@@ -159,6 +159,16 @@ GameObject* World::CreateGameObject( EGameObjectType a_type )
 }
 
 
+std::vector<GameObject*> World::GetCollidiongGameObjects(glm::vec2 a_point)
+{
+  return m_physicsSystem->GetCollidiongGameObjects(a_point);
+}
+
+std::vector<GameObject*> World::GetCollidiongGameObjects(TestableCollider* a_testableCollider)
+{
+  return m_physicsSystem->GetCollidiongGameObjects(a_testableCollider);
+}
+
 void World::SetGameObjectWorld(GameObject* a_gameobject)
 {
   if( a_gameobject )

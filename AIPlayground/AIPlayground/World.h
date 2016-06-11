@@ -14,6 +14,7 @@
 
 class GameObject;
 class Window;
+struct TestableCollider;
 
 struct WorldLimits
 {
@@ -48,6 +49,10 @@ public:
 
   World::SharedPtr GetWorldShared()const { return m_thisShared; }
   void SetWorldShared( World::SharedPtr a_ptr ) { m_thisShared = a_ptr; }
+
+  std::vector<GameObject*> GetCollidiongGameObjects(glm::vec2 point);
+  std::vector<GameObject*> GetCollidiongGameObjects(TestableCollider* a_testableCollider);
+
 
 protected:
   void SetGameObjectWorld( GameObject* a_gameobject );

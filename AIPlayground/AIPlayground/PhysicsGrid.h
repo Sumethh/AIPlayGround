@@ -38,6 +38,11 @@ public:
   void PerformCollisionTests();
 
   void Draw( Renderer2D* a_window );
+
+
+  std::vector<GameObject*> GetCollidiongGameObjects(glm::vec2 point);
+  std::vector<GameObject*> GetCollidiongGameObjects(TestableCollider* a_testableCollider);
+
 private:
 
   //void SplitCell(GridCell* a_cell);
