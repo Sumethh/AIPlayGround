@@ -8,7 +8,7 @@ class Component
 {
 public:
   typedef std::shared_ptr<Component> SharedPtr;
-  Component( GameObject::SharedPtr a_gameObject , EComponentTypes a_type );
+  Component( GameObject* a_gameObject , EComponentTypes a_type );
   virtual ~Component();
 
   virtual void OnCosntruct();
@@ -25,12 +25,11 @@ public:
   virtual void OnCollisionStay( Collision& a_collision );
 
   inline bool IsComponentOfType( EComponentTypes a_type ) { return a_type == m_componentType; }
-  inline GameObject* GetParent()const { return m_parent.get(); }
-  inline std::shared_ptr<GameObject> GetParentShared()const { return m_parent; }
+  inline GameObject* GetParent()const { return m_parent; }
   inline bool HasBegunPlay() const { return m_hasBegunPlay; }
   inline EComponentTypes GetComponentType() { return m_componentType; }
 private:
-  GameObject::SharedPtr  m_parent;
+  GameObject*  m_parent;
   EComponentTypes m_componentType;
   bool m_hasBegunPlay;
 };

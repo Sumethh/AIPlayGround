@@ -31,7 +31,7 @@ struct TestableCollider
 class ColliderComponent : public Component
 {
 public:
-  ColliderComponent( GameObject::SharedPtr a_go , EComponentTypes a_compType , EColliderType a_colliderType );
+  ColliderComponent(GameObject*  a_go , EComponentTypes a_compType , EColliderType a_colliderType );
   virtual ~ColliderComponent();
 
   typedef std::shared_ptr<ColliderComponent> SharedPtr;

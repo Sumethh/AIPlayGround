@@ -8,7 +8,7 @@
 #include <ctime>
 #include <glm/glm.hpp>
 #include <glm/gtx/vector_angle.hpp>
-WanderingComponent::WanderingComponent( GameObject::SharedPtr a_go , EComponentTypes a_type ) :
+WanderingComponent::WanderingComponent(GameObject*  a_go , EComponentTypes a_type ) :
   Component( a_go , a_type )
 {
 }
@@ -19,7 +19,7 @@ WanderingComponent::~WanderingComponent()
 
 void WanderingComponent::BeginPlay()
 {
-  std::shared_ptr<GameObject> owner = GetParentShared();
+  GameObject*  owner = GetParent();
   if( owner )
   {
     m_pathfindingComp = (PathfindingAgentComponent*)owner->GetComponentOfType( EComponentTypes::CT_PathfindingAgentComponent );
@@ -33,7 +33,7 @@ void WanderingComponent::Update( float a_dt )
     if( !path && !m_pathfindingComp->HasPathBeenRequested() )
     {
       World* world;
-      world = GetParentShared()->GetWorld();
+      world = GetParent()->GetWorld();
       if( world )
       {
         WorldLimits limits = world->GetWorldLimits();
@@ -41,7 +41,7 @@ void WanderingComponent::Update( float a_dt )
         destX = (float)( std::rand() % (int)limits.bottomRight.x ) + limits.topLeft.x;
         destY = (float)( std::rand() % (int)limits.bottomRight.y ) + limits.topLeft.y;
         glm::vec2 destination( destX , destY );
-        Transform parentTransform = GetParentShared()->GetTransform();
+        Transform parentTransform = GetParent()->GetTransform();
         Grid* grid = m_pathfindingComp->GetGrid();
         if( grid )
         {          
@@ -62,7 +62,7 @@ void WanderingComponent::Update( float a_dt )
       if( path->nodes.size() > 0 )
       {
         glm::vec2 currentNode = path->nodes[ 0 ];
-        Transform parentTransform = GetParentShared()->GetTransform();
+        Transform parentTransform = GetParent()->GetTransform();
         glm::vec2 vecBetween = currentNode - parentTransform.position;
         float length = glm::length( vecBetween );
         if( length < 2.0f )
@@ -81,8 +81,8 @@ void WanderingComponent::Update( float a_dt )
         parentTransform.position += direction* 128.0f * a_dt;
 
         float angle = GetLookAtAngle( currentNode , parentTransform.position );
-        GetParentShared()->SetPosition( parentTransform.position );
-        GetParentShared()->SetRotation(angle);
+        GetParent()->SetPosition( parentTransform.position );
+        GetParent()->SetRotation(angle);
       }
       else
         m_pathfindingComp->ClearPath();

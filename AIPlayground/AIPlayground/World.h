@@ -57,6 +57,9 @@ public:
 protected:
   void SetGameObjectWorld( GameObject* a_gameobject );
 private:
+
+  void AddGoDescriptors();
+
   std::vector<GameObject*> m_gameObjects;
   std::map<EGameObjectType , GameObjectConstructionDescriptor> m_gameObjectDescriptors;
   World::SharedPtr m_thisShared;

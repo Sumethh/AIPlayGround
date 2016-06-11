@@ -3,7 +3,7 @@
 #include "World.h"
 #include "Common/log.h"
 
-RigidbodyComponent::RigidbodyComponent( GameObject::SharedPtr a_go , EComponentTypes a_compType ) :
+RigidbodyComponent::RigidbodyComponent(GameObject*  a_go , EComponentTypes a_compType ) :
   PhysicsComponentBase( a_go , a_compType ) ,
   m_velocity( 0.0f , 0.0f ) ,
   m_acceleration( 0.0f , 0.0f ) ,
@@ -23,7 +23,7 @@ RigidbodyComponent::~RigidbodyComponent()
 
 void RigidbodyComponent::BeginPlay()
 {
-  GameObject::SharedPtr parent = GetParentShared();
+  GameObject* parent = GetParent();
   if( parent )
   {
     Component* comp = parent->GetComponentOfType( GetComponentType() );

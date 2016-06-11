@@ -1,6 +1,6 @@
 #include "Component.h"
 
-Component::Component( GameObject::SharedPtr  a_gameObject , EComponentTypes a_componentType ) :
+Component::Component( GameObject* a_gameObject , EComponentTypes a_componentType ) :
   m_parent( a_gameObject ) ,
   m_componentType( a_componentType )
 {

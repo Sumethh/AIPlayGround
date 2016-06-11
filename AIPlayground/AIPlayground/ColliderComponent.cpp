@@ -4,7 +4,7 @@
 #include "Common/log.h"
 #include "Common/HelperFunctions.h"
 #include "Common/Window.h"
-ColliderComponent::ColliderComponent(GameObject::SharedPtr a_go, EComponentTypes a_compType, EColliderType a_colliderType) :
+ColliderComponent::ColliderComponent(GameObject*  a_go, EComponentTypes a_compType, EColliderType a_colliderType) :
   Component(a_go, a_compType),
   m_colliderType(a_colliderType),
   m_cellsRegistered(4)

@@ -5,7 +5,7 @@
 #include "Renderer2D.h"
 #include "world.h"
 
-RendererComponent::RendererComponent( GameObject::SharedPtr  a_gameObject , EComponentTypes a_type ) :
+RendererComponent::RendererComponent( GameObject*   a_gameObject , EComponentTypes a_type ) :
   Component( a_gameObject , a_type )
 {
 }

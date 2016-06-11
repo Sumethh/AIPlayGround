@@ -117,15 +117,13 @@ public:
 private:
   void SetWorld( World* a_newWorld ) { m_world = a_newWorld; };
   ELayerID m_currentLayer;
-  std::vector<std::shared_ptr<Component>> m_components;
-  std::vector<std::shared_ptr<Component>> m_componentsToAdd;
+  std::vector<Component*> m_components;
+  std::vector<Component*> m_componentsToAdd;
 
   Transform m_transform;
   World* m_world;
 
   EGameObjectType m_goType;
-
-  std::shared_ptr<GameObject> m_thisSharedPtr;
 
   bool m_hasBegunPlay;
   bool m_toBeDestroyed;

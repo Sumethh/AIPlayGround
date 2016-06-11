@@ -197,6 +197,7 @@
     <ClCompile Include="Renderer2D.cpp" />
     <ClCompile Include="RendererComponent.cpp" />
     <ClCompile Include="RigidbodyComponent.cpp" />
+    <ClCompile Include="SelectableGameObjectComponent.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="SpriteBatchRenderer.cpp" />
@@ -229,6 +230,7 @@
     <ClInclude Include="Renderer2D.h" />
     <ClInclude Include="RendererComponent.h" />
     <ClInclude Include="RigidbodyComponent.h" />
+    <ClInclude Include="SelectableGameObjectComponent.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="SpriteBatchRenderer.h" />

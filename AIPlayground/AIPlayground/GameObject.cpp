@@ -9,7 +9,6 @@ GameObject::GameObject( EGameObjectType a_type ) :
   m_hasBegunPlay( false ) ,
   m_toBeDestroyed( false ) ,
   m_world( nullptr ) ,
-  m_thisSharedPtr( this ) ,
   m_rotationMatrixDirty( true ) ,
   m_currentLayer( ELayerID::DynamicObject )
 {
@@ -20,6 +19,16 @@ GameObject::GameObject( EGameObjectType a_type ) :
 
 GameObject::~GameObject()
 {
+  for (auto itr = m_components.begin(); itr != m_components.end();)
+  {
+    delete* itr;
+    itr = m_components.erase(itr);
+  }
+  for (auto itr = m_componentsToAdd.begin(); itr != m_componentsToAdd.end();)
+  {
+    delete* itr;
+    itr = m_components.erase(itr);
+  }
 }
 
 void GameObject::OnCosntruct( GameObjectConstructionDescriptor* a_constructionDescriptor )
@@ -30,26 +39,26 @@ void GameObject::OnCosntruct( GameObjectConstructionDescriptor* a_constructionDe
       AddComponent( i );
   }
   PostFrame();
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
+  for( auto itr = m_components.begin(); itr != m_components.end(); ++itr )
     ( *itr )->OnCosntruct();
 }
 
 void GameObject::OnDestroy()
 {
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
+  for( auto itr = m_components.begin(); itr != m_components.end(); ++itr )
     ( *itr )->OnDestroy();
 }
 
 void GameObject::BeginPlay()
 {
   m_hasBegunPlay = true;
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
+  for( auto itr = m_components.begin(); itr != m_components.end(); ++itr )
     ( *itr )->BeginPlay();
 }
 
 void GameObject::Update( float a_dt )
 {
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
+  for( auto itr = m_components.begin(); itr != m_components.end(); ++itr )
     ( *itr )->Update( a_dt );
   /*if( m_rotationMatrixDirty )
   {
@@ -86,31 +95,31 @@ void GameObject::Update( float a_dt )
 
 void GameObject::FixedUpdate( float a_dt )
 {
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
+  for( auto itr = m_components.begin(); itr != m_components.end(); ++itr )
     ( *itr )->FixedUpdate( a_dt );
 }
 
 void GameObject::PreRender()
 {
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
+  for( auto itr = m_components.begin(); itr != m_components.end(); ++itr )
     ( *itr )->PreRender();
 }
 #include "Renderer2D.h"
 #include "World.h"
 void GameObject::Render( Renderer2D* a_renderer )
 {
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
+  for( auto itr = m_components.begin(); itr != m_components.end(); ++itr )
     ( *itr )->Render( a_renderer );
 }
 
 void GameObject::PostFrame()
 {
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
+  for( auto itr = m_components.begin(); itr != m_components.end(); ++itr )
     ( *itr )->PostFrame();
 
   for( size_t i = 0; i < m_componentsToAdd.size(); ++i )
   {
-    std::shared_ptr<Component> newComp = m_componentsToAdd[ i ];
+    Component* newComp = m_componentsToAdd[ i ];
     m_components.push_back( newComp );
     if( HasBegunPlay() && !newComp->HasBegunPlay() )
       newComp->BeginPlay();
@@ -120,33 +129,33 @@ void GameObject::PostFrame()
 
 void GameObject::OnCollisionEnter( Collision a_collision )
 {
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
+  for( auto itr = m_components.begin(); itr != m_components.end(); ++itr )
     ( *itr )->OnCollisionEnter( a_collision );
 }
 
 void GameObject::OnCollisionLeave( Collision a_collision )
 {
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
+  for( auto itr = m_components.begin(); itr != m_components.end(); ++itr )
     ( *itr )->OnCollisionLeave( a_collision );
 }
 
 void GameObject::OnCollisionStay( Collision a_collision )
 {
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
+  for( auto itr = m_components.begin(); itr != m_components.end(); ++itr )
     ( *itr )->OnCollisionStay( a_collision );
 }
 
 void GameObject::AddComponent( EComponentTypes a_componentType )
 {
-  std::shared_ptr<Component> newComp( ComponentFactory::GI()->MakeComponent( a_componentType , m_thisSharedPtr ) );
+  Component* newComp( ComponentFactory::GI()->MakeComponent( a_componentType , this ) );
   if( !nullptr )
     m_componentsToAdd.push_back( newComp );
 }
 
 Component* GameObject::GetComponentOfType( EComponentTypes a_type )
 {
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
+  for( auto itr = m_components.begin(); itr != m_components.end(); ++itr )
     if( ( *itr )->IsComponentOfType( a_type ) )
-      return ( itr )->get();
+      return ( *itr );
   return nullptr;
 }

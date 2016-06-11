@@ -6,7 +6,7 @@
 #include <SFML/Graphics.hpp>
 #include "Common/Window.h"
 #include "DebugValues.h"
-PathfindingAgentComponent::PathfindingAgentComponent( GameObject::SharedPtr a_go , EComponentTypes a_type ) :
+PathfindingAgentComponent::PathfindingAgentComponent( GameObject* a_go , EComponentTypes a_type ) :
   Component( a_go , a_type )
 {
 }
@@ -17,7 +17,7 @@ PathfindingAgentComponent::~PathfindingAgentComponent()
 
 void PathfindingAgentComponent::OnCosntruct()
 {
-  std::shared_ptr<GameObject> parent = GetParentShared();
+  GameObject* parent = GetParent();
   if( parent )
   {
     World* world = parent->GetWorld();
@@ -30,7 +30,7 @@ void PathfindingAgentComponent::Render( Renderer2D* a_renderer )
 {
   if( m_path )
   {
-    World* world = GetParentShared()->GetWorld();
+    World* world = GetParent()->GetWorld();
     Camera* cam = nullptr;
     if( world )
       cam = world->GetCamera();

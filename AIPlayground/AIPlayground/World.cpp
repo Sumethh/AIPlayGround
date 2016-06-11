@@ -23,26 +23,23 @@ World::World() :
   m_pathfinder( new Pathfinder( m_grid ) ) ,
   m_physicsSystem( new PhysicsSystem() )
 {
-  for( unsigned short i = 0; i < (unsigned int)EGameObjectType::GOT_Max; ++i )
-    m_gameObjectDescriptors[ (EGameObjectType)i ] = {};
-
-  GameObjectConstructionDescriptor& descriptor = m_gameObjectDescriptors[ EGameObjectType::GOT_Unit ];
-  descriptor.listOfComps.push_back( EComponentTypes::CT_RenderComponent );
-  descriptor.listOfComps.push_back( EComponentTypes::CT_PathfindingAgentComponent );
-  descriptor.listOfComps.push_back( EComponentTypes::CT_WanderingComponent );
-  descriptor.listOfComps.push_back( EComponentTypes::CT_ColliderComponent );
-
-  GameObjectConstructionDescriptor& physicsDescriptor = m_gameObjectDescriptors[ EGameObjectType::GOT_PhysicsTest ];
-  physicsDescriptor.listOfComps.push_back( EComponentTypes::CT_RenderComponent );
-  physicsDescriptor.listOfComps.push_back( EComponentTypes::CT_RigidbodyComponent );
-  physicsDescriptor.listOfComps.push_back( EComponentTypes::CT_ColliderComponent );
-
+  AddGoDescriptors();
   m_worldLimits.topLeft = g_gridOrigin;
   m_worldLimits.bottomRight = g_gridOrigin + glm::vec2( g_tileSizeX * g_tileCountX , g_tileSizeY * g_tileCountY );
 }
 
 World::~World()
 {
+  delete m_grid;
+  delete m_camera;
+  delete m_playerController;
+  delete m_pathfinder;
+  delete m_physicsSystem;
+  for (auto it = m_gameObjects.begin(); it != m_gameObjects.end(); )
+  {
+    delete *it;
+    it = m_gameObjects.erase(it);
+  }
 }
 
 RendererComponent* comp;
@@ -173,4 +170,22 @@ void World::SetGameObjectWorld(GameObject* a_gameobject)
 {
   if( a_gameobject )
     a_gameobject->SetWorld( this );
+}
+
+void World::AddGoDescriptors()
+{
+  for (unsigned short i = 0; i < (unsigned int)EGameObjectType::GOT_Max; ++i)
+    m_gameObjectDescriptors[(EGameObjectType)i] = {};
+
+  GameObjectConstructionDescriptor& unitDescriptor = m_gameObjectDescriptors[EGameObjectType::GOT_Unit];
+  unitDescriptor.listOfComps.push_back(EComponentTypes::CT_RenderComponent);
+  unitDescriptor.listOfComps.push_back(EComponentTypes::CT_PathfindingAgentComponent);
+  unitDescriptor.listOfComps.push_back(EComponentTypes::CT_WanderingComponent);
+  unitDescriptor.listOfComps.push_back(EComponentTypes::CT_ColliderComponent);
+
+  GameObjectConstructionDescriptor& physicsDescriptor = m_gameObjectDescriptors[EGameObjectType::GOT_PhysicsTest];
+  physicsDescriptor.listOfComps.push_back(EComponentTypes::CT_RenderComponent);
+  physicsDescriptor.listOfComps.push_back(EComponentTypes::CT_RigidbodyComponent);
+  physicsDescriptor.listOfComps.push_back(EComponentTypes::CT_ColliderComponent);
+
 }

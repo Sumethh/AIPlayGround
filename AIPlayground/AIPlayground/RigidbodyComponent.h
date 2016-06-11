@@ -8,7 +8,7 @@
 class RigidbodyComponent : public PhysicsComponentBase
 {
 public:
-  RigidbodyComponent( GameObject::SharedPtr  a_go , EComponentTypes a_compType );
+  RigidbodyComponent(GameObject*   a_go , EComponentTypes a_compType );
   ~RigidbodyComponent();
   typedef std::shared_ptr<RigidbodyComponent> SharedPtr;
   typedef std::weak_ptr<RigidbodyComponent> WeakPtr;

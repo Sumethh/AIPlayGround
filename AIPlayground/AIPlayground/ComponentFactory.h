@@ -11,7 +11,7 @@ public:
   ComponentFactory();
   ~ComponentFactory();
 
-  Component* MakeComponent( EComponentTypes a_component , std::shared_ptr<GameObject> a_gameObject );
+  Component* MakeComponent( EComponentTypes a_component , GameObject*  a_gameObject );
 
   static ComponentFactory* GI()
   {
@@ -22,5 +22,5 @@ public:
 
 private:
   static ComponentFactory* m_instance;
-  std::map<EComponentTypes , std::function<Component*( std::shared_ptr<GameObject>  a_gameObject )>> m_functionMap;
+  std::map<EComponentTypes , std::function<Component*(GameObject* a_gameObject )>> m_functionMap;
 };

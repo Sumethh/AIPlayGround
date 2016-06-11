@@ -5,7 +5,7 @@
 class RendererComponent : public Component
 {
 public:
-  RendererComponent( GameObject::SharedPtr , EComponentTypes a_type );
+  RendererComponent(GameObject*, EComponentTypes a_type );
   ~RendererComponent();
 
   void PreRender() override;
