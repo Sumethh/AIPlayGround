@@ -8,6 +8,7 @@
 #define COLLIDERS_PER_CELL 10
 class Window;
 class ColliderComponent;
+class Renderer2D;
 struct GridCell
 {
   glm::vec2 center;
@@ -36,7 +37,7 @@ public:
 
   void PerformCollisionTests();
 
-  void Draw( Window* a_window );
+  void Draw( Renderer2D* a_window );
 private:
 
   //void SplitCell(GridCell* a_cell);

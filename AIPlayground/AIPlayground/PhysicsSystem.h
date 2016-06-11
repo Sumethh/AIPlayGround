@@ -24,7 +24,7 @@ public:
   void SetWorld( World* a_world );
   std::weak_ptr<World> GetWorld() const { return m_world; }
 
-  void Render( Window* a_window );
+  void Render( Renderer2D* a_renderer );
   static float time;;
 private:
   std::vector<PhysicsComponentBase*> m_physicsObjects;

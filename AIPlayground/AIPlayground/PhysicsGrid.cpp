@@ -5,7 +5,7 @@
 #include "ColliderComponent.h"
 #include "Common/log.h"
 #include "DebugValues.h"
-
+#include "Renderer2D.h"
 void GridCell::AddCollider( ColliderComponent* a_collider )
 {
 }
@@ -166,14 +166,11 @@ void PhysicsGrid::PerformCollisionTests()
   //LOGI( "%d" , tests );
 }
 
-void PhysicsGrid::Draw( Window* a_window )
+void PhysicsGrid::Draw( Renderer2D* a_window )
 {
   if( DebugValues::GI()->RenderGrid )
   {
-    sf::RectangleShape rect;
-    rect.setFillColor( sf::Color::Transparent );
-    rect.setOutlineThickness( 1.5 );
-    rect.setOutlineColor( sf::Color::Red );
+    LineRenderer& lineRender = a_window->GetLineRenderer();
     glm::vec2 camLoc( 0 , 0 );
     auto cam = m_physicsSystem.lock()->GetWorld().lock()->GetCamera();
     if( !cam.expired() )
@@ -181,23 +178,30 @@ void PhysicsGrid::Draw( Window* a_window )
       auto t = cam.lock();
       camLoc = t->GetPos();
     }
+
+    glm::vec2 tl , tr , bl , br;
+
     for( uint i = 0; i < m_gridCountX * m_gridCountY; i++ )
     {
       GridCell& cell = m_grid[ i ];
+      tl = cell.center - cell.size / 2.0f;
+      tr.x = cell.center.x + cell.size.x / 2.0f;
+      tr.y = cell.center.y - cell.size.y / 2.0f;
+      bl.x = cell.center.x - cell.size.x / 2.0f;
+      bl.y = cell.center.y + cell.size.y / 2.0f;
+      br = cell.center + cell.size / 2.0f;
 
-      rect.setPosition( ConvertVec2( cell.center - camLoc ) );
-      rect.setOrigin( ConvertVec2( cell.size / 2.0f ) );
-      rect.setSize( ConvertVec2( cell.size ) );
-      a_window->RenderDrawable( rect );
+      lineRender.Submit( tl , tr , glm::vec4( 1.0f , 1.0f , 1.0f , 1.0f ) );
+      lineRender.Submit( br , tr , glm::vec4( 1.0f , 1.0f , 1.0f , 1.0f ) );
+      lineRender.Submit( br , bl , glm::vec4( 1.0f , 1.0f , 1.0f , 1.0f ) );
+      lineRender.Submit( tl , bl , glm::vec4( 1.0f , 1.0f , 1.0f , 1.0f ) );
 
-      if( cell.colliders.size() )
-        for( size_t i = 0; i < cell.colliders.size(); i++ )
+        if( cell.colliders.size() )
         {
-          sf::Vertex line[] = {
-            sf::Vertex( ConvertVec2( cell.center - camLoc ) ),
-            sf::Vertex( ConvertVec2( cell.colliders[ i ]->GetParent()->GetTransform().position - camLoc ) )
-          };
-          a_window->GetWindow()->draw( line , 2 , sf::PrimitiveType::Lines );
+          for( size_t i = 0; i < cell.colliders.size(); i++ )
+          {
+            lineRender.Submit( cell.center , cell.colliders[ i ]->GetParent()->GetTransform().position , glm::vec4( 0.398f , 0.398f , 1.0f , 1.0f ) );
+          }
         }
     }
   }
