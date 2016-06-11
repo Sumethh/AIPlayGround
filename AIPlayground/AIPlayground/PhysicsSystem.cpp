@@ -41,9 +41,9 @@ void PhysicsSystem::Update( float a_dt )
   time = (float)myTime.IntervalMS();
 }
 
-void PhysicsSystem::Render( Window* a_window )
+void PhysicsSystem::Render( Renderer2D* a_renderer )
 {
-  m_grid->Draw( a_window );
+  m_grid->Draw( a_renderer );
 }
 
 void PhysicsSystem::RegisterRigidbody( PhysicsComponentBase* a_rigidbody )

@@ -9,6 +9,6 @@ out vec2 texCoord;
 
 void main()
 {
-  gl_Position = Proj * Model * vec4(Position.x, Position.y , Position.z, 1.0f);
+  gl_Position = Proj * Model * vec4(Position.x, Position.y , Position.z , 1.0f);
   texCoord = TexCoord;
 }

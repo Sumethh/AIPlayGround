@@ -20,7 +20,6 @@
 
 int32 frames;
 float currentFPS;
-#define NVIDIADEBUG
 Timer frameTimer , deltaTime , renderTimer , updateTimer , preRenderTimer;
 int fpsTimerIndex , dtTimerIndex , renderTimerIndex , updateTimerIndex , preRenderTimerIndex , physicsTimerIndex;
 Game game;
@@ -71,7 +70,7 @@ int main()
 
   JobSystem::Init( 4 );
   float fixedUpdateAccum = 0.0f;
-  bool t = true;
+  glClearColor( 0.0f , 0.0f , 0.0f , 0.0f );
   while( !mainWindow.IsCloseRequested() )
   {
     float dt = (float)deltaTime.IntervalS();
@@ -82,7 +81,9 @@ int main()
     DebugOnScreenTimer::SetTimerValue( dtTimerIndex , dt );
     deltaTime.Reset();
     
-    mainWindow.Clear( sf::Color::Black );
+    glClear( GL_COLOR_BUFFER_BIT );
+    mainWindow.Update();
+
     if( fixedUpdateAccum >= TimeConsts::fixedUpdateTimeStep )
     {
       fixedUpdateAccum -= TimeConsts::fixedUpdateTimeStep;

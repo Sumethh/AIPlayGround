@@ -1,7 +1,7 @@
 #include "GameObject.h"
 #include "Component.h"
 #include <glm/gtc/matrix_transform.hpp>
-
+#include "glm/gtx/rotate_vector.hpp"
 typedef std::vector<std::shared_ptr<Component>>::iterator ComponentItr;
 
 GameObject::GameObject( EGameObjectType a_type ) :
@@ -10,7 +10,8 @@ GameObject::GameObject( EGameObjectType a_type ) :
   m_toBeDestroyed( false ) ,
   m_world( nullptr ) ,
   m_thisSharedPtr( this ) ,
-  m_rotationMatrixDirty( true )
+  m_rotationMatrixDirty( true ) ,
+  m_currentLayer( ELayerID::DynamicObject )
 {
   SetScale( glm::vec2( 1.0f , 1.0f ) );
   SetRotation( 0 );
@@ -60,6 +61,27 @@ void GameObject::Update( float a_dt )
     rMatrix[ 1 ][ 0 ] = sinResult;
     rMatrix[ 1 ][ 1 ] = cosResult;
   }*/
+  if( GetRotationFlagDirty() )
+  {
+    ResetRotationDityFlag();
+    glm::vec2 right( 0 , 1 );
+    glm::vec2 forward( 1 , 0 );
+
+    float angle = -m_transform.rotation;
+    float cos = glm::cos( angle );
+    float sin = glm::sin( angle );
+
+    glm::vec2 newVec;
+    newVec.x = forward.x * cos - forward.y * sin;
+    newVec.y = forward.x * sin + forward.y * cos;
+    forward = newVec;
+    newVec.x = right.x * cos - right.y * sin;
+    newVec.y = right.x * sin + right.y * cos;
+    right = newVec;
+
+    m_transform.forward = glm::normalize(forward);
+    m_transform.right = glm::normalize( right);
+  }
 }
 
 void GameObject::FixedUpdate( float a_dt )
@@ -73,11 +95,12 @@ void GameObject::PreRender()
   for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
     ( *itr )->PreRender();
 }
-
-void GameObject::Render( Renderer2D* a_window )
+#include "Renderer2D.h"
+#include "World.h"
+void GameObject::Render( Renderer2D* a_renderer )
 {
   for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
-    ( *itr )->Render( a_window );
+    ( *itr )->Render( a_renderer );
 }
 
 void GameObject::PostFrame()

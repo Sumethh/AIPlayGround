@@ -33,7 +33,7 @@ public:
   virtual void Update( float a_dt );
   virtual void FixedUpdate( float a_dt );
   virtual void PreRender();
-  virtual void Render();
+  virtual void Render( Renderer2D* renderer);
   virtual void PostFrame();
 
   GameObject* CreateGameObject( EGameObjectType a_type = EGameObjectType::GOT_Generic );
@@ -59,5 +59,4 @@ private:
   std::shared_ptr<PlayerController> m_playerController;
   std::shared_ptr<Pathfinder> m_pathfinder;
   std::shared_ptr<PhysicsSystem> m_physicsSystem;
-  Renderer2D m_renderer;
 };

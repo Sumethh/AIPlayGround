@@ -1,5 +1,9 @@
 #pragma once
 #include <glm/glm.hpp>
+#include "LineRenderer.h"
+#include "SpriteBatchRenderer.h"
+#include "Basic2DRenderer.h"
+#include "StaticRenderer.h"
 class Renderer2D
 {
 public:
@@ -8,7 +12,25 @@ public:
 
   static void SetProjectionMatrix( glm::mat4 a_mat ) { m_projection = a_mat; }
   static glm::mat4 GetProjection();
+
+  void Init();
+
+  void Begin();
+  void End(); 
+  
+  void Flush();
+
+  LineRenderer& GetLineRenderer() { return m_lineRenderer; }
+  StaticRenderer& GetStaticRenderer() { return m_staticRenderer; }
+  SpriteBatchRenderer& GetSpriteBatchRenderer() { return m_batchRenderer; }
+  Basic2DRenderer& GetBasicRenderer() { return m_basicRenderer;}
+
 private:
+
+  LineRenderer m_lineRenderer;
+  SpriteBatchRenderer m_batchRenderer;
+  StaticRenderer m_staticRenderer;
+  Basic2DRenderer m_basicRenderer;
 
   static glm::mat4 m_projection;
 };

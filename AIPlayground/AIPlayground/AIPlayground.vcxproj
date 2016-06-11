@@ -99,14 +99,14 @@
     <IncludePath>$(ProjectDir)..\extern\include\x86\;$(IncludePath);$(ProjectDir)..\Common</IncludePath>
     <LibraryPath>$(ProjectDir)..\extern\lib\x86\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>\bin\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)\bin\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)D</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(ProjectDir)..\extern\include\x86\;$(IncludePath);$(ProjectDir)..\Common</IncludePath>
     <LibraryPath>$(ProjectDir)..\extern\lib\x86\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>\bin\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)\bin\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

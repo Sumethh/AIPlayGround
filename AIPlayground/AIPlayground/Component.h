@@ -17,7 +17,7 @@ public:
   virtual void Update( float a_dt );
   virtual void FixedUpdate( float a_dt );
   virtual void PreRender();
-  virtual void Render( Renderer2D* a_window );
+  virtual void Render( Renderer2D* a_renderer );
   virtual void PostFrame();
 
   virtual void OnCollisionEnter( Collision& a_collision );

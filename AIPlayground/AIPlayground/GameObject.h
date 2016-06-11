@@ -4,6 +4,7 @@
 #include "ComponentFactory.h"
 #include "GameObjectTypes.h"
 #include "PhysicsStructs.h"
+#include "Common/Types.h"
 class Component;
 class World;
 class Window;
@@ -12,7 +13,17 @@ enum EGameOjbectFlags
 {
   RenderState = 1 << 0 ,
   PhysicsDirty = 1 << 1 ,
-  CollisionRotationDirty = 1 << 2
+  CollisionRotationDirty = 1 << 2 ,
+  RotationDirtyFlag = 1 <<3
+};
+
+
+/*Layers for the gameobjects, these will determine the z order of the objects the background is drawn on level 10*/
+enum class ELayerID : uint8
+{
+  DynamicObject = 3 ,
+  StaticObject = 4 ,
+  COUNT
 };
 
 struct GameObjectConstructionDescriptor
@@ -35,7 +46,7 @@ public:
   virtual void Update( float a_dt );
   virtual void FixedUpdate( float a_dt );
   virtual void PreRender();
-  virtual void Render( Renderer2D* a_windows );
+  virtual void Render( Renderer2D* a_renderer );
   virtual void PostFrame();
 
   virtual void OnCollisionEnter( Collision a_collision );
@@ -52,6 +63,7 @@ public:
     SetPhysicsFlagDirty();
     SetCollisionFlagDirty();
     SetRenderStateDirty();
+    SetRotationFlagDirty();
   }
   inline void SetPosition( glm::vec2 a_position )
   {
@@ -72,6 +84,7 @@ public:
     SetPhysicsFlagDirty();
     SetCollisionFlagDirty();
     SetRenderStateDirty();
+    SetRotationFlagDirty();
   }
 
   inline void Destroy() { m_toBeDestroyed = true; }
@@ -95,9 +108,15 @@ public:
   inline void ResetCollisionDirtyFlag() { m_gameObjectFlags &= ~EGameOjbectFlags::CollisionRotationDirty; }
   inline void SetCollisionFlagDirty() { m_gameObjectFlags |= EGameOjbectFlags::CollisionRotationDirty; }
 
+  ELayerID GetLayer() { return m_currentLayer; }
+  void SetLayer( ELayerID a_layer) { m_currentLayer = a_layer; }
+
+  inline void SetRotationFlagDirty() { m_gameObjectFlags |= EGameOjbectFlags::RotationDirtyFlag; }
+  inline bool GetRotationFlagDirty() { return m_gameObjectFlags & EGameOjbectFlags::RotationDirtyFlag; }
+  inline void ResetRotationDityFlag() { m_gameObjectFlags &= ~EGameOjbectFlags::RotationDirtyFlag; }
 private:
   void SetWorld( World* a_newWorld ) { m_world = a_newWorld; };
-
+  ELayerID m_currentLayer;
   std::vector<std::shared_ptr<Component>> m_components;
   std::vector<std::shared_ptr<Component>> m_componentsToAdd;
 

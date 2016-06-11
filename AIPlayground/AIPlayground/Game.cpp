@@ -3,6 +3,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "Common/Input.h"
+#include "TextureManager.h"
+#include "ShaderManager.h"
 Game::Game() :
   m_world( new World() )
 {
@@ -15,11 +17,16 @@ Game::~Game()
   m_world->OnDestroyed();
 }
 
-#if 0
+#if 1
 void Game::Init()
 {
   m_world->OnConstruct();
-  m_world->BeginPlay();
+  m_world->BeginPlay();  
+  glm::mat4 projection = glm::ortho( 0.f , 1280.0f , 720.0f , 0.0f );
+  Renderer2D::SetProjectionMatrix( projection );
+  TextureManager::GI()->Init();
+  ShaderManager::GI()->Init();
+  m_renderer.Init();
 }
 
 void Game::FixedUpdate( float a_dt )
@@ -38,7 +45,10 @@ void Game::PreRender()
 
 void Game::Render()
 {
-  m_world->Render();
+  m_renderer.Begin();
+  m_world->Render(&m_renderer);
+  m_renderer.End();
+  m_renderer.Flush();
 }
 
 void Game::PostFrame()
@@ -46,7 +56,7 @@ void Game::PostFrame()
   m_world->PostFrame();
 }
 #endif
-#if 1
+#if 0
 
 #include "SpriteBatchRenderer.h"
 #include "Renderer2D.h"
@@ -139,7 +149,7 @@ void Game::PreRender()
     //it.transformationMatrix = glm::translate( glm::mat4() , glm::vec3( it.position , 0.0f ) );
     //it.transformationMatrix = glm::rotate( it.transformationMatrix , Angle , glm::vec3( 0 , 0 , 1 ) );
     //it.transformationMatrix = glm::scale( it.transformationMatrix , glm::vec3( it.scale , 1.0f ) );
-    renderer.Submit( glm::vec3( it.position , 1.0f ) , it.scale , Angle , glm::vec4( 0 , 0 , 1 , 0 ) , glm::vec4( 0 , 1 , 1 , 1 ) );
+    //renderer.Submit( glm::vec3( it.position , 1.0f ) , it.scale , Angle , glm::vec4( 0 , 0 , 1 , 0 ) , glm::vec4( 0 , 1 , 1 , 1 ) );
   }
   //
  // glm::vec2 mouseLoc = Input::GetMousePosition();
@@ -163,11 +173,10 @@ void Game::PreRender()
 
 void Game::Render()
 {
-  renderer.Flush();
-  staticRenderer.Flush();
-  lineRenderer.Flush();
+  //renderer.Flush();
+  //staticRenderer.Flush();
+  //lineRenderer.Flush();
   basicRenderer.Flush();
-
 }
 
 void Game::PostFrame()

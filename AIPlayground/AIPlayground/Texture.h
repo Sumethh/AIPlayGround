@@ -12,7 +12,7 @@ public:
   void Bind( uint a_slot = 0 );
   void UnBind( uint a_slot = 0 );
   void LoadFromFile( std::string a_file );
-  void LoadFromIamge( sf::Image& a_image );
+  void LoadFromImage( sf::Image& a_image );
   glm::vec2 GetSize() { return m_size; }
 private:
   uint m_textureID;

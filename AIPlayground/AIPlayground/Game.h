@@ -17,4 +17,5 @@ public:
 
 private:
   World::SharedPtr m_world;
+  Renderer2D m_renderer;
 };

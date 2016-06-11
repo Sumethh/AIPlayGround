@@ -4,8 +4,10 @@
 #include <SFML/Graphics.hpp>
 #include <glm/glm.hpp>
 #include <memory>
+#include "Texture.h"
+#include "Transform.h"
 class Window;
-
+class Renderer2D;
 struct Node
 {
   enum Neighbors
@@ -46,7 +48,7 @@ public:
   typedef std::shared_ptr<Grid> SharedPtr;
   void Init();
   void PreRender( const glm::vec2 a_cameraPo );
-  void Render( Window* const a_windowToDrawTo );
+  void Render( Renderer2D* a_renderer);
 
   inline int GetTileSizeX() const { return m_tileSizeX; }
   inline int GetTileSizeY() const { return m_tileSizeY; }
@@ -115,10 +117,8 @@ private:
   void CalculateTileIndex( Node* a_node );
 
   void UpdateImage();
-
-  sf::Sprite m_gridSprite;
-  sf::Texture m_gridTexture;
-
+  Texture m_gridTexture;
+  Transform m_gridTransform;
   sf::Image m_spriteSheet;
   sf::Image m_gridImage;
 

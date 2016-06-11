@@ -1,11 +1,13 @@
 #include "WanderingComponent.h"
 #include "PathfindingAgentComponent.h"
 #include "World.h"
+#include "Common/Input.h"
+#include <Common/HelperFunctions.h>
 
 #include <cstdlib>
 #include <ctime>
 #include <glm/glm.hpp>
-
+#include <glm/gtx/vector_angle.hpp>
 WanderingComponent::WanderingComponent( GameObject::SharedPtr a_go , EComponentTypes a_type ) :
   Component( a_go , a_type )
 {
@@ -23,7 +25,6 @@ void WanderingComponent::BeginPlay()
     m_pathfindingComp = (PathfindingAgentComponent*)owner->GetComponentOfType( EComponentTypes::CT_PathfindingAgentComponent );
   }
 }
-
 void WanderingComponent::Update( float a_dt )
 {
   if( m_pathfindingComp )
@@ -79,7 +80,10 @@ void WanderingComponent::Update( float a_dt )
         }
         glm::vec2 direction = glm::normalize( vecBetween );
         parentTransform.position += direction* 128.0f * a_dt;
+
+        float angle = GetLookAtAngle( currentNode , parentTransform.position );
         GetParentShared()->SetPosition( parentTransform.position );
+        GetParentShared()->SetRotation(angle);
       }
       else
         m_pathfindingComp->ClearPath();
