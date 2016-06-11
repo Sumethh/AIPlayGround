@@ -16,7 +16,7 @@ ColliderComponent::ColliderComponent(GameObject::SharedPtr a_go, EComponentTypes
     World* world = parent->GetWorld();
     if (world)
     {
-      std::shared_ptr<PhysicsSystem> phySsystem = world->GetPhysicsSystem().lock();
+  PhysicsSystem* phySsystem = world->GetPhysicsSystem();
       if (phySsystem)
       {
         phySsystem->RegisterCollider(this);
@@ -182,58 +182,9 @@ bool ColliderComponent::TestCollision(ColliderComponent* a_other, Collision& a_c
   return false;
 }
 
-void ColliderComponent::Render(Window* a_window)
+void ColliderComponent::Render(Renderer2D* a_window)
 {
-  return;
-  Camera* cam = GetParent()->GetWorld()->GetCamera().lock().get();
-  if (m_colliderType == EColliderType::Sphere)
-  {
-    sf::CircleShape circle;
-    circle.setFillColor(sf::Color::Transparent);
-    circle.setOutlineColor(sf::Color::Blue);
-    circle.setOutlineThickness(2.0f);
-    circle.setPosition(ConvertVec2(GetParent()->GetTransform().position - cam->GetPos()));
-    circle.setRadius(m_collider.radius);
-    circle.setOrigin(ConvertVec2(glm::vec2(m_collider.radius, m_collider.radius)));
-    //a_window->RenderDrawable( circle );
-    circle.setRadius(2.0f);
-    circle.setOrigin(2.0f, 2.0f);
-    for (int i = 0; i < 8; i++)
-    {
-      circle.setPosition(ConvertVec2(m_collider.testableVerts[i]));
-      a_window->RenderDrawable(circle);
-    }
-  }
-  else if (m_colliderType == EColliderType::Box)
-  {
-    sf::RectangleShape rect;
-    rect.setSize(ConvertVec2(m_collider.extents));
-    rect.setOrigin(ConvertVec2(m_collider.extents / 2.0f));
-    rect.setOutlineThickness(2.0f);
-    rect.setRotation(GetParent()->GetTransform().rotation);
-    rect.setPosition(ConvertVec2(GetParent()->GetTransform().position - cam->GetPos()));
-    rect.setFillColor(sf::Color::Transparent);
-    rect.setOutlineColor(sf::Color::Blue);
-    //a_window->RenderDrawable( rect );
-    rect.setSize(sf::Vector2f(2.0f, 2.0f));
-    rect.setOrigin(1.0f, 1.0f);
-    //for( int i = 0; i < 8; i++ )
-    //{
-    //  rect.setPosition( ConvertVec2( m_collider.testableVerts[ i ] ) );
-    //  a_window->RenderDrawable( rect );
-    //}
-    for (int i = 0; i < 8; i++)
-    {
-      sf::CircleShape circle;
-      circle.setRadius(2.0f);
-      circle.setFillColor(sf::Color::Transparent);
-      circle.setOutlineColor(sf::Color::Blue);
-      circle.setOutlineThickness(1.0f);
-      circle.setPosition(ConvertVec2(m_collider.testableVerts[i]));
-      circle.setOrigin(ConvertVec2(glm::vec2(0.5f, 0.5f)));
-      a_window->RenderDrawable(circle);
-    }
-  }
+
 }
 
 void ColliderComponent::OnCollisionEnter(Collision& a_collision)

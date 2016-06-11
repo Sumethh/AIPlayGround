@@ -31,36 +31,35 @@ void PathfindingAgentComponent::Render( Renderer2D* a_renderer )
   if( m_path )
   {
     World* world = GetParentShared()->GetWorld();
-    std::weak_ptr<Camera> cam;
+    Camera* cam = nullptr;
     if( world )
       cam = world->GetCamera();
-    if( DebugValues::GI()->RenderGrid )
+    if( DebugValues::GI()->RenderGrid && cam)
     {
-      Camera* camera = cam.lock().get();
       LineRenderer& lineRender = a_renderer->GetLineRenderer();
       for( uint i = 1; i < m_path->nodes.size(); i++ )
       {
-        lineRender.Submit( m_path->nodes[ i - 1 ] -camera->GetPos(), m_path->nodes[ i ] - camera->GetPos() , glm::vec4( 1.0f , 0.0f , 0.0f , 1.0f ) );
+        lineRender.Submit( m_path->nodes[ i - 1 ] -cam->GetPos(), m_path->nodes[ i ] - cam->GetPos() , glm::vec4( 1.0f , 0.0f , 0.0f , 1.0f ) );
       }
     }
   }
 }
 
-std::weak_ptr<Grid> PathfindingAgentComponent::GetGrid() const
+Grid* PathfindingAgentComponent::GetGrid() const
 {
-  if( !m_pathfinder.expired() )
-    return m_pathfinder.lock()->GetGrid();
+  if( m_pathfinder )
+    return m_pathfinder->GetGrid();
 
-  return std::weak_ptr<Grid>();
+  return nullptr;
 }
 
 void PathfindingAgentComponent::RequestPath( glm::vec2 a_start , glm::vec2 a_end )
 {
-  if( !m_pathfinder.expired() )
+  if( m_pathfinder )
   {
     if (m_path)
       delete m_path;
-    m_pathfinder.lock()->AddPathfindingJob(
+    m_pathfinder->AddPathfindingJob(
       std::bind( &PathfindingAgentComponent::PathCallback , this , std::placeholders::_1 )
       , a_start , a_end );
 

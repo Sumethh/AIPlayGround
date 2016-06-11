@@ -4,7 +4,7 @@
 #include <future>
 #include <map>
 
-Pathfinder::Pathfinder( std::shared_ptr<Grid>& a_grid ) :
+Pathfinder::Pathfinder( Grid*a_grid ) :
   m_grid( a_grid )
 {
 }
@@ -26,11 +26,10 @@ int GetDistance( Node* a_node , Node* a_otherNode )
 
 void Pathfinder::AddPathfindingJob( std::function<void( Path* )> a_callback , glm::vec2 a_startPos , glm::vec2 a_endPos )
 {
-  if( !m_grid.expired() )
+  if( m_grid )
   {
-    std::shared_ptr<Grid> grid = m_grid.lock();
-    Node* startNode = grid->GetNode( a_startPos );
-    Node* endNode = grid->GetNode( a_endPos );
+    Node* startNode = m_grid->GetNode( a_startPos );
+    Node* endNode = m_grid->GetNode( a_endPos );
     AddPathfindingJob( a_callback , startNode , endNode );
   }
 }
@@ -77,7 +76,7 @@ void Pathfinder::GetPath( JobParametersBase* a_params )
   endNode = params->endNode;
 
   m_timer.Start();
-  if( m_grid.expired() )
+  if( m_grid )
   {
     LOGE( "I got a path request however i dont have a grid" );
     params->callback( nullptr );
@@ -89,7 +88,7 @@ void Pathfinder::GetPath( JobParametersBase* a_params )
     params->callback( nullptr );
     return;
   }
-  std::shared_ptr<Grid> grid = m_grid.lock();
+  Grid* grid = m_grid;
 
   if( endNode && !endNode->bwalkable )
   {

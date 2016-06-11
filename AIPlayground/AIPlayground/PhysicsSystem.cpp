@@ -29,7 +29,7 @@ void PhysicsSystem::SetWorld(World* a_world)
 {
   if( a_world )
   {
-    m_world = a_world->GetWorldShared();
+    m_world = a_world;
     m_grid = new PhysicsGrid( a_world->GetPhysicsSystem() );
   }
 }

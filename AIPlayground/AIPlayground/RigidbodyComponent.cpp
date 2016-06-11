@@ -29,12 +29,9 @@ void RigidbodyComponent::BeginPlay()
     Component* comp = parent->GetComponentOfType( GetComponentType() );
     if( comp == this )
     {
-      PhysicsSystem::WeakPtr physicsSys = parent->GetWorld()->GetPhysicsSystem();
-      if( !physicsSys.expired() )
-      {
-        PhysicsSystem::SharedPtr physics = physicsSys.lock();
-        physics->RegisterRigidbody( (PhysicsComponentBase*)comp );
-      }
+      PhysicsSystem* physicsSys = parent->GetWorld()->GetPhysicsSystem();
+      if( physicsSys )
+        physicsSys->RegisterRigidbody( (PhysicsComponentBase*)comp );
     }
   }
 }

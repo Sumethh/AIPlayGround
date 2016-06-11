@@ -26,7 +26,7 @@ struct GridCell
 class PhysicsGrid
 {
 public:
-  PhysicsGrid( PhysicsSystem::WeakPtr a_physicsSystem );
+  PhysicsGrid( PhysicsSystem* a_physicsSystem );
   ~PhysicsGrid();
 
   void Generate();
@@ -58,7 +58,7 @@ private:
 
   void GetCollidingCells( ColliderComponent* a_collider , std::vector<GridCell*>& a_vecOut );
 
-  PhysicsSystem::WeakPtr m_physicsSystem;
+  PhysicsSystem* m_physicsSystem;
   std::vector<ColliderComponent*> m_registeredColliders;
   GridCell* m_grid;
   uint m_gridSizeX;

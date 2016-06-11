@@ -42,10 +42,9 @@ void WanderingComponent::Update( float a_dt )
         destY = (float)( std::rand() % (int)limits.bottomRight.y ) + limits.topLeft.y;
         glm::vec2 destination( destX , destY );
         Transform parentTransform = GetParentShared()->GetTransform();
-        std::weak_ptr<Grid> gridWkPtr = m_pathfindingComp->GetGrid();
-        if( !gridWkPtr.expired() )
-        {
-          std::shared_ptr<Grid> grid = gridWkPtr.lock();
+        Grid* grid = m_pathfindingComp->GetGrid();
+        if( grid )
+        {          
           Node* node = grid->GetNode( destination );
           Node* currentNode = grid->GetNode( parentTransform.position );
           /*while( !node->bwalkable && node != currentNode );

@@ -7,7 +7,7 @@ class Camera;
 class PlayerController
 {
 public:
-  PlayerController( std::shared_ptr<Grid>& a_grid , std::shared_ptr<Camera>& a_camera );
+  PlayerController( Grid* a_grid , Camera* a_camera );
   ~PlayerController();
 
   void Init();
@@ -22,7 +22,7 @@ private:
 
   const float m_moveSpeed = 512.0f;
 
-  std::weak_ptr<Grid> const  m_grid;
-  std::weak_ptr<Camera> const m_camera;
+  Grid* const  m_grid;
+  Camera* const m_camera;
   Transform m_selectionTransform;
 };

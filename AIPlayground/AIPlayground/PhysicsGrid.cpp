@@ -15,7 +15,7 @@ GridCell* GridCell::GetCellFromPosition( glm::vec2 a_pos )
   return nullptr;
 }
 
-PhysicsGrid::PhysicsGrid( PhysicsSystem::WeakPtr a_physicsSystem ) :
+PhysicsGrid::PhysicsGrid( PhysicsSystem* a_physicsSystem ) :
   m_physicsSystem( a_physicsSystem )
 {
 }
@@ -26,19 +26,16 @@ PhysicsGrid::~PhysicsGrid()
 
 void PhysicsGrid::Generate()
 {
-  PhysicsSystem::SharedPtr physSys;
-  physSys = m_physicsSystem.lock();
-  if( physSys )
-  {
-    World::WeakPtr worldWeak = physSys->GetWorld();
 
-    World::SharedPtr worldPtr;
-    worldPtr = worldWeak.lock();
+  if( m_physicsSystem )
+  {
+    World* worldPtr = m_physicsSystem->GetWorld();
+
 
     WorldLimits worldLimits = worldPtr->GetWorldLimits();
     glm::vec2 worldSize = worldLimits.bottomRight - worldLimits.topLeft;
     assert( worldSize.x > 0 && worldSize.y > 0 );
-    Grid::SharedPtr grid = worldPtr->GetGrid().lock();
+    Grid* grid = worldPtr->GetGrid();
     int tileSizeX = grid->GetTileSizeX();
     int tileSizeY = grid->GetTileSizeY();
     m_gridSizeX = tileSizeX * TILE_COUNT_X_PER_CELL;
@@ -172,12 +169,9 @@ void PhysicsGrid::Draw( Renderer2D* a_window )
   {
     LineRenderer& lineRender = a_window->GetLineRenderer();
     glm::vec2 camLoc( 0 , 0 );
-    auto cam = m_physicsSystem.lock()->GetWorld().lock()->GetCamera();
-    if( !cam.expired() )
-    {
-      auto t = cam.lock();
-      camLoc = t->GetPos();
-    }
+    auto cam = m_physicsSystem->GetWorld()->GetCamera();
+    if( cam )
+      camLoc = cam->GetPos();
 
     glm::vec2 tl , tr , bl , br;
     for( uint i = 0; i < m_gridCountX * m_gridCountY; i++ )

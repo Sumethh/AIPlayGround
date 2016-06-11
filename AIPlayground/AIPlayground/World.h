@@ -40,12 +40,12 @@ public:
   virtual void PostFrame();
 
   GameObject* CreateGameObject( EGameObjectType a_type = EGameObjectType::GOT_Generic );
-  inline std::weak_ptr<PlayerController> GetPlayerController()const { return m_playerController; }
-  inline std::weak_ptr<Pathfinder> GetPathfinder()const { return m_pathfinder; }
-  inline std::weak_ptr<Camera> GetCamera()const { return m_camera; }
-  inline Grid::WeakPtr GetGrid() const { return m_grid; }
+  inline PlayerController* GetPlayerController()const { return m_playerController; }
+  inline Pathfinder* GetPathfinder()const { return m_pathfinder; }
+  inline Camera* GetCamera()const { return m_camera; }
+  inline Grid* GetGrid() const { return m_grid; }
   inline WorldLimits GetWorldLimits()const { return m_worldLimits; }
-  inline std::weak_ptr<PhysicsSystem> GetPhysicsSystem()const { return m_physicsSystem; }
+  inline PhysicsSystem* GetPhysicsSystem()const { return m_physicsSystem; }
 
   World::SharedPtr GetWorldShared()const { return m_thisShared; }
   void SetWorldShared( World::SharedPtr a_ptr ) { m_thisShared = a_ptr; }
@@ -61,10 +61,10 @@ private:
   std::map<EGameObjectType , GameObjectConstructionDescriptor> m_gameObjectDescriptors;
   World::SharedPtr m_thisShared;
   WorldLimits m_worldLimits;
-  std::shared_ptr<Grid> m_grid;
-  std::shared_ptr<Camera> m_camera;
-  std::shared_ptr<PlayerController> m_playerController;
-  std::shared_ptr<Pathfinder> m_pathfinder;
-  std::shared_ptr<PhysicsSystem> m_physicsSystem;
+  Grid* m_grid;
+  Camera* m_camera;
+  PlayerController* m_playerController;
+  Pathfinder* m_pathfinder;
+  PhysicsSystem* m_physicsSystem;
   bool m_begunPlay;
 };

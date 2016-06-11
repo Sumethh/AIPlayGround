@@ -22,13 +22,12 @@ void RendererComponent::PreRender()
   {
     Transform goTransform = parent->GetTransform();
     World* world = parent->GetWorld();
-    std::weak_ptr<Camera> cam;
+    Camera* cam = nullptr;
     if( world )
       cam = world->GetCamera();
-    if( !cam.expired() )
+    if( cam )
     {
-      std::shared_ptr<Camera> camera = cam.lock();
-      m_sprite.setPosition( ConvertVec2( goTransform.position - camera->GetPos() ) );
+      m_sprite.setPosition( ConvertVec2( goTransform.position - cam->GetPos() ) );
       m_sprite.setScale( ConvertVec2( goTransform.scale ) );
       m_sprite.setRotation( goTransform.rotation );
       parent->ResetRenderStateDirtyFlag();
@@ -40,7 +39,7 @@ void RendererComponent::Render( Renderer2D* a_renderer)
 {
   SpriteBatchRenderer& spriteRender = a_renderer->GetSpriteBatchRenderer();
   World* world = GetParent()->GetWorld();
-  Camera* camera = world->GetCamera().lock().get();
+  Camera* camera = world->GetCamera();
   Transform trans = GetParent()->GetTransform();
   ELayerID layer = GetParent()->GetLayer();
   spriteRender.Submit( glm::vec3(trans.position - camera->GetPos() , (uint8)layer / 10.0f) , trans.scale * 32.0f , trans.rotation , glm::vec4( 0 , 0 , 1 , 0 ) , glm::vec4( 0 , 1 , 1 , 1 ) );
