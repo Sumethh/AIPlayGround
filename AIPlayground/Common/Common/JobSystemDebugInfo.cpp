@@ -66,10 +66,11 @@ void JobSystemDebugInfo::SetTextStrings(sf::Text& a_threadID, sf::Text& a_jobTim
 
 void JobSystemDebugInfo::SetDebugInfo(TimeFunctionCallArgument a_argument)
 {
+  void* data = &a_argument;
   for (auto threadInfo : m_threadInfos)
   {
     threadInfo->infoLock.lock();
-
+    if (data) {}
     threadInfo->jobsCompletedLast5Seconds = threadInfo->jobsCompleted;
     threadInfo->jobsCompleted = 0;
 

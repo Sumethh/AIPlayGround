@@ -38,7 +38,7 @@ void PathfindingAgentComponent::Render( Renderer2D* a_renderer )
     {
       Camera* camera = cam.lock().get();
       LineRenderer& lineRender = a_renderer->GetLineRenderer();
-      for( int i = 1; i < m_path->nodes.size(); i++ )
+      for( uint i = 1; i < m_path->nodes.size(); i++ )
       {
         lineRender.Submit( m_path->nodes[ i - 1 ] -camera->GetPos(), m_path->nodes[ i ] - camera->GetPos() , glm::vec4( 1.0f , 0.0f , 0.0f , 1.0f ) );
       }

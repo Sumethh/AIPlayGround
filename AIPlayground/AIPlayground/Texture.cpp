@@ -84,8 +84,8 @@ void Texture::LoadFromFile( std::string a_file )
     glGenerateMipmap( GL_TEXTURE_2D );
     glBindTexture( GL_TEXTURE_2D , 0 );
     m_init = true;
-    m_size.x = image.getSize().x;
-    m_size.y = image.getSize().y;
+    m_size.x = (float)image.getSize().x;
+    m_size.y = (float)image.getSize().y;
   }
 }
 
@@ -112,7 +112,7 @@ void Texture::LoadFromImage( sf::Image& a_image )
     glGenerateMipmap( GL_TEXTURE_2D );
     glBindTexture( GL_TEXTURE_2D , 0 );
     m_init = true;
-    m_size.x = a_image.getSize().x;
-    m_size.y = a_image.getSize().y;
+    m_size.x = (float)a_image.getSize().x;
+    m_size.y = (float)a_image.getSize().y;
   }
 }

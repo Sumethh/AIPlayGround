@@ -112,7 +112,7 @@ public:
   void SetLayer( ELayerID a_layer) { m_currentLayer = a_layer; }
 
   inline void SetRotationFlagDirty() { m_gameObjectFlags |= EGameOjbectFlags::RotationDirtyFlag; }
-  inline bool GetRotationFlagDirty() { return m_gameObjectFlags & EGameOjbectFlags::RotationDirtyFlag; }
+  inline int GetRotationFlagDirty() { return m_gameObjectFlags & EGameOjbectFlags::RotationDirtyFlag; }
   inline void ResetRotationDityFlag() { m_gameObjectFlags &= ~EGameOjbectFlags::RotationDirtyFlag; }
 private:
   void SetWorld( World* a_newWorld ) { m_world = a_newWorld; };
