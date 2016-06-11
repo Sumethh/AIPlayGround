@@ -47,10 +47,10 @@ void PlayerController::Update( float a_dt )
       newSpritePos.y = node->pos.y - camPos.y;
 
       m_selectionSprite.setPosition( newSpritePos );
-      if( Input::GetMouseButton( sf::Mouse::Left ) )
+      if( Input::GetMouseButton( sf::Mouse::Left ) &&!Input::IsMouseOverUI() )
         grid->SetNodeTileIndex( indexX , indexY , 0 );
 
-      if( Input::GetMouseButton( sf::Mouse::Right ) )
+      if( Input::GetMouseButton( sf::Mouse::Right ) &&!Input::IsMouseOverUI())
         grid->SetNodeTileIndex( indexX , indexY , 1 );
     }
 

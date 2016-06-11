@@ -79,7 +79,7 @@ public:
 
   inline static void DrawTimers()
   {
-    ImGui::Begin("Debug Timers",nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse |
+    ImGui::Begin("Debug Timers",nullptr, ImGuiWindowFlags_NoCollapse |
     ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
     for( size_t i = 0; i < m_timers.size(); i++ )
       {

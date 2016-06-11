@@ -3,7 +3,7 @@
 
 #include <Gl/glew.h>
 #include <glm/glm.hpp>
-#define MAX_LINE_RENDERS 30000
+#define MAX_LINE_RENDERS 100000
 
 class LineRenderer
 {

@@ -10,6 +10,8 @@
 #include "PhysicsSystem.h"
 #include "Renderer2D.h"
 #include <memory.h>
+#include "Common/TimedFunctionCall.h"
+
 class GameObject;
 class Window;
 
@@ -59,4 +61,5 @@ private:
   std::shared_ptr<PlayerController> m_playerController;
   std::shared_ptr<Pathfinder> m_pathfinder;
   std::shared_ptr<PhysicsSystem> m_physicsSystem;
+  bool m_begunPlay;
 };

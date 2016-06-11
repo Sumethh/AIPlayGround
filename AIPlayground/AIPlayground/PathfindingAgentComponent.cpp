@@ -58,6 +58,8 @@ void PathfindingAgentComponent::RequestPath( glm::vec2 a_start , glm::vec2 a_end
 {
   if( !m_pathfinder.expired() )
   {
+    if (m_path)
+      delete m_path;
     m_pathfinder.lock()->AddPathfindingJob(
       std::bind( &PathfindingAgentComponent::PathCallback , this , std::placeholders::_1 )
       , a_start , a_end );

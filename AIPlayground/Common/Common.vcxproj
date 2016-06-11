@@ -36,6 +36,7 @@
     <ClInclude Include="Common\InvokableEvent.h" />
     <ClInclude Include="Common\JobSystem.h" />
     <ClInclude Include="Common\JobSystemDebugInfo.h" />
+    <ClInclude Include="Common\json.hpp" />
     <ClInclude Include="Common\log.h" />
     <ClInclude Include="Common\stb_rect_pack.h" />
     <ClInclude Include="Common\stb_textedit.h" />

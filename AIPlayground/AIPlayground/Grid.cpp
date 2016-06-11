@@ -172,7 +172,7 @@ void Grid::CreateGrid()
       currentNode.bwalkable = true;
       currentNode.tileIndex = 1;
       currentNode.indexSingle = yIndex + x;
-
+      currentNode.parent = nullptr;
       currentNode.index.x = (float)x;
       currentNode.index.y = (float)y;
       m_dirtyTileIndiciesQueue.push( yIndex + x );

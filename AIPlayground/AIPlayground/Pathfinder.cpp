@@ -162,7 +162,7 @@ Path* Pathfinder::RetracePath( Node* a_start , Node* a_end )
   Path* newPath = new Path();
 
   Node* currentNode = a_end;
-  while( currentNode->parent != a_start )
+  while( currentNode->parent && currentNode->parent != a_start)
   {
     newPath->nodes.push_back( currentNode->center );
     currentNode = currentNode->parent;
