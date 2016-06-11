@@ -337,7 +337,7 @@ void Imgui_HandleEvents( void* a_event )
   }
   case sf::Event::MouseWheelMoved:
   {
-    g_MouseWheel = newEvent->mouseWheel.delta;
+    g_MouseWheel = (float)newEvent->mouseWheel.delta;
   }
   default:
     break;
@@ -353,7 +353,6 @@ void ImGui_NewFrame( float a_dt )
 
   // Setup display size (every frame to accommodate for window resizing)
   int w , h;
-  int display_w , display_h;
   w = g_Window->GetWidth();
   h = g_Window->GetHeight();
   io.DisplaySize = ImVec2( (float)w , (float)h );

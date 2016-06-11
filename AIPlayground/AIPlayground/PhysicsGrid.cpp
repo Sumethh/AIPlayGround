@@ -213,7 +213,7 @@ std::vector<GameObject*> PhysicsGrid::GetCollidiongGameObjects(glm::vec2 point)
   GridCell * cell = GetCellFromPosition(point);
   if (cell)
   {
-    for (int i = 0; i < cell->colliders.size(); i++)
+    for (uint i = 0; i < cell->colliders.size(); i++)
     {
       if (cell->colliders[i]->CollidesWithPoint(point))
         returningObjs.push_back(cell->colliders[i]->GetParent());
@@ -228,7 +228,7 @@ std::vector<GameObject*> PhysicsGrid::GetCollidiongGameObjects(TestableCollider*
   GridCell * cell = GetCellFromPosition(a_testableCollider->position);
   if (cell)
   {
-    for (int i = 0; i < cell->colliders.size(); i++)
+    for (uint i = 0; i < cell->colliders.size(); i++)
     {
       if (cell->colliders[i]->CollidesWithTestableCollider(*a_testableCollider))
         returningObjs.push_back(cell->colliders[i]->GetParent());
