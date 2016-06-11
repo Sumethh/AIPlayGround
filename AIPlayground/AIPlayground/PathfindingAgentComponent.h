@@ -13,7 +13,7 @@ public:
   ~PathfindingAgentComponent();
 
   void OnCosntruct() override;
-  void Render( Window* a_window );
+  void Render( Renderer2D* a_renderer) override;
 
   bool HasPathBeenRequested() { return m_pathRequested; }
   Path* GetPath() { return m_path; }

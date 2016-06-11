@@ -2,6 +2,9 @@
 #include "Common/Types.h"
 #include "Common/Window.h"
 #include "Common/Log.h"
+#include "Renderer2D.h"
+#include "ShaderManager.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <fstream>
 #include <string>
@@ -11,24 +14,6 @@ sf::IntRect tiles[] =
 {
   sf::IntRect( 0,0, 32,32 ),
   sf::IntRect( 32,0, 32,32 ),
-  //sf::IntRect( 64,0, 32,32 ),
-  //sf::IntRect( 96,0, 32,32 ),
-  //sf::IntRect( 128,0, 32,32 ),
-
-  //sf::IntRect( 0,32, 32,32 ),
-  //sf::IntRect( 128,32, 32,32 ),
-
-  //sf::IntRect( 0,64, 32,32 ),
-  //sf::IntRect( 32,64, 32,32 ),
-  //sf::IntRect( 64,64, 32,32 ),
-  //sf::IntRect( 96,64, 32,32 ),
-  //sf::IntRect( 128,64, 32,32 ),
-
-  //sf::IntRect( 0,96, 32,32 ),
-  //sf::IntRect( 32,96, 32,32 ),
-  //sf::IntRect( 64,96, 32,32 ),
-  //sf::IntRect( 96,96, 32,32 ),
-  //sf::IntRect( 128,96, 32,32 ),
 };
 
 Grid::Grid( glm::vec2 a_gridOrigin , int a_tileCountX , int a_tileCountY , int a_tileSizeX , int a_tileSizeY ) :
@@ -40,8 +25,8 @@ Grid::Grid( glm::vec2 a_gridOrigin , int a_tileCountX , int a_tileCountY , int a
 {
   if( !m_spriteSheet.loadFromFile( "../Assets/Art/TileSheet.png" ) )
     LOGE( "Could not load Sprite Sheet" );
-
-  m_gridSprite.setPosition( sf::Vector2f( m_gridOrigin.x , m_gridOrigin.y ) );
+  m_gridTransform.position = a_gridOrigin;
+  m_gridTransform.scale = glm::vec2( 1 , 1 );
 }
 
 Grid::~Grid()
@@ -63,17 +48,28 @@ void Grid::PreRender( const glm::vec2 a_cameraPos )
     UpdateImage();
     m_bImageDirty = false;
   }
+  glm::vec2 newPos;
+  newPos.x = -a_cameraPos.x  + m_gridImage.getSize().x/2;
+  newPos.y = -a_cameraPos.y+ m_gridImage.getSize().x/2;
 
-  sf::Vector2f newPos;
-  newPos.x = -a_cameraPos.x;
-  newPos.y = -a_cameraPos.y;
-
-  m_gridSprite.setPosition( newPos );
+  m_gridTransform.position =  newPos;
 }
 
-void Grid::Render( Window* const a_windowToDrawTo )
+void Grid::Render(Renderer2D* a_renderer )
 {
-  a_windowToDrawTo->RenderDrawable( m_gridSprite );
+  Basic2DRenderer& basicRender = a_renderer->GetBasicRenderer();
+  RenderInfo renderInfo;
+  renderInfo.shader = ShaderManager::GI()->GetShader( EShaderID::BasicRender );
+  renderInfo.textures.push_back( std::pair<uint , Texture*>(0, &m_gridTexture) );
+  glm::mat4 renderMat;
+  renderMat = glm::translate( renderMat , glm::vec3( m_gridTransform.position , 1.0f ) );
+  renderMat = glm::rotate( renderMat , m_gridTransform.rotation , glm::vec3( 0 , 0 , 1 ) );
+  glm::vec3 scale = glm::vec3(m_gridTransform.scale,1.0f);
+  scale.x *= m_gridImage.getSize().x;
+  scale.y *= m_gridImage.getSize().y;
+  renderMat = glm::scale( renderMat , scale );
+  renderInfo.mat = renderMat;
+  basicRender.Submit( renderInfo );
 }
 
 bool Grid::SaveToDisk()
@@ -508,8 +504,7 @@ void Grid::UpdateImage()
     m_gridImage.copy( m_spriteSheet , xPixelCoord , yPixelCoord , tiles[ currentNode.tileIndex ] );
     nodesProcessed.push_back( &m_nodes[ index ] );
   }
-  m_gridTexture.loadFromImage( m_gridImage );
-  m_gridSprite.setTexture( m_gridTexture , true );
+  m_gridTexture.LoadFromImage( m_gridImage );
   for( auto i : nodesProcessed )
     i->btoBeProcessed = false;
 }

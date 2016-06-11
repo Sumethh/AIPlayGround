@@ -79,7 +79,6 @@ void PlayerController::PreRender()
   m_selectionTransform.transformationMatrix = glm::translate( m_selectionTransform.transformationMatrix , glm::vec3(m_selectionTransform.position ,0.0f));
   m_selectionTransform.transformationMatrix = glm::rotate( m_selectionTransform.transformationMatrix , 0.0f , glm::vec3( 0 , 0 , 1 ) );
   m_selectionTransform.transformationMatrix = glm::scale( m_selectionTransform.transformationMatrix , glm::vec3() );
-
 }
 
 void PlayerController::Render( Renderer2D* a_renderer )

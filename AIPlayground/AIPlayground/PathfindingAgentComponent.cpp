@@ -5,6 +5,7 @@
 #include "Common/HelperFunctions.h"
 #include <SFML/Graphics.hpp>
 #include "Common/Window.h"
+#include "DebugValues.h"
 PathfindingAgentComponent::PathfindingAgentComponent( GameObject::SharedPtr a_go , EComponentTypes a_type ) :
   Component( a_go , a_type )
 {
@@ -25,7 +26,7 @@ void PathfindingAgentComponent::OnCosntruct()
   }
 }
 
-void PathfindingAgentComponent::Render( Window* a_window )
+void PathfindingAgentComponent::Render( Renderer2D* a_renderer )
 {
   if( m_path )
   {
@@ -33,20 +34,15 @@ void PathfindingAgentComponent::Render( Window* a_window )
     std::weak_ptr<Camera> cam;
     if( world )
       cam = world->GetCamera();
-#if 0
-    if( !cam.expired() )
+    if( DebugValues::GI()->RenderGrid )
     {
-      std::shared_ptr<Camera> camera = cam.lock();
-      for( size_t i = 1; i < m_path->nodes.size(); ++i )
+      Camera* camera = cam.lock().get();
+      LineRenderer& lineRender = a_renderer->GetLineRenderer();
+      for( int i = 1; i < m_path->nodes.size(); i++ )
       {
-        sf::Vertex line[] = {
-          sf::Vertex( ConvertVec2( m_path->nodes[ i - 1 ] - camera->GetPos() ) ),
-          sf::Vertex( ConvertVec2( m_path->nodes[ i ] - camera->GetPos() ) )
-        };
-        a_window->GetWindow()->draw( line , 2 , sf::PrimitiveType::Lines );
+        lineRender.Submit( m_path->nodes[ i - 1 ] -camera->GetPos(), m_path->nodes[ i ] - camera->GetPos() , glm::vec4( 1.0f , 0.0f , 0.0f , 1.0f ) );
       }
     }
-#endif
   }
 }
 

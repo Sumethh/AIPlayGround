@@ -6,6 +6,7 @@ struct Transform
 {
   glm::vec2 position;
   glm::vec2 scale;
+  //radians
   float rotation;
   glm::mat4 transformationMatrix;
 };

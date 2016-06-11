@@ -99,7 +99,7 @@ void World::OnConstruct()
     Transform transform;
     transform = newGO->GetTransform();
     transform.position = glm::vec2( 384 , 384 );
-    transform.rotation = 0.0f;
+    transform.rotation = glm::radians(0.0f);
     newGO->SetTransfrom( transform );
     auto t = (ColliderComponent*)newGO->GetComponentOfType( EComponentTypes::CT_ColliderComponent );
     auto collider = t->GetCollider();
@@ -160,15 +160,15 @@ glm::vec2 RotatePoint( glm::vec2 vec , float radians )
   return newVec;
 }
 
-void World::Render()
+void World::Render(Renderer2D* a_renderer)
 {
   //
 
- // m_grid->Render();
-  m_playerController->Render(&m_renderer);
+  m_grid->Render(a_renderer);
+  m_playerController->Render(a_renderer);
   // m_physicsSystem->Render( a_window );
   for( auto gameObject : m_gameObjects )
-    gameObject->Render(&m_renderer);
+    gameObject->Render(a_renderer);
 }
 
 void World::PostFrame()

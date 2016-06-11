@@ -10,7 +10,8 @@ GameObject::GameObject( EGameObjectType a_type ) :
   m_toBeDestroyed( false ) ,
   m_world( nullptr ) ,
   m_thisSharedPtr( this ) ,
-  m_rotationMatrixDirty( true )
+  m_rotationMatrixDirty( true ) ,
+  m_currentLayer( ELayerID::DynamicObject )
 {
   SetScale( glm::vec2( 1.0f , 1.0f ) );
   SetRotation( 0 );
@@ -74,10 +75,10 @@ void GameObject::PreRender()
     ( *itr )->PreRender();
 }
 
-void GameObject::Render( Renderer2D* a_window )
+void GameObject::Render( Renderer2D* a_renderer )
 {
   for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
-    ( *itr )->Render( a_window );
+    ( *itr )->Render( a_renderer );
 }
 
 void GameObject::PostFrame()

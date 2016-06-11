@@ -2,7 +2,7 @@
 #include "Common/Window.h"
 #include "Transform.h"
 #include "Common/HelperFunctions.h"
-
+#include "Renderer2D.h"
 #include "world.h"
 
 RendererComponent::RendererComponent( GameObject::SharedPtr  a_gameObject , EComponentTypes a_type ) :
@@ -36,10 +36,15 @@ void RendererComponent::PreRender()
   }
 }
 
-void RendererComponent::Render( Renderer2D* a_window )
+void RendererComponent::Render( Renderer2D* a_renderer)
 {
-  //Component::Render( a_window );
-  //a_window->RenderDrawable( m_sprite );
+  SpriteBatchRenderer& spriteRender = a_renderer->GetSpriteBatchRenderer();
+  World* world = GetParent()->GetWorld();
+  Camera* camera = world->GetCamera().lock().get();
+  Transform trans = GetParent()->GetTransform();
+  ELayerID layer = GetParent()->GetLayer();
+  spriteRender.Submit( glm::vec3(trans.position - camera->GetPos() , (uint8)layer / 10.0f) , trans.scale * 32.0f , trans.rotation , glm::vec4( 0 , 0 , 1 , 0 ) , glm::vec4( 0 , 1 , 1 , 1 ) );
+  
 }
 
 void RendererComponent::SetTexture( sf::Texture* a_texture )
