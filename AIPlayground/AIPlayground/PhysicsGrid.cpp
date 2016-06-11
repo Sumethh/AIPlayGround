@@ -180,9 +180,9 @@ void PhysicsGrid::Draw( Renderer2D* a_window )
     }
 
     glm::vec2 tl , tr , bl , br;
-
     for( uint i = 0; i < m_gridCountX * m_gridCountY; i++ )
     {
+      
       GridCell& cell = m_grid[ i ];
       tl = cell.center - cell.size / 2.0f;
       tr.x = cell.center.x + cell.size.x / 2.0f;
@@ -191,16 +191,16 @@ void PhysicsGrid::Draw( Renderer2D* a_window )
       bl.y = cell.center.y + cell.size.y / 2.0f;
       br = cell.center + cell.size / 2.0f;
 
-      lineRender.Submit( tl , tr , glm::vec4( 1.0f , 1.0f , 1.0f , 1.0f ) );
-      lineRender.Submit( br , tr , glm::vec4( 1.0f , 1.0f , 1.0f , 1.0f ) );
-      lineRender.Submit( br , bl , glm::vec4( 1.0f , 1.0f , 1.0f , 1.0f ) );
-      lineRender.Submit( tl , bl , glm::vec4( 1.0f , 1.0f , 1.0f , 1.0f ) );
+      lineRender.Submit( tl- camLoc , tr - camLoc, glm::vec4( 1.0f , 1.0f , 1.0f , 1.0f ) );
+      lineRender.Submit( br- camLoc , tr - camLoc, glm::vec4( 1.0f , 1.0f , 1.0f , 1.0f ) );
+      lineRender.Submit( br- camLoc , bl - camLoc, glm::vec4( 1.0f , 1.0f , 1.0f , 1.0f ) );
+      lineRender.Submit( tl- camLoc , bl - camLoc, glm::vec4( 1.0f , 1.0f , 1.0f , 1.0f ) );
 
         if( cell.colliders.size() )
         {
           for( size_t i = 0; i < cell.colliders.size(); i++ )
           {
-            lineRender.Submit( cell.center , cell.colliders[ i ]->GetParent()->GetTransform().position , glm::vec4( 0.398f , 0.398f , 1.0f , 1.0f ) );
+            lineRender.Submit( cell.center - camLoc , cell.colliders[ i ]->GetParent()->GetTransform().position - camLoc , glm::vec4( 0.398f , 0.398f , 1.0f , 1.0f ) );
           }
         }
     }

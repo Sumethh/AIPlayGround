@@ -13,7 +13,8 @@ enum EGameOjbectFlags
 {
   RenderState = 1 << 0 ,
   PhysicsDirty = 1 << 1 ,
-  CollisionRotationDirty = 1 << 2
+  CollisionRotationDirty = 1 << 2 ,
+  RotationDirtyFlag = 1 <<3
 };
 
 
@@ -62,6 +63,7 @@ public:
     SetPhysicsFlagDirty();
     SetCollisionFlagDirty();
     SetRenderStateDirty();
+    SetRotationFlagDirty();
   }
   inline void SetPosition( glm::vec2 a_position )
   {
@@ -82,6 +84,7 @@ public:
     SetPhysicsFlagDirty();
     SetCollisionFlagDirty();
     SetRenderStateDirty();
+    SetRotationFlagDirty();
   }
 
   inline void Destroy() { m_toBeDestroyed = true; }
@@ -107,6 +110,10 @@ public:
 
   ELayerID GetLayer() { return m_currentLayer; }
   void SetLayer( ELayerID a_layer) { m_currentLayer = a_layer; }
+
+  inline void SetRotationFlagDirty() { m_gameObjectFlags |= EGameOjbectFlags::RotationDirtyFlag; }
+  inline bool GetRotationFlagDirty() { return m_gameObjectFlags & EGameOjbectFlags::RotationDirtyFlag; }
+  inline void ResetRotationDityFlag() { m_gameObjectFlags &= ~EGameOjbectFlags::RotationDirtyFlag; }
 private:
   void SetWorld( World* a_newWorld ) { m_world = a_newWorld; };
   ELayerID m_currentLayer;

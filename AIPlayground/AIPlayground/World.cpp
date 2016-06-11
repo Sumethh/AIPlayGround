@@ -99,7 +99,7 @@ void World::OnConstruct()
     Transform transform;
     transform = newGO->GetTransform();
     transform.position = glm::vec2( 384 , 384 );
-    transform.rotation = glm::radians(0.0f);
+    transform.rotation = glm::radians(90.0f);
     newGO->SetTransfrom( transform );
     auto t = (ColliderComponent*)newGO->GetComponentOfType( EComponentTypes::CT_ColliderComponent );
     auto collider = t->GetCollider();

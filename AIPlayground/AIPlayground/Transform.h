@@ -9,4 +9,7 @@ struct Transform
   //radians
   float rotation;
   glm::mat4 transformationMatrix;
+
+  glm::vec2 forward;
+  glm::vec2 right;
 };
