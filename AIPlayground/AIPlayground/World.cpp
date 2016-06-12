@@ -51,6 +51,7 @@ World::~World()
 }
 
 RendererComponent* comp;
+#include <fstream>
 void World::OnConstruct()
 {
   m_begunPlay = false;
@@ -62,6 +63,14 @@ void World::OnConstruct()
   m_grid->Init();
   GameObject* go = CreateGameObject(EGameObjectType::GOT_Unit);
   go->SetPosition(glm::vec2(400, 400));
+
+  json savedData;
+  go->OnSave(savedData);
+
+  std::string data = savedData.dump(2);
+  std::ofstream outFile("../Assets/Saves/Test.json");
+  outFile << data;
+  outFile.close();
 }
 
 void World::OnDestroyed()
@@ -105,20 +114,9 @@ void World::FixedUpdate( float a_dt )
 
 void World::PreRender()
 {
-  m_grid->PreRender( m_camera->GetPos() );
-  for( auto gameObject : m_gameObjects )
+  m_grid->PreRender(m_camera->GetPos());
+  for (auto gameObject : m_gameObjects)
     gameObject->PreRender();
-}
-
-glm::vec2 RotatePoint( glm::vec2 vec , float radians )
-{
-  glm::vec2 newVec;
-  float Cos = glm::cos( radians );
-  float Sin = glm::sin( radians );
-  newVec.x = vec.x * Cos - vec.y * Sin;
-  newVec.y = vec.x * Sin + vec.y * Cos;
-
-  return newVec;
 }
 
 void World::Render(Renderer2D* a_renderer)

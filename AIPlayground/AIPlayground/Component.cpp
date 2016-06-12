@@ -43,7 +43,17 @@ void Component::PostFrame()
 {
 }
 
-void Component::OnCollisionEnter( Collision& a_collision )
+void Component::OnLoad(json& a_json)
+{
+
+}
+
+void Component::OnSave(json& a_json)
+{
+  a_json["ComponentID"] = (uint)m_componentType;
+}
+
+void Component::OnCollisionEnter(Collision& a_collision)
 {
 }
 

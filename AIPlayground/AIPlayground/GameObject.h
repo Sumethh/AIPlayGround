@@ -5,10 +5,12 @@
 #include "GameObjectTypes.h"
 #include "PhysicsStructs.h"
 #include "Common/Types.h"
+#include <Common/json.hpp>
 class Component;
 class World;
 class Window;
 class Renderer2D;
+using json =  nlohmann::json;
 enum EGameOjbectFlags
 {
   RenderState = 1 << 0 ,
@@ -52,6 +54,10 @@ public:
   virtual void OnCollisionEnter( Collision a_collision );
   virtual void OnCollisionLeave( Collision a_collision );
   virtual void OnCollisionStay( Collision a_collision );
+
+  virtual void OnSave(json& a_json);
+  virtual void OnLoad(json& a_json);
+
 
   Component* AddComponent( EComponentTypes a_componentType );
 

@@ -22,7 +22,7 @@ void TextureManager::Init()
 
   LoadTextureCoordInfo(ETextureID::StaticSpriteSheet, "../Assets/art/SpriteSheetsGenerated/StaticSpriteSheetData.json");
   LoadTextureCoordInfo(ETextureID::DynamicSpriteSheet, "../Assets/art/SpriteSheetsGenerated/DynamicSpriteSheetData.json");
-  int t = 0;
+
 }
 void TextureManager::LoadTextureCoordInfo(ETextureID a_textureId, const char* a_fileName)
 {
@@ -38,15 +38,14 @@ void TextureManager::LoadTextureCoordInfo(ETextureID a_textureId, const char* a_
     VertexShaderStream.close();
   }
   myJson = json::parse(fileData);
-  auto size = myJson.size();
-  auto framesData = myJson["frames"];
-  auto metaData = myJson["meta"];
+  json framesData = myJson["frames"];
+  json metaData = myJson["meta"];
 
   glm::vec2 imageSize;
   imageSize.x = metaData["size"]["w"];
   imageSize.y = metaData["size"]["h"];
 
-  for (int i = 0; i < framesData.size(); i++)
+  for (uint i = 0; i < framesData.size(); i++)
   {
     TextureCoordInfo newCoordInfo;
     auto newSpriteData = framesData[i];

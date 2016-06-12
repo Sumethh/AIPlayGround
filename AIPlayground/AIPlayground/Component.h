@@ -20,6 +20,9 @@ public:
   virtual void Render( Renderer2D* a_renderer );
   virtual void PostFrame();
 
+  virtual void OnLoad(json& a_json);
+  virtual void OnSave(json& a_json);
+
   virtual void OnCollisionEnter( Collision& a_collision );
   virtual void OnCollisionLeave( Collision& a_collision );
   virtual void OnCollisionStay( Collision& a_collision );
