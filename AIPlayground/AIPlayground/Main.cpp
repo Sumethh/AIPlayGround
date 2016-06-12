@@ -6,6 +6,7 @@
 #include "Common/log.h"
 #include <string.h>
 #include "Game.h"
+#include "PhysicsSystem.h"
 #include "Common/DebugOnScreenTimer.h"
 #include <cstdlib>
 #include <ctime>

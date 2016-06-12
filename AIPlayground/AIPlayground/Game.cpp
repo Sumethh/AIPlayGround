@@ -20,12 +20,12 @@ Game::~Game()
 #if 1
 void Game::Init()
 {
+  TextureManager::GI()->Init();
+  ShaderManager::GI()->Init();
   m_world->OnConstruct();
   m_world->BeginPlay();  
   glm::mat4 projection = glm::ortho( 0.f , 1280.0f , 720.0f , 0.0f );
   Renderer2D::SetProjectionMatrix( projection );
-  TextureManager::GI()->Init();
-  ShaderManager::GI()->Init();
   m_renderer.Init();
 }
 

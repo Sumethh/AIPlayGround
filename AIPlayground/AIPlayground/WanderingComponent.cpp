@@ -2,7 +2,8 @@
 #include "PathfindingAgentComponent.h"
 #include "World.h"
 #include "Common/Input.h"
-#include <Common/HelperFunctions.h>
+#include "Common/HelperFunctions.h"
+#include "Pathfinder.h"
 
 #include <cstdlib>
 #include <ctime>
@@ -36,7 +37,7 @@ void WanderingComponent::Update( float a_dt )
       world = GetParent()->GetWorld();
       if( world )
       {
-        WorldLimits limits = world->GetWorldLimits();
+        WorldInfo limits = world->GetWorldInfo();
         float destX , destY = 0.0f;
         destX = (float)( std::rand() % (int)limits.bottomRight.x ) + limits.topLeft.x;
         destY = (float)( std::rand() % (int)limits.bottomRight.y ) + limits.topLeft.y;
@@ -45,14 +46,6 @@ void WanderingComponent::Update( float a_dt )
         Grid* grid = m_pathfindingComp->GetGrid();
         if( grid )
         {          
-          Node* node = grid->GetNode( destination );
-          Node* currentNode = grid->GetNode( parentTransform.position );
-          /*while( !node->bwalkable && node != currentNode );
-          {
-            destination.x = (float)( std::rand() % (int)limits.bottomRight.x ) + limits.topLeft.x;
-            destination.y = (float)( std::rand() % (int)limits.bottomRight.y ) + limits.topLeft.y;
-            node = grid->GetNode( destination );
-          }*/
           m_pathfindingComp->RequestPath( parentTransform.position , destination );
         }
       }

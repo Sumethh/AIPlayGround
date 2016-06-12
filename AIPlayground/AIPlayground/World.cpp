@@ -8,6 +8,12 @@
 #include "Common/Input.h"
 #include "DebugValues.h"
 #include "ColliderComponent.h"
+#include "PlayerController.h"
+#include "PhysicsSystem.h"
+#include "Pathfinder.h"
+#include "Camera.h"
+#include "Grid.h"
+
 const int g_tileSizeX = 32; //Tile Size X in pixels
 const int g_tileSizeY = 32; //Tile Size Y in pixels
 
@@ -23,9 +29,11 @@ World::World() :
   m_pathfinder( new Pathfinder( m_grid ) ) ,
   m_physicsSystem( new PhysicsSystem() )
 {
+  m_playerController->SetWorld(this);
   AddGoDescriptors();
-  m_worldLimits.topLeft = g_gridOrigin;
-  m_worldLimits.bottomRight = g_gridOrigin + glm::vec2( g_tileSizeX * g_tileCountX , g_tileSizeY * g_tileCountY );
+  m_worldInfo.topLeft = g_gridOrigin;
+  m_worldInfo.bottomRight = g_gridOrigin + glm::vec2( g_tileSizeX * g_tileCountX , g_tileSizeY * g_tileCountY );
+  m_worldInfo.tileSize = glm::vec2(g_tileSizeX, g_tileSizeY);
 }
 
 World::~World()
@@ -46,12 +54,14 @@ RendererComponent* comp;
 void World::OnConstruct()
 {
   m_begunPlay = false;
-  if( m_physicsSystem )
+  if (m_physicsSystem)
   {
-    m_physicsSystem->SetWorld( this );
+    m_physicsSystem->SetWorld(this);
     m_physicsSystem->Construct();
   }
   m_grid->Init();
+  GameObject* go = CreateGameObject(EGameObjectType::GOT_Unit);
+  go->SetPosition(glm::vec2(400, 400));
 }
 
 void World::OnDestroyed()
@@ -60,6 +70,7 @@ void World::OnDestroyed()
 
 void World::BeginPlay()
 {
+  m_playerController->Init();
   for( auto gameObject : m_gameObjects )
     gameObject->BeginPlay();
   m_begunPlay = true;
@@ -156,12 +167,12 @@ GameObject* World::CreateGameObject( EGameObjectType a_type )
 }
 
 
-std::vector<GameObject*> World::GetCollidiongGameObjects(glm::vec2 a_point)
+std::vector<GameObject*> World::GetCollidingGameObjects(glm::vec2 a_point)
 {
   return m_physicsSystem->GetCollidiongGameObjects(a_point);
 }
 
-std::vector<GameObject*> World::GetCollidiongGameObjects(TestableCollider* a_testableCollider)
+std::vector<GameObject*> World::GetCollidingGameObjects(TestableCollider* a_testableCollider)
 {
   return m_physicsSystem->GetCollidiongGameObjects(a_testableCollider);
 }
@@ -182,6 +193,7 @@ void World::AddGoDescriptors()
   unitDescriptor.listOfComps.push_back(EComponentTypes::CT_PathfindingAgentComponent);
   unitDescriptor.listOfComps.push_back(EComponentTypes::CT_WanderingComponent);
   unitDescriptor.listOfComps.push_back(EComponentTypes::CT_ColliderComponent);
+  unitDescriptor.listOfComps.push_back(EComponentTypes::CT_SelectableGameObjectComponent);
 
   GameObjectConstructionDescriptor& physicsDescriptor = m_gameObjectDescriptors[EGameObjectType::GOT_PhysicsTest];
   physicsDescriptor.listOfComps.push_back(EComponentTypes::CT_RenderComponent);

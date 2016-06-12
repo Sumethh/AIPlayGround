@@ -48,7 +48,6 @@ public:
   inline void AddRegisteredCell( GridCell* a_gridCell ) { m_cellsRegistered.push_back( a_gridCell ); }
   inline std::vector<GridCell*>& GetRegisteredCells() { return m_cellsRegistered; }
 
-  inline void Render( Renderer2D* a_window )override ;
   inline void SetColliderType( EColliderType a_type ) { m_colliderType = a_type; }
 
   std::map<ColliderComponent* , bool>& GetTestedColliders() { return m_testedColliders; }

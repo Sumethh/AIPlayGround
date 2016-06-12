@@ -1,24 +1,25 @@
 #pragma once
 #include <vector>
 #include <map>
-#include "Grid.h"
-#include "Pathfinder.h"
-#include "Camera.h"
-#include "PlayerController.h"
+
 #include "GameObjectTypes.h"
 #include "GameObject.h"
-#include "PhysicsSystem.h"
-#include "Renderer2D.h"
 #include <memory.h>
 #include "Common/TimedFunctionCall.h"
 
 class GameObject;
 class Window;
+class Grid;
+class Camera;
+class Pathfinder;
+class PhysicsSystem;
+class PlayerController;
 struct TestableCollider;
 
-struct WorldLimits
+struct WorldInfo
 {
   glm::vec2 topLeft , bottomRight;
+  glm::vec2 tileSize;
 };
 
 class World
@@ -40,18 +41,19 @@ public:
   virtual void PostFrame();
 
   GameObject* CreateGameObject( EGameObjectType a_type = EGameObjectType::GOT_Generic );
+  void DestroyGameObject(GameObject* a_go);
   inline PlayerController* GetPlayerController()const { return m_playerController; }
   inline Pathfinder* GetPathfinder()const { return m_pathfinder; }
   inline Camera* GetCamera()const { return m_camera; }
   inline Grid* GetGrid() const { return m_grid; }
-  inline WorldLimits GetWorldLimits()const { return m_worldLimits; }
+  inline WorldInfo GetWorldInfo()const { return m_worldInfo; }
   inline PhysicsSystem* GetPhysicsSystem()const { return m_physicsSystem; }
 
   World::SharedPtr GetWorldShared()const { return m_thisShared; }
   void SetWorldShared( World::SharedPtr a_ptr ) { m_thisShared = a_ptr; }
 
-  std::vector<GameObject*> GetCollidiongGameObjects(glm::vec2 point);
-  std::vector<GameObject*> GetCollidiongGameObjects(TestableCollider* a_testableCollider);
+  std::vector<GameObject*> GetCollidingGameObjects(glm::vec2 point);
+  std::vector<GameObject*> GetCollidingGameObjects(TestableCollider* a_testableCollider);
 
 
 protected:
@@ -59,11 +61,10 @@ protected:
 private:
 
   void AddGoDescriptors();
-
   std::vector<GameObject*> m_gameObjects;
   std::map<EGameObjectType , GameObjectConstructionDescriptor> m_gameObjectDescriptors;
   World::SharedPtr m_thisShared;
-  WorldLimits m_worldLimits;
+  WorldInfo m_worldInfo;
   Grid* m_grid;
   Camera* m_camera;
   PlayerController* m_playerController;

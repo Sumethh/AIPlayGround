@@ -76,7 +76,7 @@ void Pathfinder::GetPath( JobParametersBase* a_params )
   endNode = params->endNode;
 
   m_timer.Start();
-  if( m_grid )
+  if( !m_grid )
   {
     LOGE( "I got a path request however i dont have a grid" );
     params->callback( nullptr );

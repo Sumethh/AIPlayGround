@@ -53,7 +53,7 @@ public:
   virtual void OnCollisionLeave( Collision a_collision );
   virtual void OnCollisionStay( Collision a_collision );
 
-  void AddComponent( EComponentTypes a_componentType );
+  Component* AddComponent( EComponentTypes a_componentType );
 
   inline World* GetWorld() const { return m_world; }
   inline Transform GetTransform()const { return m_transform; }

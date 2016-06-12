@@ -14,6 +14,7 @@ struct TextureCoordInfo
   glm::vec2 topRight;
   glm::vec2 bottomLeft;
   glm::vec2 bottomRight;
+  glm::vec2 sizeInPixels;
 };
 class TextureManager
 {
@@ -35,6 +36,8 @@ public:
   inline Texture* GetTexture( ETextureID a_id ) { return &m_textures[ a_id ]; }
 
 private:
+  void LoadTextureCoordInfo(ETextureID a_textureId, const char* a_fileName);
+
   std::map<ETextureID , Texture> m_textures;
   std::map<ETextureID , std::map<uint8 , TextureCoordInfo>> m_textureCoordInfo;
   static TextureManager* m_instance;

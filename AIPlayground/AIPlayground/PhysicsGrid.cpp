@@ -6,6 +6,7 @@
 #include "Common/log.h"
 #include "DebugValues.h"
 #include "Renderer2D.h"
+#include "Camera.h"
 void GridCell::AddCollider( ColliderComponent* a_collider )
 {
 }
@@ -32,7 +33,7 @@ void PhysicsGrid::Generate()
     World* worldPtr = m_physicsSystem->GetWorld();
 
 
-    WorldLimits worldLimits = worldPtr->GetWorldLimits();
+    WorldInfo worldLimits = worldPtr->GetWorldInfo();
     glm::vec2 worldSize = worldLimits.bottomRight - worldLimits.topLeft;
     assert( worldSize.x > 0 && worldSize.y > 0 );
     Grid* grid = worldPtr->GetGrid();

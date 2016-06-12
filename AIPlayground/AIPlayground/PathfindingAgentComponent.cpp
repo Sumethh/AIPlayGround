@@ -6,6 +6,8 @@
 #include <SFML/Graphics.hpp>
 #include "Common/Window.h"
 #include "DebugValues.h"
+#include "Renderer2D.h"
+#include "Camera.h"
 PathfindingAgentComponent::PathfindingAgentComponent( GameObject* a_go , EComponentTypes a_type ) :
   Component( a_go , a_type )
 {

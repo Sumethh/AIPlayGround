@@ -4,9 +4,13 @@
 #include "Common/HelperFunctions.h"
 #include "Renderer2D.h"
 #include "world.h"
+#include "Camera.h"
 
-RendererComponent::RendererComponent( GameObject*   a_gameObject , EComponentTypes a_type ) :
-  Component( a_gameObject , a_type )
+RendererComponent::RendererComponent(GameObject*   a_gameObject, EComponentTypes a_type) :
+  Component(a_gameObject, a_type),
+  m_renderType(RenderType::Dynamic),
+  m_active(true),
+  m_renderRotated(true)
 {
 }
 
@@ -14,46 +18,42 @@ RendererComponent::~RendererComponent()
 {
 }
 
+void RendererComponent::OnCosntruct()
+{
+  ChangeTextureID(0);
+}
+
+
 void RendererComponent::PreRender()
 {
   Component::PreRender();
-  GameObject* parent = GetParent();
-  if( parent && parent->GetRenderStateDirty() )
-  {
-    Transform goTransform = parent->GetTransform();
-    World* world = parent->GetWorld();
-    Camera* cam = nullptr;
-    if( world )
-      cam = world->GetCamera();
-    if( cam )
-    {
-      m_sprite.setPosition( ConvertVec2( goTransform.position - cam->GetPos() ) );
-      m_sprite.setScale( ConvertVec2( goTransform.scale ) );
-      m_sprite.setRotation( goTransform.rotation );
-      parent->ResetRenderStateDirtyFlag();
-    }
-  }
 }
 
-void RendererComponent::Render( Renderer2D* a_renderer)
+void RendererComponent::Render(Renderer2D* a_renderer)
 {
+  if (!m_active)
+    return;
   SpriteBatchRenderer& spriteRender = a_renderer->GetSpriteBatchRenderer();
   World* world = GetParent()->GetWorld();
   Camera* camera = world->GetCamera();
   Transform trans = GetParent()->GetTransform();
   ELayerID layer = GetParent()->GetLayer();
-  spriteRender.Submit( glm::vec3(trans.position - camera->GetPos() , (uint8)layer / 10.0f) , trans.scale * 32.0f , trans.rotation , glm::vec4( 0 , 0 , 1 , 0 ) , glm::vec4( 0 , 1 , 1 , 1 ) );
-  
-}
+  spriteRender.Submit(glm::vec3(trans.position - camera->GetPos(), (uint8)layer / 10.0f), trans.scale * m_textureCoordInfo.sizeInPixels, trans.rotation * (int)m_renderRotated,
+    glm::vec4(m_textureCoordInfo.topLeft, m_textureCoordInfo.topRight), glm::vec4(m_textureCoordInfo.bottomLeft, m_textureCoordInfo.bottomRight));
 
-void RendererComponent::SetTexture( sf::Texture* a_texture )
+}
+void RendererComponent::ChangeTextureID(const uint a_newTextureID)
 {
-  m_texture = a_texture;
-  if( m_texture )
+  m_textureID = a_newTextureID;
+  switch (m_renderType)
   {
-    m_sprite.setTexture( *m_texture , true );
-    sf::Vector2u scale = m_texture->getSize();
-    m_dimensions = ConvertVec2( scale );
-    m_sprite.setOrigin( m_dimensions.x / 2.0f , m_dimensions.y / 2.0f );
+  case RenderType::Dynamic:
+    m_textureCoordInfo = TextureManager::GI()->GetTextureCoordInfo(ETextureID::DynamicSpriteSheet, (uint8)a_newTextureID);
+    break;
+  case RenderType::Static:
+    m_textureCoordInfo = TextureManager::GI()->GetTextureCoordInfo(ETextureID::StaticSpriteSheet, (uint8)a_newTextureID);
+    break;
+  default:
+    break;
   }
 }

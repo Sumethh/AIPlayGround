@@ -145,11 +145,12 @@ void GameObject::OnCollisionStay( Collision a_collision )
     ( *itr )->OnCollisionStay( a_collision );
 }
 
-void GameObject::AddComponent( EComponentTypes a_componentType )
+Component* GameObject::AddComponent( EComponentTypes a_componentType )
 {
   Component* newComp( ComponentFactory::GI()->MakeComponent( a_componentType , this ) );
   if( !nullptr )
     m_componentsToAdd.push_back( newComp );
+  return newComp;
 }
 
 Component* GameObject::GetComponentOfType( EComponentTypes a_type )

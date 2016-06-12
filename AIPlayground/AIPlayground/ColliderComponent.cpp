@@ -29,13 +29,13 @@ ColliderComponent::~ColliderComponent()
 {
 }
 
-void CalculateRotatedVerts(Collider& a_collider, Transform& a_transform)
+void CalculateRotatedVerts(Collider& a_collider, Transform a_transform)
 {
   const float cosResult = glm::cos(a_transform.rotation);
   const float sinResult = glm::sin(a_transform.rotation);
 
   glm::vec2& position = a_transform.position;
-  glm::vec2& halfExtents = a_collider.extents * 0.5f;
+  glm::vec2 halfExtents = a_collider.extents * 0.5f;
 
   // [0] TopLeft [1] BottomLeft [2] TopRight [2]BottomRight
 
@@ -180,11 +180,6 @@ bool ColliderComponent::TestCollision(ColliderComponent* a_other, Collision& a_c
     break;
   }
   return false;
-}
-
-void ColliderComponent::Render(Renderer2D* a_window)
-{
-
 }
 
 void ColliderComponent::OnCollisionEnter(Collision& a_collision)

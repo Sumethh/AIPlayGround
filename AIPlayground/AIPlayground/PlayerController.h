@@ -4,6 +4,7 @@
 #include <memory>
 class Renderer2D;
 class Camera;
+class World;
 class PlayerController
 {
 public:
@@ -14,15 +15,17 @@ public:
   void Update( float a_dt );
   void PreRender();
   void Render( Renderer2D* a_renderer);
-
+  inline void SetWorld(World* a_world) { m_world = a_world; }
+  inline World* GetWorld() { return m_world; }
 private:
 
-  sf::Sprite m_selectionSprite;
-  sf::Texture m_selectionTexture;
+  GameObject* m_selectionGO;
 
   const float m_moveSpeed = 512.0f;
-
+  World* m_world;
   Grid* const  m_grid;
   Camera* const m_camera;
   Transform m_selectionTransform;
+  std::vector<GameObject*> m_selectedGameObjects;
+  float m_cameraMoveSpeed = 256.0f;
 };
