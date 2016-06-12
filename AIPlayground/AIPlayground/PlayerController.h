@@ -10,7 +10,7 @@ class PlayerController
 public:
   PlayerController( Grid* a_grid , Camera* a_camera );
   ~PlayerController();
-
+  
   void Init();
   void Update( float a_dt );
   void PreRender();
@@ -18,7 +18,7 @@ public:
   inline void SetWorld(World* a_world) { m_world = a_world; }
   inline World* GetWorld() { return m_world; }
 private:
-
+  void UpdateUI();
   GameObject* m_selectionGO;
 
   const float m_moveSpeed = 512.0f;

@@ -7,6 +7,7 @@
 #include "RendererComponent.h"
 #include "SelectableGameObjectComponent.h"
 #include "ColliderComponent.h"
+#include "Common/imgui.h"
 PlayerController::PlayerController(Grid* a_grid, Camera* a_camera) :
   m_grid(a_grid),
   m_camera(a_camera)
@@ -44,8 +45,8 @@ void PlayerController::Update(float a_dt)
       glm::vec2 mousePos = Input::GetMousePosition();
       WorldInfo worldInfo = m_world->GetWorldInfo();
       glm::vec2 newGoLoc;
-      newGoLoc.x = (int)(m_camera->GetPos().x + mousePos.x) / (int)worldInfo.tileSize.x;
-      newGoLoc.y = (int)(m_camera->GetPos().y + mousePos.y) / (int)worldInfo.tileSize.y;
+      newGoLoc.x = (float)((int)(m_camera->GetPos().x + mousePos.x) / (int)worldInfo.tileSize.x);
+      newGoLoc.y = (float)((int)(m_camera->GetPos().y + mousePos.y) / (int)worldInfo.tileSize.y);
 
       if (Input::GetMouseButton(0))
       {
@@ -55,7 +56,7 @@ void PlayerController::Update(float a_dt)
         std::vector<GameObject*> overlappingGO = m_world->GetCollidingGameObjects(&testCol);
         if (overlappingGO.size())
         {
-          for (int i = 0; i < overlappingGO.size(); i++)
+          for (uint i = 0; i < overlappingGO.size(); i++)
           {
             SelectableGameObjectComponent* selectableComponent = (SelectableGameObjectComponent*)overlappingGO[i]->GetComponentOfType(EComponentTypes::CT_SelectableGameObjectComponent);
             if (selectableComponent)
@@ -97,6 +98,7 @@ void PlayerController::Update(float a_dt)
         m_camera->MoveY(m_cameraMoveSpeed* a_dt* moveSpeedMod);
     }
   }
+  UpdateUI();
 }
 
 void PlayerController::PreRender()
@@ -105,4 +107,32 @@ void PlayerController::PreRender()
 
 void PlayerController::Render(Renderer2D* a_renderer)
 {
+}
+
+void PlayerController::UpdateUI()
+{
+  int buttonSpacing = 4;
+  int buttonSizeX = 64, buttonSizeY = 64;
+  int buttonCount = 0;
+  int windowPadding = ImGui::GetStyle().WindowPadding.x;
+  ImGui::SetNextWindowPos(ImVec2(32, 624));
+  ImGui::SetNextWindowSize(ImVec2(1216, 80));
+  ImGui::Begin("BuildMenu", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove |ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+
+  ImGui::Button("Coal Dirt", ImVec2(buttonSizeX, buttonSizeY));
+  buttonCount++;
+
+  ImGui::Button("Coal Rock", ImVec2(buttonSizeX, buttonSizeY));
+  ImGui::SameLine(buttonCount*buttonSizeX +buttonSpacing + buttonSizeX);
+  buttonCount++;
+
+  ImGui::Button("Copper Dirt", ImVec2(buttonSizeX, buttonSizeY));
+  ImGui::SameLine(buttonCount*buttonSizeX +buttonSpacing + buttonSizeX );
+  buttonCount++;
+
+  ImGui::Button("Copper Rock", ImVec2(buttonSizeX, buttonSizeY));
+  ImGui::SameLine(buttonCount*buttonSizeX + buttonSpacing + buttonSizeX );
+  buttonCount++;
+
+  ImGui::End();
 }

@@ -20,13 +20,19 @@ public:
   
   void Flush();
 
+  static Renderer2D* GI() {
+    if (!m_instance)
+      m_instance = new Renderer2D;
+    return m_instance;
+  }
+
   LineRenderer& GetLineRenderer() { return m_lineRenderer; }
   StaticRenderer& GetStaticRenderer() { return m_staticRenderer; }
   SpriteBatchRenderer& GetSpriteBatchRenderer() { return m_batchRenderer; }
   Basic2DRenderer& GetBasicRenderer() { return m_basicRenderer;}
 
 private:
-
+  static Renderer2D* m_instance;
   LineRenderer m_lineRenderer;
   SpriteBatchRenderer m_batchRenderer;
   StaticRenderer m_staticRenderer;

@@ -2,7 +2,7 @@
 #include <glm/glm.hpp>
 
 glm::mat4 Renderer2D::m_projection;
-
+Renderer2D* Renderer2D::m_instance;
 glm::mat4 Renderer2D::GetProjection()
 {
   return m_projection;
@@ -38,6 +38,7 @@ void Renderer2D::Flush()
 
 Renderer2D::Renderer2D()
 {
+  m_instance = this;
 }
 
 Renderer2D::~Renderer2D()

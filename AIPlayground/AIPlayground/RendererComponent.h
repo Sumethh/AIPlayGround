@@ -24,7 +24,7 @@ public:
   void ChangeTextureID(const uint a_newTextureID);
   inline uint GetTextureID() { return m_textureID; }
 
-  void ChangeRenderType(RenderType a_type) { m_renderType = a_type; }
+  void ChangeRenderType(RenderType a_type);
   RenderType GetRenderType() { return m_renderType; }
 
   void SetRenderRotated(bool a_bool) {m_renderRotated = a_bool;}
@@ -35,4 +35,6 @@ private:
   uint m_textureID;
   bool m_active;
   bool m_renderRotated;
+  int m_registeredID;
+  bool m_registered;
 };

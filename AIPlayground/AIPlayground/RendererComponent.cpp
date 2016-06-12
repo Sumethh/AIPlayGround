@@ -27,6 +27,15 @@ void RendererComponent::OnCosntruct()
 void RendererComponent::PreRender()
 {
   Component::PreRender();
+  if (GetParent()->GetRenderStateDirty())
+  {
+    if (m_registered && m_renderType == RenderType::Static)
+    {
+      StaticRenderer& renderer = Renderer2D::GI()->GetStaticRenderer();
+      renderer.UpdatePosition(m_registeredID, GetParent()->GetTransform().MakeMatrix());
+      renderer.UpdateTexCoords(m_registeredID, glm::vec4(m_textureCoordInfo.topLeft, m_textureCoordInfo.topRight), glm::vec4(m_textureCoordInfo.bottomLeft, m_textureCoordInfo.bottomRight));
+    }
+  }
 }
 
 void RendererComponent::Render(Renderer2D* a_renderer)
@@ -49,11 +58,36 @@ void RendererComponent::ChangeTextureID(const uint a_newTextureID)
   {
   case RenderType::Dynamic:
     m_textureCoordInfo = TextureManager::GI()->GetTextureCoordInfo(ETextureID::DynamicSpriteSheet, (uint8)a_newTextureID);
+    if (m_registered)
+    {
+      StaticRenderer& renderer = Renderer2D::GI()->GetStaticRenderer();
+      renderer.UpdateTexCoords(m_registeredID, glm::vec4(m_textureCoordInfo.topLeft, m_textureCoordInfo.topRight), glm::vec4(m_textureCoordInfo.bottomLeft, m_textureCoordInfo.bottomRight));
+    }
     break;
   case RenderType::Static:
     m_textureCoordInfo = TextureManager::GI()->GetTextureCoordInfo(ETextureID::StaticSpriteSheet, (uint8)a_newTextureID);
     break;
   default:
     break;
+  }
+}
+
+void RendererComponent::ChangeRenderType(RenderType a_type)
+{
+  if (m_renderType == RenderType::Static)
+  {
+    m_registered = false;
+    StaticRenderer& renderer = Renderer2D::GI()->GetStaticRenderer();
+    renderer.UnRegister(m_registeredID);
+    m_registeredID = 0;
+  }
+  m_renderType = a_type;
+  if (m_renderType == RenderType::Static)
+  {
+    StaticRenderer& renderer = Renderer2D::GI()->GetStaticRenderer();
+    m_registered = true;
+    m_registeredID = renderer.Register();
+    renderer.UpdatePosition(m_registeredID, GetParent()->GetTransform().MakeMatrix());
+    renderer.UpdateTexCoords(m_registeredID, glm::vec4(m_textureCoordInfo.topLeft, m_textureCoordInfo.topRight), glm::vec4(m_textureCoordInfo.bottomLeft, m_textureCoordInfo.bottomRight));
   }
 }
