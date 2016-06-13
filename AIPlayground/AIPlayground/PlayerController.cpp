@@ -10,7 +10,8 @@
 #include "Common/imgui.h"
 PlayerController::PlayerController(Grid* a_grid, Camera* a_camera) :
   m_grid(a_grid),
-  m_camera(a_camera)
+  m_camera(a_camera),
+  m_currentSpawningObj(nullptr)
 {
 }
 
@@ -33,6 +34,8 @@ void PlayerController::Init()
         renderComp->ChangeRenderType(RenderType::Dynamic);
       }
     }
+
+
   }
 }
 
@@ -50,52 +53,67 @@ void PlayerController::Update(float a_dt)
 
       if (Input::GetMouseButton(0))
       {
-        TestableCollider testCol;
-        testCol.position = mousePos + m_camera->GetPos();
-        testCol.radius = 8.0f;
-        std::vector<GameObject*> overlappingGO = m_world->GetCollidingGameObjects(&testCol);
-        if (overlappingGO.size())
+        if (!m_currentSpawningObj)
         {
-          for (uint i = 0; i < overlappingGO.size(); i++)
+          TestableCollider testCol;
+          testCol.position = mousePos + m_camera->GetPos();
+          testCol.radius = 8.0f;
+          std::vector<GameObject*> overlappingGO = m_world->GetCollidingGameObjects(&testCol);
+          if (overlappingGO.size())
           {
-            SelectableGameObjectComponent* selectableComponent = (SelectableGameObjectComponent*)overlappingGO[i]->GetComponentOfType(EComponentTypes::CT_SelectableGameObjectComponent);
-            if (selectableComponent)
+            for (uint i = 0; i < overlappingGO.size(); i++)
             {
-              selectableComponent->Select();
-              m_selectedGameObjects.push_back(overlappingGO[i]);
+              SelectableGameObjectComponent* selectableComponent = (SelectableGameObjectComponent*)overlappingGO[i]->GetComponentOfType(EComponentTypes::CT_SelectableGameObjectComponent);
+              if (selectableComponent)
+              {
+                selectableComponent->Select();
+                m_selectedGameObjects.push_back(overlappingGO[i]);
+              }
+            }
+          }
+          else if (m_selectedGameObjects.size() && !Input::GetKeyDown(sf::Keyboard::Key::LShift))
+          {
+            for (auto go = m_selectedGameObjects.begin(); go != m_selectedGameObjects.end();)
+            {
+              SelectableGameObjectComponent* selectableComponent = (SelectableGameObjectComponent*)(*go)->GetComponentOfType(EComponentTypes::CT_SelectableGameObjectComponent);
+              if (selectableComponent)
+              {
+                selectableComponent->Deselect();
+              }
+              go = m_selectedGameObjects.erase(go);
             }
           }
         }
-        else if (m_selectedGameObjects.size() && !Input::GetKeyDown(sf::Keyboard::Key::LShift))
+        else
         {
-          for (auto go = m_selectedGameObjects.begin(); go != m_selectedGameObjects.end();)
-          {
-            SelectableGameObjectComponent* selectableComponent = (SelectableGameObjectComponent*)(*go)->GetComponentOfType(EComponentTypes::CT_SelectableGameObjectComponent);
-            if (selectableComponent)
-            {
-              selectableComponent->Deselect();
-            }
-            go = m_selectedGameObjects.erase(go);
-          }
+          m_currentSpawningObj = nullptr;
+          RendererComponent* selectionGoRenderComponent = (RendererComponent*)m_selectionGO->GetComponentOfType(EComponentTypes::CT_RenderComponent);
+          selectionGoRenderComponent->SetActive(true);
         }
       }
 
       newGoLoc *= worldInfo.tileSize;
       newGoLoc += worldInfo.tileSize / 2.0f;
 
-      m_selectionGO->SetPosition(newGoLoc);
+      if (m_currentSpawningObj)
+      {
+        m_currentSpawningObj->SetPosition(newGoLoc);
+      }
+      else
+        m_selectionGO->SetPosition(newGoLoc);
       float moveSpeedMod = 1.0f;
       if (Input::GetKeyDown(sf::Keyboard::Key::LShift))
         moveSpeedMod = 2.0f;
       if (Input::GetKeyDown(sf::Keyboard::Key::A))
-        m_camera->MoveX( -m_cameraMoveSpeed* a_dt * moveSpeedMod);
+        m_camera->MoveX(-m_cameraMoveSpeed* a_dt * moveSpeedMod);
       if (Input::GetKeyDown(sf::Keyboard::Key::D))
         m_camera->MoveX(m_cameraMoveSpeed* a_dt* moveSpeedMod);
-      
+
       if (Input::GetKeyDown(sf::Keyboard::Key::W))
         m_camera->MoveY(-m_cameraMoveSpeed* a_dt* moveSpeedMod);
       if (Input::GetKeyDown(sf::Keyboard::Key::S))
         m_camera->MoveY(m_cameraMoveSpeed* a_dt* moveSpeedMod);
+
     }
   }
   UpdateUI();
@@ -111,28 +129,43 @@ void PlayerController::Render(Renderer2D* a_renderer)
 
 void PlayerController::UpdateUI()
 {
-  int buttonSpacing = 4;
-  int buttonSizeX = 64, buttonSizeY = 64;
-  int buttonCount = 0;
-  int windowPadding = ImGui::GetStyle().WindowPadding.x;
+  int buttonSizeX = 32, buttonSizeY = 32;
   ImGui::SetNextWindowPos(ImVec2(32, 624));
   ImGui::SetNextWindowSize(ImVec2(1216, 80));
-  ImGui::Begin("BuildMenu", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove |ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+  ImGui::Begin("BuildMenu", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
 
-  ImGui::Button("Coal Dirt", ImVec2(buttonSizeX, buttonSizeY));
-  buttonCount++;
+  if (ImGui::SmallButton("Coal Dirt"))
+    SpawningObject(ESpawnableItemIDs::CoalDirt);
+  ImGui::SameLine();
+  if (ImGui::SmallButton("Coal Rock"))
+    SpawningObject(ESpawnableItemIDs::CoalRock);
 
-  ImGui::Button("Coal Rock", ImVec2(buttonSizeX, buttonSizeY));
-  ImGui::SameLine(buttonCount*buttonSizeX +buttonSpacing + buttonSizeX);
-  buttonCount++;
+  ImGui::SameLine();
+  if (ImGui::SmallButton("Copper Dirt"))
+    SpawningObject(ESpawnableItemIDs::CopperDirt);
 
-  ImGui::Button("Copper Dirt", ImVec2(buttonSizeX, buttonSizeY));
-  ImGui::SameLine(buttonCount*buttonSizeX +buttonSpacing + buttonSizeX );
-  buttonCount++;
+  ImGui::SameLine();
+  if (ImGui::SmallButton("Copper Rock"))
+    SpawningObject(ESpawnableItemIDs::CopperRock);
 
-  ImGui::Button("Copper Rock", ImVec2(buttonSizeX, buttonSizeY));
-  ImGui::SameLine(buttonCount*buttonSizeX + buttonSpacing + buttonSizeX );
-  buttonCount++;
+  ImGui::SameLine();
 
   ImGui::End();
+}
+
+
+void PlayerController::SpawningObject(ESpawnableItemIDs a_id)
+{
+  if (!m_currentSpawningObj)
+  {
+    RendererComponent* selectionGoRenderComponent = (RendererComponent*)m_selectionGO->GetComponentOfType(EComponentTypes::CT_RenderComponent);
+    selectionGoRenderComponent->SetActive(false);
+    m_currentSpawningObj = GetWorld()->CreateGameObject(EGameObjectType::GOT_Empty);
+    if (m_currentSpawningObj)
+    {
+      RendererComponent* component = (RendererComponent*)m_currentSpawningObj->AddComponent(EComponentTypes::CT_RenderComponent);
+      component->ChangeRenderType(RenderType::Static);
+      component->ChangeTextureID((uint)a_id);
+    }
+  }
 }

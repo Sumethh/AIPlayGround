@@ -98,7 +98,7 @@ void Game::Init()
   projection = glm::ortho( 0.f , 1280.0f , 720.0f , 0.0f );
   Renderer2D::SetProjectionMatrix( projection );
   myTrans.position = glm::vec2( 400.0f , 400.0f );
-  myTrans.scale = glm::vec2( 32 , 32 );
+  myTrans.scale = glm::vec2( 32   , 32 );
   myTrans.rotation = 0.0f;
 
   myTrans.transformationMatrix = glm::translate( glm::mat4() , glm::vec3( myTrans.position , 0.0f ) );
@@ -122,7 +122,7 @@ void Game::Init()
   }
 
   uint reg = staticRenderer.Register();
-  staticRenderer.UpdateTexCoords( reg , glm::vec4( 0 , 0 , 1 , 0 ) , glm::vec4( 0 , 1 , 1 , 1 ) );
+  staticRenderer.UpdateTexCoords( reg , glm::vec4( 0 , 0 , 1 /12.0f , 0 ) , glm::vec4( 0 , 1 , 1/12.0f , 1 ) );
 
   staticRenderer.UpdatePosition( reg , myTrans.transformationMatrix );
 }
@@ -174,9 +174,9 @@ void Game::PreRender()
 void Game::Render()
 {
   //renderer.Flush();
-  //staticRenderer.Flush();
+  staticRenderer.Flush();
   //lineRenderer.Flush();
-  basicRenderer.Flush();
+  //basicRenderer.Flush();
 }
 
 void Game::PostFrame()

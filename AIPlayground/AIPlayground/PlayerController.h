@@ -7,6 +7,14 @@ class Camera;
 class World;
 class PlayerController
 {
+  enum class ESpawnableItemIDs : uint8
+  {
+    CoalDirt,
+    CoalRock,
+    CopperDirt,
+    CopperRock,
+    MaxCount
+  };
 public:
   PlayerController( Grid* a_grid , Camera* a_camera );
   ~PlayerController();
@@ -19,8 +27,11 @@ public:
   inline World* GetWorld() { return m_world; }
 private:
   void UpdateUI();
-  GameObject* m_selectionGO;
 
+  void SpawningObject(ESpawnableItemIDs a_id);
+
+  GameObject* m_selectionGO;
+  GameObject* m_currentSpawningObj;
   const float m_moveSpeed = 512.0f;
   World* m_world;
   Grid* const  m_grid;

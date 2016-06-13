@@ -6,7 +6,8 @@ enum class EShaderID : uint8
 {
   SpriteBatch ,
   LineRender ,
-  BasicRender
+  BasicRender,
+  StaticRender
 };
 class ShaderManager
 {

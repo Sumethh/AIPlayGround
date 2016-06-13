@@ -32,15 +32,17 @@ void RendererComponent::PreRender()
     if (m_registered && m_renderType == RenderType::Static)
     {
       StaticRenderer& renderer = Renderer2D::GI()->GetStaticRenderer();
-      renderer.UpdatePosition(m_registeredID, GetParent()->GetTransform().MakeMatrix());
-      renderer.UpdateTexCoords(m_registeredID, glm::vec4(m_textureCoordInfo.topLeft, m_textureCoordInfo.topRight), glm::vec4(m_textureCoordInfo.bottomLeft, m_textureCoordInfo.bottomRight));
+      glm::mat4 mat = GetParent()->GetTransform().MakeMatrix(m_textureCoordInfo.sizeInPixels);
+      mat[3][2] = (uint8)GetParent()->GetLayer() / 10.0f;
+      renderer.UpdatePosition(m_registeredID, mat);
     }
+    GetParent()->ResetRenderStateDirtyFlag();
   }
 }
 
 void RendererComponent::Render(Renderer2D* a_renderer)
 {
-  if (!m_active)
+  if (!m_active || m_renderType == RenderType::Static)  
     return;
   SpriteBatchRenderer& spriteRender = a_renderer->GetSpriteBatchRenderer();
   World* world = GetParent()->GetWorld();
@@ -57,15 +59,15 @@ void RendererComponent::ChangeTextureID(const uint a_newTextureID)
   switch (m_renderType)
   {
   case RenderType::Dynamic:
-    m_textureCoordInfo = TextureManager::GI()->GetTextureCoordInfo(ETextureID::DynamicSpriteSheet, (uint8)a_newTextureID);
+    m_textureCoordInfo = TextureManager::GI()->GetTextureCoordInfo(ETextureID::DynamicSpriteSheet, (uint8)a_newTextureID);   
+    break;
+  case RenderType::Static:
+    m_textureCoordInfo = TextureManager::GI()->GetTextureCoordInfo(ETextureID::StaticSpriteSheet, (uint8)a_newTextureID);
     if (m_registered)
     {
       StaticRenderer& renderer = Renderer2D::GI()->GetStaticRenderer();
       renderer.UpdateTexCoords(m_registeredID, glm::vec4(m_textureCoordInfo.topLeft, m_textureCoordInfo.topRight), glm::vec4(m_textureCoordInfo.bottomLeft, m_textureCoordInfo.bottomRight));
     }
-    break;
-  case RenderType::Static:
-    m_textureCoordInfo = TextureManager::GI()->GetTextureCoordInfo(ETextureID::StaticSpriteSheet, (uint8)a_newTextureID);
     break;
   default:
     break;
@@ -87,6 +89,7 @@ void RendererComponent::ChangeRenderType(RenderType a_type)
     StaticRenderer& renderer = Renderer2D::GI()->GetStaticRenderer();
     m_registered = true;
     m_registeredID = renderer.Register();
+    m_textureCoordInfo = TextureManager::GI()->GetTextureCoordInfo(ETextureID::StaticSpriteSheet, m_textureID);
     renderer.UpdatePosition(m_registeredID, GetParent()->GetTransform().MakeMatrix());
     renderer.UpdateTexCoords(m_registeredID, glm::vec4(m_textureCoordInfo.topLeft, m_textureCoordInfo.topRight), glm::vec4(m_textureCoordInfo.bottomLeft, m_textureCoordInfo.bottomRight));
   }

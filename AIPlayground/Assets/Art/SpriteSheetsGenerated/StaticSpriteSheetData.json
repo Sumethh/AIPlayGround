@@ -38,7 +38,7 @@
 },
 {
 	"filename": "Dirt.png",
-	"frame": {"x":0,"y":32,"w":32,"h":32},
+	"frame": {"x":128,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -47,7 +47,7 @@
 },
 {
 	"filename": "GoldDirt.png",
-	"frame": {"x":32,"y":32,"w":32,"h":32},
+	"frame": {"x":160,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -56,7 +56,7 @@
 },
 {
 	"filename": "GoldRock.png",
-	"frame": {"x":64,"y":32,"w":32,"h":32},
+	"frame": {"x":192,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -65,7 +65,7 @@
 },
 {
 	"filename": "IronDirt.png",
-	"frame": {"x":96,"y":32,"w":32,"h":32},
+	"frame": {"x":224,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -74,7 +74,7 @@
 },
 {
 	"filename": "IronRock.png",
-	"frame": {"x":0,"y":64,"w":32,"h":32},
+	"frame": {"x":256,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -83,7 +83,7 @@
 },
 {
 	"filename": "Rock.png",
-	"frame": {"x":32,"y":64,"w":32,"h":32},
+	"frame": {"x":288,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -92,7 +92,7 @@
 },
 {
 	"filename": "UraniumDirt.png",
-	"frame": {"x":64,"y":64,"w":32,"h":32},
+	"frame": {"x":320,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -101,7 +101,7 @@
 },
 {
 	"filename": "UraniumRock.png",
-	"frame": {"x":96,"y":64,"w":32,"h":32},
+	"frame": {"x":352,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -113,8 +113,8 @@
 	"version": "1.0",
 	"image": "StaticSpriteSheet.png",
 	"format": "RGBA8888",
-	"size": {"w":128,"h":128},
+	"size": {"w":384,"h":32},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:5d1c0be46bf8d81926032e4dc65e3495:c648cf1414e4540b9a5f29be7bd724bd:637beb114314b48bca17386af8e1bb0b$"
+	"smartupdate": "$TexturePacker:SmartUpdate:13416dbb5a3a91d16166229e49b898e1:c648cf1414e4540b9a5f29be7bd724bd:637beb114314b48bca17386af8e1bb0b$"
 }
 }
