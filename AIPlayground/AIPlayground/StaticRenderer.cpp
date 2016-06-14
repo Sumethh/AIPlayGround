@@ -103,8 +103,7 @@ void StaticRenderer::Flush()
   glUniformMatrix4fv(m_shader->GetProjectionUniformLoc(), 1, GL_FALSE, glm::value_ptr(Renderer2D::GetProjection()));
   m_texture->Bind();
   glBindVertexArray(m_vao);
-  glDrawArrays(GL_POINTS, 0, m_staticCount);
-  LOGI("%d", m_staticCount);
+  glDrawArrays(GL_POINTS, 0, m_staticCount);  
   m_texture->UnBind();
   glBindVertexArray(0);
   m_shader->UnBind();

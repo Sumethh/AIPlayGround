@@ -33,7 +33,8 @@ void RendererComponent::PreRender()
     {
       StaticRenderer& renderer = Renderer2D::GI()->GetStaticRenderer();
       glm::mat4 mat = GetParent()->GetTransform().MakeMatrix(m_textureCoordInfo.sizeInPixels);
-      mat[3][2] = (uint8)GetParent()->GetLayer() / 10.0f;
+        float z = (uint8)GetParent()->GetLayer() / 10.0f;
+        mat[ 3 ][ 2 ] = z;
       renderer.UpdatePosition(m_registeredID, mat);
     }
     GetParent()->ResetRenderStateDirtyFlag();

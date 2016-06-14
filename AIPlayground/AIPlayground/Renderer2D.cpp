@@ -14,6 +14,7 @@ void Renderer2D::Init()
   m_basicRenderer.Init();
   m_staticRenderer.Init();
   m_batchRenderer.Init();
+  //glEnable( GL_DEPTH_TEST );
 }
 
 void Renderer2D::Begin()

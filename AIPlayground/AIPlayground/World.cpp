@@ -123,7 +123,7 @@ void World::Render(Renderer2D* a_renderer)
 {
   //
 
- //. m_grid->Render(a_renderer);
+   m_grid->Render(a_renderer);
   m_playerController->Render(a_renderer);
    m_physicsSystem->Render( a_renderer );
   for( auto gameObject : m_gameObjects )

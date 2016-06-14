@@ -108,7 +108,6 @@ int main()
     DebugOnScreenTimer::SetTimerValue(physicsTimerIndex, PhysicsSystem::time);
     preRenderTimer.Start();
     game.PreRender();
-    ImGui::ShowTestWindow();
     DebugOnScreenTimer::SetTimerValue(preRenderTimerIndex, (float)preRenderTimer.IntervalMS());
     renderTimer.Start();
     game.Render();
