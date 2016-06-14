@@ -1,94 +1,185 @@
 #include "GameObject.h"
 #include "Component.h"
+#include <glm/gtc/matrix_transform.hpp>
+#include "glm/gtx/rotate_vector.hpp"
+typedef std::vector<std::shared_ptr<Component>>::iterator ComponentItr;
 
-typedef std::vector<Component*>::iterator ComponentItr;
-
-
-GameObject::GameObject( EGameObjectType a_type ) :
-  m_goType( a_type ) ,
-  m_hasBegunPlay( false ) ,
-  m_toBeDestroyed( false ) ,
-  m_world( nullptr )
+GameObject::GameObject(EGameObjectType a_type) :
+  m_goType(a_type),
+  m_hasBegunPlay(false),
+  m_toBeDestroyed(false),
+  m_world(nullptr),
+  m_rotationMatrixDirty(true),
+  m_currentLayer(ELayerID::DynamicObject)
 {
+  SetScale(glm::vec2(1.0f, 1.0f));
+  SetRotation(0);
+  SetPosition(glm::vec2(0.0f, 0.0f));
 }
-
 
 GameObject::~GameObject()
 {
+  for (auto itr = m_components.begin(); itr != m_components.end();)
+  {
+    delete* itr;
+    itr = m_components.erase(itr);
+  }
+  for (auto itr = m_componentsToAdd.begin(); itr != m_componentsToAdd.end();)
+  {
+    delete* itr;
+    itr = m_components.erase(itr);
+  }
 }
 
-void GameObject::OnCosntruct( GameObjectConstructionDescriptor* a_constructionDescriptor )
+void GameObject::OnCosntruct(GameObjectConstructionDescriptor* a_constructionDescriptor)
 {
-  if( a_constructionDescriptor )
+  if (a_constructionDescriptor)
   {
-    for( auto i : a_constructionDescriptor->listOfComps )
-      AddComponent( i );
+    for (auto i : a_constructionDescriptor->listOfComps)
+      AddComponent(i);
   }
   PostFrame();
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
-    ( *itr )->OnCosntruct();
+  for (auto itr = m_components.begin(); itr != m_components.end(); ++itr)
+    (*itr)->OnCosntruct();
 }
 
 void GameObject::OnDestroy()
 {
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
-    ( *itr )->OnDestroy();
+  for (auto itr = m_components.begin(); itr != m_components.end(); ++itr)
+    (*itr)->OnDestroy();
 }
 
 void GameObject::BeginPlay()
 {
   m_hasBegunPlay = true;
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
-    ( *itr )->BeginPlay();
+  for (auto itr = m_components.begin(); itr != m_components.end(); ++itr)
+    (*itr)->BeginPlay();
 }
 
-void GameObject::Update( float a_dt )
+void GameObject::Update(float a_dt)
 {
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
-    ( *itr )->Update( a_dt );
+  for (auto itr = m_components.begin(); itr != m_components.end(); ++itr)
+    (*itr)->Update(a_dt);
+  /*if( m_rotationMatrixDirty )
+  {
+    glm::mat2 rMatrix = m_transform.rotationMatrix;
+    float cosResult = glm::cos( glm::radians( m_transform.rotation ) );
+    float sinResult = glm::sin( glm::radians( m_transform.rotation ) );
+    rMatrix[ 0 ][ 0 ] = cosResult;
+    rMatrix[ 0 ][ 1 ] = -sinResult;
+    rMatrix[ 1 ][ 0 ] = sinResult;
+    rMatrix[ 1 ][ 1 ] = cosResult;
+  }*/
+  if (GetRotationFlagDirty())
+  {
+    ResetRotationDityFlag();
+    glm::vec2 right(0, 1);
+    glm::vec2 forward(1, 0);
+
+    float angle = -m_transform.rotation;
+    float cos = glm::cos(angle);
+    float sin = glm::sin(angle);
+
+    glm::vec2 newVec;
+    newVec.x = forward.x * cos - forward.y * sin;
+    newVec.y = forward.x * sin + forward.y * cos;
+    forward = newVec;
+    newVec.x = right.x * cos - right.y * sin;
+    newVec.y = right.x * sin + right.y * cos;
+    right = newVec;
+
+    m_transform.forward = glm::normalize(forward);
+    m_transform.right = glm::normalize(right);
+  }
+}
+
+void GameObject::FixedUpdate(float a_dt)
+{
+  for (auto itr = m_components.begin(); itr != m_components.end(); ++itr)
+    (*itr)->FixedUpdate(a_dt);
 }
 
 void GameObject::PreRender()
 {
-
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
-    ( *itr )->PreRender();
+  for (auto itr = m_components.begin(); itr != m_components.end(); ++itr)
+    (*itr)->PreRender();
 }
-
-void GameObject::Render( Window* a_window )
+#include "Renderer2D.h"
+#include "World.h"
+void GameObject::Render(Renderer2D* a_renderer)
 {
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
-    ( *itr )->Render( a_window );
+  for (auto itr = m_components.begin(); itr != m_components.end(); ++itr)
+    (*itr)->Render(a_renderer);
 }
 
 void GameObject::PostFrame()
 {
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
-    ( *itr )->PostFrame();
+  for (auto itr = m_components.begin(); itr != m_components.end(); ++itr)
+    (*itr)->PostFrame();
 
-  for( size_t i = 0; i < m_componentsToAdd.size(); ++i )
+  for (size_t i = 0; i < m_componentsToAdd.size(); ++i)
   {
-    Component* newComp = m_componentsToAdd[ i ];
-    m_components.push_back( newComp );
-    if( HasBegunPlay() && !newComp->HasBegunPlay() )
+    Component* newComp = m_componentsToAdd[i];
+    m_components.push_back(newComp);
+    if (HasBegunPlay() && !newComp->HasBegunPlay())
       newComp->BeginPlay();
   }
   m_componentsToAdd.clear();
 }
 
-void GameObject::AddComponent( EComponentTypes a_componentType )
+void GameObject::OnCollisionEnter(Collision a_collision)
 {
-  Component* newComp = ComponentFactory::GI()->MakeComponent( a_componentType , this );
-  if( !nullptr )
-    m_componentsToAdd.push_back( newComp );
+  for (auto itr = m_components.begin(); itr != m_components.end(); ++itr)
+    (*itr)->OnCollisionEnter(a_collision);
+}
+
+void GameObject::OnCollisionLeave(Collision a_collision)
+{
+  for (auto itr = m_components.begin(); itr != m_components.end(); ++itr)
+    (*itr)->OnCollisionLeave(a_collision);
+}
+
+void GameObject::OnCollisionStay(Collision a_collision)
+{
+  for (auto itr = m_components.begin(); itr != m_components.end(); ++itr)
+    (*itr)->OnCollisionStay(a_collision);
+}
+
+void GameObject::OnSave(json& a_json)
+{
+  a_json["GameObjectType"] = (uint)m_goType;
+  json transformData;
+  transformData["Position"] = { { "x", m_transform.position.x }, { "y", m_transform.position.y }, {"z", (uint8)m_currentLayer} };
+  transformData["Scale"] = { {"x",m_transform.scale.x}, {"y", m_transform.scale.y} };
+  transformData["Rotation"] = m_transform.rotation;
+  a_json["Transform"] = transformData;
+  json componentsData;
+  for (int i = 0; i < m_components.size(); i++)
+  {
+    json compData;
+    m_components[i]->OnSave(compData);
+    componentsData.push_back(compData);
+  }
+  a_json["Components"] = componentsData;
+}
+
+void GameObject::OnLoad(json& a_json)
+{
 
 }
 
-
-Component* GameObject::GetComponentOfType( EComponentTypes a_type )
+Component* GameObject::AddComponent(EComponentTypes a_componentType)
 {
-  for( ComponentItr itr = m_components.begin(); itr != m_components.end(); ++itr )
-    if( ( *itr )->IsComponentOfType( a_type ) )
-      return ( *itr );
+  Component* newComp(ComponentFactory::GI()->MakeComponent(a_componentType, this));
+  if (!nullptr)
+    m_componentsToAdd.push_back(newComp);
+  return newComp;
+}
+
+Component* GameObject::GetComponentOfType(EComponentTypes a_type)
+{
+  for (auto itr = m_components.begin(); itr != m_components.end(); ++itr)
+    if ((*itr)->IsComponentOfType(a_type))
+      return (*itr);
   return nullptr;
 }

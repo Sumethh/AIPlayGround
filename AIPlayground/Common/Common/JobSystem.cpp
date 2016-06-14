@@ -1,6 +1,6 @@
 #include "JobSystem.h"
 #include "log.h"
-
+#include <malloc.h>
 
 std::vector<Job*> JobSystem::m_jobs;
 std::mutex JobSystem::m_jobsMutex;
@@ -15,6 +15,8 @@ std::mutex JobSystem::m_activeJobsMutex;
 
 uint32 JobSystem::m_currentMaxID;
 
+std::condition_variable JobSystem::m_jobCondition;
+SLIST_HEADER JobSystem::m_jobList;
 WorkerThread::WorkerThread( uint a_threadID ) :
   workerThread( &WorkerThread::WorkerMainFunction , this ) ,
   threadID( a_threadID )
@@ -59,10 +61,8 @@ void WorkerThread::WorkerMainFunction()
           threadInfo->jobTimeTotal += time;
           threadInfo->jobTimeSamplesCount++;
           threadInfo->jobsCompleted++;
-
         }
       }
-
     }
     else
       std::this_thread::yield();
@@ -78,10 +78,9 @@ void JobSystem::Init( uint a_threadCount )
   for( uint i = 0; i < a_threadCount; i++ )
     m_workerThreads.push_back( new WorkerThread( i ) );
   m_currentMaxID = 1;
+
+  InitializeSListHead( &m_jobList );
 }
-
-
-
 
 bool JobSystem::CheckJobConditions( Job* a_job )
 {
@@ -116,8 +115,8 @@ bool JobSystem::CheckJobConditions( Job* a_job )
 Job* JobSystem::GetAnyAvaidableJob()
 {
   Job* returningJob = nullptr;
-  if( !m_jobsMutex.try_lock() )
-    return nullptr;
+  std::unique_lock<std::mutex> lock( m_jobsMutex );
+  m_jobCondition.wait( lock , [] {return m_jobCount > 0 || !m_hasInitBeenCalled; } );
   for( auto job = m_jobs.begin(); job != m_jobs.end(); )
   {
     if( CheckJobConditions( *job ) )
@@ -130,7 +129,25 @@ Job* JobSystem::GetAnyAvaidableJob()
     }
     job++;
   }
-  m_jobsMutex.unlock();
+
+  if( QueryDepthSList( &m_jobList ) > 0 )
+  {
+    SLIST_ENTRY* entry = nullptr;
+    LinkedListEntry* jobEntry = nullptr;
+    do
+    {
+      entry = InterlockedPopEntrySList( &m_jobList );
+      if( entry )
+      {
+        jobEntry = (LinkedListEntry*)entry;
+        m_jobs.push_back( jobEntry->job );
+      }
+    } while( entry != nullptr );
+  }
+
+  lock.unlock();
+  m_jobCondition.notify_one();
+
   return returningJob;
 }
 
@@ -142,7 +159,6 @@ void JobSystem::AddActiveJob( Job* a_job )
     m_activeJobs[ a_job->jobID ] = a_job;
     //This is a test
   }
-
 }
 void JobSystem::JobCompleted( Job* a_job )
 {
@@ -153,7 +169,6 @@ void JobSystem::JobCompleted( Job* a_job )
     m_activeJobs.erase( a_job->jobID );
   }
   m_activeJobsMutex.unlock();
-
 }
 
 void JobSystem::UnInit()
@@ -164,6 +179,7 @@ void JobSystem::UnInit()
     for( uint i = 0; i < m_workerThreads.size(); i++ )
       m_workerThreads[ i ]->runningFlag.clear();
 
+    m_jobCondition.notify_all();
     for( uint i = 0; i < m_workerThreads.size(); i++ )
     {
       if( !m_workerThreads[ i ]->workerThread.joinable() )
@@ -186,21 +202,59 @@ uint32 JobSystem::ScheduleJob( Job* a_jobToAdd )
       LOGE( "I recieved a null job!" );
       return jobID;
     }
-    std::lock_guard<std::mutex> lock( m_jobsMutex );
+    LinkedListEntry* entry = (LinkedListEntry*)_aligned_malloc( sizeof( LinkedListEntry ) , MEMORY_ALLOCATION_ALIGNMENT );
+    entry->job = a_jobToAdd;
+    InterlockedPushEntrySList( &m_jobList , &( entry->entry ) );
+    m_jobCount++;
+    m_jobCondition.notify_one();
+    //std::lock_guard<std::mutex> lock( m_jobsMutex );
+    //if( !m_freeIDs.empty() )
+    //{
+    //  jobID = m_freeIDs.front();
+    //  m_freeIDs.pop();
+    //}
+    //else
+    //{
+    //  jobID = m_currentMaxID;
+    //  m_currentMaxID++;
+    //}
+    //a_jobToAdd->jobID = jobID;
+    //m_jobs.push_back( a_jobToAdd );
+    //m_jobCount++;
+    //if( CheckJobConditions( a_jobToAdd ) )
+    //  m_jobCondition.notify_one();
+  }
+  return jobID;
+}
+
+uint32 JobSystem::ScheduleJobWithoutLock( Job* a_jobToAdd )
+{
+  int32 jobID = 0;
+
+  if( m_hasInitBeenCalled )
+  {
+    if( !a_jobToAdd )
+    {
+      LOGE( "I recieved a null job!" );
+      return jobID;
+    }
     if( !m_freeIDs.empty() )
     {
       jobID = m_freeIDs.front();
       m_freeIDs.pop();
     }
-    jobID = m_currentMaxID;
-    m_currentMaxID++;
+    else
+    {
+      jobID = m_currentMaxID;
+      m_currentMaxID++;
+    }
     a_jobToAdd->jobID = jobID;
     m_jobs.push_back( a_jobToAdd );
     m_jobCount++;
-
+    if( CheckJobConditions( a_jobToAdd ) )
+      m_jobCondition.notify_one();
   }
   else
     LOGE( "Tried to schedule job but jobsystem has not be initialized" );
   return jobID;
 }
-

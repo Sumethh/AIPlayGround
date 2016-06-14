@@ -1,22 +1,19 @@
 #include "PlayerController.h"
 #include "Common/Input.h"
-#include "Common/Window.h"
 #include "Common/log.h"
+#include "World.h"
 #include "Camera.h"
-
-
-
-PlayerController::PlayerController( std::shared_ptr<Grid>& a_grid , std::shared_ptr<Camera>& a_camera ) :
-  m_grid( a_grid ) ,
-  m_camera( a_camera )
+#include "Renderer2D.h"
+#include "RendererComponent.h"
+#include "SelectableGameObjectComponent.h"
+#include "ColliderComponent.h"
+#include "Common/imgui.h"
+PlayerController::PlayerController(Grid* a_grid, Camera* a_camera) :
+  m_grid(a_grid),
+  m_camera(a_camera),
+  m_currentSpawningObj(nullptr)
 {
-  if( m_selectionTexture.loadFromFile( "../assets/art/SelectionImage.png" ) )
-  {
-    m_selectionSprite.setTexture( m_selectionTexture );
-  }
-
 }
-
 
 PlayerController::~PlayerController()
 {
@@ -24,67 +21,151 @@ PlayerController::~PlayerController()
 
 void PlayerController::Init()
 {
-
-}
-
-void PlayerController::Update( float a_dt )
-{
-  int tileSizeX = 0 , tileSizeY = 0;
-  if( !m_grid.expired() && !m_camera.expired() )
+  if (m_world)
   {
-    std::shared_ptr<Grid> grid = m_grid.lock();
-    std::shared_ptr<Camera> camera = m_camera.lock();
 
-
-    tileSizeX = grid->GetTileSizeX();
-    tileSizeY = grid->GetTileSizeY();
-
-    glm::vec2 mousePos = Input::GetMousePosition();
-
-    sf::Vector2f newSpritePos;
-    glm::vec2 camPos = camera->GetPos();
-    int indexX = (int)( mousePos.x + camPos.x ) / tileSizeX;
-    int indexY = (int)( mousePos.y + camPos.y ) / tileSizeY;
-    Node* node = grid->GetNode( indexX , indexY );
-    if( node )
+    m_selectionGO = m_world->CreateGameObject(EGameObjectType::GOT_Empty);
+    if (m_selectionGO)
     {
-      newSpritePos.x = node->pos.x - camPos.x;
-      newSpritePos.y = node->pos.y - camPos.y;
-
-      m_selectionSprite.setPosition( newSpritePos );
-      if( Input::GetMouseButton( sf::Mouse::Left ) )
-        grid->SetNodeTileIndex( indexX , indexY , 0 );
-
-      if( Input::GetMouseButton( sf::Mouse::Right ) )
-        grid->SetNodeTileIndex( indexX , indexY , 1 );
+      RendererComponent* renderComp = (RendererComponent*)m_selectionGO->AddComponent(EComponentTypes::CT_RenderComponent);
+      if (renderComp)
+      {
+        renderComp->ChangeTextureID(1);
+        renderComp->ChangeRenderType(RenderType::Dynamic);
+      }
     }
 
-    if( Input::GetKey( sf::Keyboard::F10 ) )
-      grid->SaveToDisk();
-  }
 
-  if( !m_camera.expired() )
+  }
+}
+
+void PlayerController::Update(float a_dt)
+{
+  if (m_selectionGO)
   {
-    std::shared_ptr<Camera> camera = m_camera.lock();
-    if( Input::GetKeyDown( sf::Keyboard::Key::A ) )
-      camera->MoveX( -m_moveSpeed*a_dt );
-    if( Input::GetKeyDown( sf::Keyboard::Key::D ) )
-      camera->MoveX( m_moveSpeed*a_dt );
+    if (!Input::IsMouseOverUI())
+    {
+      glm::vec2 mousePos = Input::GetMousePosition();
+      WorldInfo worldInfo = m_world->GetWorldInfo();
+      glm::vec2 newGoLoc;
+      newGoLoc.x = (float)((int)(m_camera->GetPos().x + mousePos.x) / (int)worldInfo.tileSize.x);
+      newGoLoc.y = (float)((int)(m_camera->GetPos().y + mousePos.y) / (int)worldInfo.tileSize.y);
 
-    if( Input::GetKeyDown( sf::Keyboard::Key::W ) )
-      camera->MoveY( -m_moveSpeed*a_dt );
+      if (Input::GetMouseButton(0))
+      {
+        if (!m_currentSpawningObj)
+        {
+          TestableCollider testCol;
+          testCol.position = mousePos + m_camera->GetPos();
+          testCol.radius = 8.0f;
+          std::vector<GameObject*> overlappingGO = m_world->GetCollidingGameObjects(&testCol);
+          if (overlappingGO.size())
+          {
+            for (uint i = 0; i < overlappingGO.size(); i++)
+            {
+              SelectableGameObjectComponent* selectableComponent = (SelectableGameObjectComponent*)overlappingGO[i]->GetComponentOfType(EComponentTypes::CT_SelectableGameObjectComponent);
+              if (selectableComponent)
+              {
+                selectableComponent->Select();
+                m_selectedGameObjects.push_back(overlappingGO[i]);
+              }
+            }
+          }
+          else if (m_selectedGameObjects.size() && !Input::GetKeyDown(sf::Keyboard::Key::LShift))
+          {
+            for (auto go = m_selectedGameObjects.begin(); go != m_selectedGameObjects.end();)
+            {
+              SelectableGameObjectComponent* selectableComponent = (SelectableGameObjectComponent*)(*go)->GetComponentOfType(EComponentTypes::CT_SelectableGameObjectComponent);
+              if (selectableComponent)
+              {
+                selectableComponent->Deselect();
+              }
+              go = m_selectedGameObjects.erase(go);
+            }
+          }
+        }
+        else
+        {
+          m_currentSpawningObj = nullptr;
+          RendererComponent* selectionGoRenderComponent = (RendererComponent*)m_selectionGO->GetComponentOfType(EComponentTypes::CT_RenderComponent);
+          selectionGoRenderComponent->SetActive(true);
+        }
+      }
 
-    if( Input::GetKeyDown( sf::Keyboard::Key::S ) )
-      camera->MoveY( m_moveSpeed*a_dt );
+      newGoLoc *= worldInfo.tileSize;
+      newGoLoc += worldInfo.tileSize / 2.0f;
+
+      if (m_currentSpawningObj)
+      {
+        m_currentSpawningObj->SetPosition(newGoLoc);
+      }
+      else
+        m_selectionGO->SetPosition(newGoLoc);
+      float moveSpeedMod = 1.0f;
+      if (Input::GetKeyDown(sf::Keyboard::Key::LShift))
+        moveSpeedMod = 2.0f;
+      if (Input::GetKeyDown(sf::Keyboard::Key::A))
+        m_camera->MoveX(-m_cameraMoveSpeed* a_dt * moveSpeedMod);
+      if (Input::GetKeyDown(sf::Keyboard::Key::D))
+        m_camera->MoveX(m_cameraMoveSpeed* a_dt* moveSpeedMod);
+
+      if (Input::GetKeyDown(sf::Keyboard::Key::W))
+        m_camera->MoveY(-m_cameraMoveSpeed* a_dt* moveSpeedMod);
+      if (Input::GetKeyDown(sf::Keyboard::Key::S))
+        m_camera->MoveY(m_cameraMoveSpeed* a_dt* moveSpeedMod);
+
+    }
   }
+  UpdateUI();
 }
 
 void PlayerController::PreRender()
 {
-
 }
 
-void PlayerController::Render( Window* const a_window )
+void PlayerController::Render(Renderer2D* a_renderer)
 {
-  a_window->RenderDrawable( m_selectionSprite );
+}
+
+void PlayerController::UpdateUI()
+{
+  int buttonSizeX = 32, buttonSizeY = 32;
+  ImGui::SetNextWindowPos(ImVec2(32, 624));
+  ImGui::SetNextWindowSize(ImVec2(1216, 80));
+  ImGui::Begin("BuildMenu", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+
+  if (ImGui::SmallButton("Coal Dirt"))
+    SpawningObject(ESpawnableItemIDs::CoalDirt);
+  ImGui::SameLine();
+  if (ImGui::SmallButton("Coal Rock"))
+    SpawningObject(ESpawnableItemIDs::CoalRock);
+
+  ImGui::SameLine();
+  if (ImGui::SmallButton("Copper Dirt"))
+    SpawningObject(ESpawnableItemIDs::CopperDirt);
+
+  ImGui::SameLine();
+  if (ImGui::SmallButton("Copper Rock"))
+    SpawningObject(ESpawnableItemIDs::CopperRock);
+
+  ImGui::SameLine();
+
+  ImGui::End();
+}
+
+
+void PlayerController::SpawningObject(ESpawnableItemIDs a_id)
+{
+  if (!m_currentSpawningObj)
+  {
+    RendererComponent* selectionGoRenderComponent = (RendererComponent*)m_selectionGO->GetComponentOfType(EComponentTypes::CT_RenderComponent);
+    selectionGoRenderComponent->SetActive(false);
+    m_currentSpawningObj = GetWorld()->CreateGameObject(EGameObjectType::GOT_Empty);
+    if (m_currentSpawningObj)
+    {
+      RendererComponent* component = (RendererComponent*)m_currentSpawningObj->AddComponent(EComponentTypes::CT_RenderComponent);
+      component->ChangeRenderType(RenderType::Static);
+      component->ChangeTextureID((uint)a_id);
+    }
+  }
 }

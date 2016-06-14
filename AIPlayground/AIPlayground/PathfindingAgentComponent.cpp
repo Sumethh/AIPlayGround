@@ -5,11 +5,13 @@
 #include "Common/HelperFunctions.h"
 #include <SFML/Graphics.hpp>
 #include "Common/Window.h"
+#include "DebugValues.h"
+#include "Renderer2D.h"
+#include "Camera.h"
 PathfindingAgentComponent::PathfindingAgentComponent( GameObject* a_go , EComponentTypes a_type ) :
   Component( a_go , a_type )
 {
 }
-
 
 PathfindingAgentComponent::~PathfindingAgentComponent()
 {
@@ -26,45 +28,40 @@ void PathfindingAgentComponent::OnCosntruct()
   }
 }
 
-void PathfindingAgentComponent::Render( Window* a_window )
+void PathfindingAgentComponent::Render( Renderer2D* a_renderer )
 {
-
   if( m_path )
   {
     World* world = GetParent()->GetWorld();
-    std::weak_ptr<Camera> cam;
+    Camera* cam = nullptr;
     if( world )
       cam = world->GetCamera();
-#if 0
-    if( !cam.expired() )
+    if( DebugValues::GI()->RenderGrid && cam)
     {
-      std::shared_ptr<Camera> camera = cam.lock();
-      for( size_t i = 1; i < m_path->nodes.size(); ++i )
+      LineRenderer& lineRender = a_renderer->GetLineRenderer();
+      for( uint i = 1; i < m_path->nodes.size(); i++ )
       {
-        sf::Vertex line[] = {
-          sf::Vertex( ConvertVec2( m_path->nodes[ i - 1 ] - camera->GetPos() ) ),
-          sf::Vertex( ConvertVec2( m_path->nodes[ i ] - camera->GetPos() ) )
-        };
-        a_window->GetWindow()->draw( line , 2 , sf::PrimitiveType::Lines );
+        lineRender.Submit( m_path->nodes[ i - 1 ] -cam->GetPos(), m_path->nodes[ i ] - cam->GetPos() , glm::vec4( 1.0f , 0.0f , 0.0f , 1.0f ) );
       }
     }
-#endif
   }
 }
 
-std::weak_ptr<Grid> PathfindingAgentComponent::GetGrid() const
+Grid* PathfindingAgentComponent::GetGrid() const
 {
-  if( !m_pathfinder.expired() )
-    return m_pathfinder.lock()->GetGrid();
+  if( m_pathfinder )
+    return m_pathfinder->GetGrid();
 
-  return std::weak_ptr<Grid>();
+  return nullptr;
 }
 
 void PathfindingAgentComponent::RequestPath( glm::vec2 a_start , glm::vec2 a_end )
 {
-  if( !m_pathfinder.expired() )
+  if( m_pathfinder )
   {
-    m_pathfinder.lock()->AddPathfindingJob(
+    if (m_path)
+      delete m_path;
+    m_pathfinder->AddPathfindingJob(
       std::bind( &PathfindingAgentComponent::PathCallback , this , std::placeholders::_1 )
       , a_start , a_end );
 

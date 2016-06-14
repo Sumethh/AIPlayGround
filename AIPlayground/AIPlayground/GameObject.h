@@ -3,15 +3,35 @@
 #include "Transform.h"
 #include "ComponentFactory.h"
 #include "GameObjectTypes.h"
+#include "PhysicsStructs.h"
+#include "Common/Types.h"
+#include <Common/json.hpp>
 class Component;
 class World;
 class Window;
+class Renderer2D;
+using json =  nlohmann::json;
+enum EGameOjbectFlags
+{
+  RenderState = 1 << 0 ,
+  PhysicsDirty = 1 << 1 ,
+  CollisionRotationDirty = 1 << 2 ,
+  RotationDirtyFlag = 1 <<3
+};
+
+
+/*Layers for the gameobjects, these will determine the z order of the objects the background is drawn on level 10*/
+enum class ELayerID : uint8
+{
+  DynamicObject = 3 ,
+  StaticObject = 4 ,
+  COUNT
+};
 
 struct GameObjectConstructionDescriptor
 {
   std::vector<EComponentTypes> listOfComps;
 };
-
 
 class GameObject
 {
@@ -20,54 +40,89 @@ public:
   GameObject( EGameObjectType a_type = EGameObjectType::GOT_Generic );
   virtual ~GameObject();
 
-  virtual void OnCosntruct( GameObjectConstructionDescriptor* a_constructionDescriptor);
+  typedef std::shared_ptr<GameObject> SharedPtr;
+  typedef std::weak_ptr<GameObject> WeakPtr;
+  virtual void OnCosntruct( GameObjectConstructionDescriptor* a_constructionDescriptor );
   virtual void OnDestroy();
   virtual void BeginPlay();
   virtual void Update( float a_dt );
+  virtual void FixedUpdate( float a_dt );
   virtual void PreRender();
-  virtual void Render( Window* a_windows );
+  virtual void Render( Renderer2D* a_renderer );
   virtual void PostFrame();
 
-  void AddComponent( EComponentTypes a_componentType );
+  virtual void OnCollisionEnter( Collision a_collision );
+  virtual void OnCollisionLeave( Collision a_collision );
+  virtual void OnCollisionStay( Collision a_collision );
+
+  virtual void OnSave(json& a_json);
+  virtual void OnLoad(json& a_json);
+
+
+  Component* AddComponent( EComponentTypes a_componentType );
 
   inline World* GetWorld() const { return m_world; }
   inline Transform GetTransform()const { return m_transform; }
   inline void SetTransfrom( const Transform a_newTransform )
   {
     m_transform = a_newTransform;
-    m_renderStateDirty = true;
+    SetPhysicsFlagDirty();
+    SetCollisionFlagDirty();
+    SetRenderStateDirty();
+    SetRotationFlagDirty();
   }
   inline void SetPosition( glm::vec2 a_position )
   {
     m_transform.position = a_position;
-    m_renderStateDirty = true;
+    SetPhysicsFlagDirty();
+    SetCollisionFlagDirty();
+    SetRenderStateDirty();
   }
   inline void SetScale( glm::vec2 a_scale )
   {
     m_transform.scale = a_scale;
-    m_renderStateDirty = true;
+    SetPhysicsFlagDirty();
+    SetRenderStateDirty();
   }
   inline void SetRotation( float a_angle )
   {
     m_transform.rotation = a_angle;
-    m_renderStateDirty = true;
+    SetPhysicsFlagDirty();
+    SetCollisionFlagDirty();
+    SetRenderStateDirty();
+    SetRotationFlagDirty();
   }
 
   inline void Destroy() { m_toBeDestroyed = true; }
   inline bool HasBegunPlay() { return m_hasBegunPlay; }
   inline bool IsDestroyed() { return m_toBeDestroyed; }
-  inline void ResetRenderStateDirtyFlag() { m_renderStateDirty = false; }
-  inline bool RenderStateDirty()const { return m_renderStateDirty; }
 
+  inline int GetRenderStateDirty()const { return m_gameObjectFlags & EGameOjbectFlags::RenderState; }
+  inline void ResetRenderStateDirtyFlag() { m_gameObjectFlags &= ~EGameOjbectFlags::RenderState; }
+  inline void SetRenderStateDirty() { m_gameObjectFlags |= EGameOjbectFlags::RenderState; }
   Component* GetComponentOfType( EComponentTypes a_type );
 
   World* GetWorld() { return m_world; }
 
   inline EGameObjectType GetGoType() const { return m_goType; }
 
+  inline int GetPhysicsDirtyFlag() const { return m_gameObjectFlags & EGameOjbectFlags::PhysicsDirty; }
+  inline void ResetPhysicsDirtyFlag() { m_gameObjectFlags &= ~EGameOjbectFlags::PhysicsDirty; }
+  inline void SetPhysicsFlagDirty() { m_gameObjectFlags |= EGameOjbectFlags::PhysicsDirty; }
+
+  inline int GetCollisionDirtyFlag()const { return m_gameObjectFlags & EGameOjbectFlags::CollisionRotationDirty; }
+  inline void ResetCollisionDirtyFlag() { m_gameObjectFlags &= ~EGameOjbectFlags::CollisionRotationDirty; }
+  inline void SetCollisionFlagDirty() { m_gameObjectFlags |= EGameOjbectFlags::CollisionRotationDirty; }
+
+  ELayerID GetLayer() { return m_currentLayer; }
+  void SetLayer( ELayerID a_layer) { m_currentLayer = a_layer; }
+
+  inline void SetRotationFlagDirty() { m_gameObjectFlags |= EGameOjbectFlags::RotationDirtyFlag; }
+  inline int GetRotationFlagDirty() { return m_gameObjectFlags & EGameOjbectFlags::RotationDirtyFlag; }
+  inline void ResetRotationDityFlag() { m_gameObjectFlags &= ~EGameOjbectFlags::RotationDirtyFlag; }
 private:
   void SetWorld( World* a_newWorld ) { m_world = a_newWorld; };
-
+  ELayerID m_currentLayer;
   std::vector<Component*> m_components;
   std::vector<Component*> m_componentsToAdd;
 
@@ -78,6 +133,10 @@ private:
 
   bool m_hasBegunPlay;
   bool m_toBeDestroyed;
-  bool m_renderStateDirty;
-};
 
+  int m_gameObjectFlags;
+
+  bool m_renderStateDirty;
+  bool m_physicsDirty;
+  bool m_rotationMatrixDirty;
+};

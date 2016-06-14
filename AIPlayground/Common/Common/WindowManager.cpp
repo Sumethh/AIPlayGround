@@ -3,9 +3,8 @@
 
 WindowManager* WindowManager::s_instance;
 
-
 WindowManager::WindowManager() :
-m_windows()
+  m_windows()
 {
 }
 
@@ -57,9 +56,7 @@ void WindowManager::AddWindow( std::string a_windowTitle , const int a_width , c
       m_windows[ a_windowTitle ] = std::shared_ptr<Window>( new Window( a_width , a_height , a_windowTitle.c_str() ) );
     }
   }
-
 }
-
 
 void WindowManager::SetMainWindow( std::string a_key )
 {
@@ -70,7 +67,6 @@ std::shared_ptr<Window> WindowManager::GetMainWindow()
 {
   return m_mainWindow;
 }
-
 
 void WindowManager::SwapAllWindowBuffers()
 {

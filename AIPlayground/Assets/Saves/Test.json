@@ -1,0 +1,32 @@
+{
+  "Components": [
+    {
+      "ComponentID": 0
+    },
+    {
+      "ComponentID": 1
+    },
+    {
+      "ComponentID": 2
+    },
+    {
+      "ComponentID": 4
+    },
+    {
+      "ComponentID": 5
+    }
+  ],
+  "GameObjectType": 2,
+  "Transform": {
+    "Position": {
+      "x": 400,
+      "y": 400,
+      "z": 3
+    },
+    "Rotation": 0.0,
+    "Scale": {
+      "x": 1,
+      "y": 1
+    }
+  }
+}

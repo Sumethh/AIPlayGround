@@ -1,6 +1,6 @@
 #pragma once
 #include "World.h"
-
+#include "Renderer2D.h"
 class Window;
 class Game
 {
@@ -9,12 +9,13 @@ public:
   ~Game();
 
   void Init();
+  void FixedUpdate( float a_dt );
   void Update( float a_dt );
   void PreRender();
-  void Render( Window* const a_window );
+  void Render();
   void PostFrame();
 
 private:
-  World m_world;
+  World::SharedPtr m_world;
+  Renderer2D m_renderer;
 };
-

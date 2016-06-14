@@ -1,13 +1,11 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-
 class Window
 {
 public:
   Window( const int a_width , const int a_height , const char* a_windowName );
   ~Window();
-
 
   void Swap();
   void Update();
@@ -29,6 +27,7 @@ public:
   bool IsCloseRequested() { return m_closeRequested; }
 
 
+  void( *MouseButtonCallback )( Window* , int , int , int );
 private:
 
   sf::RenderWindow* m_window;

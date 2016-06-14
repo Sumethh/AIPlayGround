@@ -1,14 +1,13 @@
 #include "Pathfinder.h"
 #include "Grid.h"
 #include <Common/log.h>
-
+#include <future>
 #include <map>
 
-Pathfinder::Pathfinder( std::shared_ptr<Grid>& a_grid ) :
+Pathfinder::Pathfinder( Grid*a_grid ) :
   m_grid( a_grid )
 {
 }
-
 
 Pathfinder::~Pathfinder()
 {
@@ -21,7 +20,6 @@ int GetH( Node* a_node , Node* a_otherNode )
 }
 int GetDistance( Node* a_node , Node* a_otherNode )
 {
-
   int dstX = (int)abs( a_node->pos.x - a_otherNode->pos.x );
   int dstY = (int)abs( a_node->pos.y - a_otherNode->pos.y );
   //return ( dstX * 10 ) + dstY * 10;
@@ -33,11 +31,10 @@ int GetDistance( Node* a_node , Node* a_otherNode )
 
 void Pathfinder::AddPathfindingJob( std::function<void( Path* )> a_callback , glm::vec2 a_startPos , glm::vec2 a_endPos )
 {
-  if( !m_grid.expired() )
+  if( m_grid )
   {
-    std::shared_ptr<Grid> grid = m_grid.lock();
-    Node* startNode = grid->GetNode( a_startPos );
-    Node* endNode = grid->GetNode( a_endPos );
+    Node* startNode = m_grid->GetNode( a_startPos );
+    Node* endNode = m_grid->GetNode( a_endPos );
     AddPathfindingJob( a_callback , startNode , endNode );
   }
 }
@@ -55,7 +52,20 @@ void Pathfinder::AddPathfindingJob( std::function<void( Path* )> a_callback , No
   newJob->jobParams = params;
   newJob->threadCleanUpJob = true;
   newJob->typeHashCode = typeid( params ).hash_code();
-  JobSystem::ScheduleJob( newJob );
+  m_jobsToSchedule.push_back( newJob );
+}
+
+void Pathfinder::ScheduleJobs()
+{
+  //std::mutex& lock = JobSystem::GetLock();
+  //lock.lock();
+  for( auto it = m_jobsToSchedule.begin(); it != m_jobsToSchedule.end(); )
+  {
+    JobSystem::ScheduleJob( *it );
+    ++it;
+  }
+  //lock.unlock();
+  m_jobsToSchedule.clear();
 }
 
 void Pathfinder::GetPath( JobParametersBase* a_params )
@@ -71,7 +81,7 @@ void Pathfinder::GetPath( JobParametersBase* a_params )
   endNode = params->endNode;
 
   m_timer.Start();
-  if( m_grid.expired() )
+  if( !m_grid )
   {
     LOGE( "I got a path request however i dont have a grid" );
     params->callback( nullptr );
@@ -80,22 +90,19 @@ void Pathfinder::GetPath( JobParametersBase* a_params )
 
   if( startNode == endNode )
   {
-    LOGW( "Got a path requested with the same start and end positions " );
     params->callback( nullptr );
     return;
   }
-  std::shared_ptr<Grid> grid = m_grid.lock();
+  Grid* grid = m_grid;
 
   if( endNode && !endNode->bwalkable )
   {
-    LOGW( "Got a path requested with end node being unwalkable" );
     params->callback( nullptr );
     return;
   }
 
   if( !endNode || !startNode )
   {
-
     LOGW( "Got a path requested with end node or start node being nullptr" );
     params->callback( nullptr );
     return;
@@ -172,7 +179,7 @@ Path* Pathfinder::RetracePath( Node* a_start , Node* a_end )
   Path* newPath = new Path();
 
   Node* currentNode = a_end;
-  while( currentNode->parent != a_start )
+  while( currentNode->parent && currentNode->parent != a_start)
   {
     newPath->nodes.push_back( currentNode->center );
     currentNode = currentNode->parent;

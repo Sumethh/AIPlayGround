@@ -24,21 +24,22 @@ struct PathParameters : public JobParametersBase
 class Pathfinder
 {
 public:
-  Pathfinder( std::shared_ptr<Grid>& a_grid );
+  Pathfinder( Grid* a_grid );
   ~Pathfinder();
 
   void AddPathfindingJob( std::function<void( Path* )> a_callback , glm::vec2 a_startPos , glm::vec2 a_endPos );
   void AddPathfindingJob( std::function<void( Path* )> a_callback , Node* a_startNode , Node* a_endNode );
   //a_start and a_end are absolute positions not tile indicies
 
-  std::weak_ptr<Grid> GetGrid() { return m_grid; }
+  Grid* GetGrid() { return m_grid; }
+
+  void ScheduleJobs();
 
 private:
 
   void GetPath( JobParametersBase* a_params );
   Path* RetracePath( Node* a_start , Node* a_end );
-  std::weak_ptr<Grid> m_grid;
+  std::vector<Job*> m_jobsToSchedule;
+  Grid* m_grid;
   Timer m_timer;
-
 };
-

@@ -20,4 +20,3 @@ private:
   TimeFunctionCallArgument m_argument;
   bool m_looping;
 };
-

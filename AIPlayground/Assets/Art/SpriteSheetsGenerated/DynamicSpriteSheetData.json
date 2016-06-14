@@ -1,0 +1,30 @@
+{"frames": [
+
+{
+	"filename": "01Unit01.png",
+	"frame": {"x":0,"y":0,"w":38,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":38,"h":32},
+	"sourceSize": {"w":38,"h":32},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "02SelectionImage.png",
+	"frame": {"x":38,"y":0,"w":32,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+	"sourceSize": {"w":32,"h":32},
+	"pivot": {"x":0.5,"y":0.5}
+}],
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "DynamicSpriteSheet.png",
+	"format": "RGBA8888",
+	"size": {"w":70,"h":32},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:61ecd190dc2dda6ccfe38a3a4a48f650:c32ecd2ea3e56d780d6a640b80b2245f:c5d647ca8ea2fd0da2c0e286cb2540ac$"
+}
+}

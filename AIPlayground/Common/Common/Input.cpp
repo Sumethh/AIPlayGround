@@ -7,11 +7,13 @@ bool Input::m_heldKeys[ sf::Keyboard::KeyCount ];
 bool Input::m_mouseButtons[ sf::Mouse::ButtonCount ];
 bool Input::m_mouseButtonsHeld[ sf::Mouse::ButtonCount ];
 
+bool Input::m_UiCaptureKeyboard;
+bool Input::m_UiCaptureMouse;
+
 glm::vec2 Input::m_mouseMovement;
 glm::vec2 Input::m_mousePosition;
 
 std::string Input::m_inputString;
-
 
 void Input::AddToInputString( char a_c )
 {
@@ -22,7 +24,6 @@ std::string Input::GetInputString()
 {
   return m_inputString;
 }
-
 
 void Input::SetKeys( const int a_key )
 {
@@ -82,6 +83,26 @@ void Input::ResetMouseButton( const int a_mouseButton )
 void Input::Reset()
 {
   memset( m_keys , 0 , _countof( m_keys ) * sizeof( bool ) );
-  memset( m_mouseButtons , 0 , _countof( m_mouseButtons ) *sizeof( bool ) );
+  memset( m_mouseButtons , 0 , _countof( m_mouseButtons ) * sizeof( bool ) );
   m_inputString.clear();
+}
+
+bool Input::IsMouseOverUI()
+{
+  return m_UiCaptureMouse;
+}
+
+bool Input::IsKeyboardCapturedByUI()
+{
+  return m_UiCaptureKeyboard;
+}
+
+void Input::SetMouseCapture( bool a_capt )
+{
+  m_UiCaptureMouse = a_capt;
+}
+
+void Input::SetKeyboardCapture( bool a_capt )
+{
+  m_UiCaptureKeyboard = a_capt;
 }

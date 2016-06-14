@@ -11,7 +11,7 @@
 struct DebugThreadInfo
 {
   uint32 threadID;
-  
+
   double jobTimeTotal;
   uint32 jobTimeSamplesCount;
   float jobTimeAverage;
@@ -20,19 +20,18 @@ struct DebugThreadInfo
   uint32 jobsCompletedLast5Seconds;
 
   std::mutex infoLock;
-
 };
 class Window;
 class JobSystemDebugInfo
 {
 public:
   void Init();
-  
+
   std::shared_ptr<DebugThreadInfo> registerThread();
 
   static inline JobSystemDebugInfo* GI()
   {
-    if( !m_instance )
+    if (!m_instance)
     {
       m_instance = new JobSystemDebugInfo();
       m_instance->Init();
@@ -40,7 +39,7 @@ public:
     return m_instance;
   }
 
-  void Render(Window* a_window);
+  void Render();
 private:
   JobSystemDebugInfo() {};
 
@@ -49,13 +48,10 @@ private:
 
   static JobSystemDebugInfo* m_instance;
 
-  void SetTextStrings( sf::Text& a_threadID , sf::Text& a_jobTimeAvg , sf::Text& a_jobsCompletedText, uint32& a_id, float& a_time, uint32& a_jobsCompleted );
+  void SetTextStrings(sf::Text& a_threadID, sf::Text& a_jobTimeAvg, sf::Text& a_jobsCompletedText, uint32& a_id, float& a_time, uint32& a_jobsCompleted);
 
-  void SetDebugInfo( TimeFunctionCallArgument a_argument );
+  void SetDebugInfo(TimeFunctionCallArgument a_argument);
 
   TimedFunctionCall* m_functionTimerHandle;
-  const uint m_ySpacing = 10;
-  const uint m_xSpacing = 10;
-  const uint m_fontSize = 8;
-  const uint m_startingYPos = 150;
+  bool m_threadInfoWindowOpen;
 };
