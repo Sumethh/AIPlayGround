@@ -23,8 +23,8 @@ void Game::Init()
   TextureManager::GI()->Init();
   ShaderManager::GI()->Init();
   m_world->OnConstruct();
-  m_world->BeginPlay();  
-  glm::mat4 projection = glm::ortho( 0.f , 1280.0f , 720.0f , 0.0f );
+  m_world->BeginPlay();
+  glm::mat4 projection = glm::ortho( 0.f , 1280.0f , 720.0f , 0.0f , 10.0f, -1.0f);
   Renderer2D::SetProjectionMatrix( projection );
   m_renderer.Init();
 }
@@ -46,7 +46,7 @@ void Game::PreRender()
 void Game::Render()
 {
   m_renderer.Begin();
-  m_world->Render(&m_renderer);
+  m_world->Render( &m_renderer );
   m_renderer.End();
   m_renderer.Flush();
 }
@@ -98,7 +98,7 @@ void Game::Init()
   projection = glm::ortho( 0.f , 1280.0f , 720.0f , 0.0f );
   Renderer2D::SetProjectionMatrix( projection );
   myTrans.position = glm::vec2( 400.0f , 400.0f );
-  myTrans.scale = glm::vec2( 32   , 32 );
+  myTrans.scale = glm::vec2( 32 , 32 );
   myTrans.rotation = 0.0f;
 
   myTrans.transformationMatrix = glm::translate( glm::mat4() , glm::vec3( myTrans.position , 0.0f ) );
@@ -122,7 +122,7 @@ void Game::Init()
   }
 
   uint reg = staticRenderer.Register();
-  staticRenderer.UpdateTexCoords( reg , glm::vec4( 0 , 0 , 1 /12.0f , 0 ) , glm::vec4( 0 , 1 , 1/12.0f , 1 ) );
+  staticRenderer.UpdateTexCoords( reg , glm::vec4( 0 , 0 , 1 / 12.0f , 0 ) , glm::vec4( 0 , 1 , 1 / 12.0f , 1 ) );
 
   staticRenderer.UpdatePosition( reg , myTrans.transformationMatrix );
 }

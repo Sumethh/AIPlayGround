@@ -50,10 +50,12 @@ void PlayerController::Update(float a_dt)
       glm::vec2 newGoLoc;
       newGoLoc.x = (float)((int)(m_camera->GetPos().x + mousePos.x) / (int)worldInfo.tileSize.x);
       newGoLoc.y = (float)((int)(m_camera->GetPos().y + mousePos.y) / (int)worldInfo.tileSize.y);
+      newGoLoc *= worldInfo.tileSize;
+      newGoLoc += worldInfo.tileSize / 2.0f;
 
-      if (Input::GetMouseButton(0))
+      if (!m_currentSpawningObj)
       {
-        if (!m_currentSpawningObj)
+        if (Input::GetMouseButton(0))
         {
           TestableCollider testCol;
           testCol.position = mousePos + m_camera->GetPos();
@@ -84,23 +86,36 @@ void PlayerController::Update(float a_dt)
             }
           }
         }
-        else
+      }
+      else
+      {
+        if (Input::GetMouseButton(0))
         {
-          m_currentSpawningObj = nullptr;
-          RendererComponent* selectionGoRenderComponent = (RendererComponent*)m_selectionGO->GetComponentOfType(EComponentTypes::CT_RenderComponent);
-          selectionGoRenderComponent->SetActive(true);
+          if (m_grid)
+          {
+            Node* node = m_grid->GetNode(newGoLoc);
+            if (node->bwalkable)
+            {
+              m_currentSpawningObj = nullptr;
+              RendererComponent* selectionGoRenderComponent = (RendererComponent*)m_selectionGO->GetComponentOfType(EComponentTypes::CT_RenderComponent);
+              selectionGoRenderComponent->SetActive(true);
+              m_grid->SetNodeWalkable(node->index.x, node->index.y, false);
+            }
+          }
         }
       }
 
-      newGoLoc *= worldInfo.tileSize;
-      newGoLoc += worldInfo.tileSize / 2.0f;
+
+
 
       if (m_currentSpawningObj)
       {
         m_currentSpawningObj->SetPosition(newGoLoc);
       }
       else
+      {
         m_selectionGO->SetPosition(newGoLoc);
+      }
       float moveSpeedMod = 1.0f;
       if (Input::GetKeyDown(sf::Keyboard::Key::LShift))
         moveSpeedMod = 2.0f;
@@ -156,16 +171,20 @@ void PlayerController::UpdateUI()
 
 void PlayerController::SpawningObject(ESpawnableItemIDs a_id)
 {
+  RendererComponent* component = nullptr;
   if (!m_currentSpawningObj)
   {
-    RendererComponent* selectionGoRenderComponent = (RendererComponent*)m_selectionGO->GetComponentOfType(EComponentTypes::CT_RenderComponent);
-    selectionGoRenderComponent->SetActive(false);
     m_currentSpawningObj = GetWorld()->CreateGameObject(EGameObjectType::GOT_Empty);
-    if (m_currentSpawningObj)
-    {
-      RendererComponent* component = (RendererComponent*)m_currentSpawningObj->AddComponent(EComponentTypes::CT_RenderComponent);
-      component->ChangeRenderType(RenderType::Static);
-      component->ChangeTextureID((uint)a_id);
-    }
+    component = (RendererComponent*)m_currentSpawningObj->AddComponent(
+      EComponentTypes::CT_RenderComponent);
+    component->ChangeRenderType(RenderType::Static);
+  }
+  RendererComponent* selectionGoRenderComponent = (RendererComponent*)m_selectionGO->GetComponentOfType(EComponentTypes::CT_RenderComponent);
+  selectionGoRenderComponent->SetActive(false);
+  if (m_currentSpawningObj)
+  {
+    if (!component)
+      component = m_currentSpawningObj->TGetComponentOfType<RendererComponent>(EComponentTypes::CT_RenderComponent);
+    component->ChangeTextureID((uint)a_id);
   }
 }

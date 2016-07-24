@@ -14,7 +14,7 @@ void Renderer2D::Init()
   m_basicRenderer.Init();
   m_staticRenderer.Init();
   m_batchRenderer.Init();
-  //glEnable( GL_DEPTH_TEST );
+  
 }
 
 void Renderer2D::Begin()
@@ -31,10 +31,13 @@ void Renderer2D::End()
 
 void Renderer2D::Flush()
 {
+  glEnable( GL_DEPTH_TEST );
+  glDepthFunc( GL_LEQUAL );
   m_staticRenderer.Flush();
   m_basicRenderer.Flush();
   m_batchRenderer.Flush();
   m_lineRenderer.Flush();
+  glDisable( GL_DEPTH_TEST );
 }
 
 Renderer2D::Renderer2D()

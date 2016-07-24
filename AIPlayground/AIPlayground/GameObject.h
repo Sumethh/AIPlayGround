@@ -24,7 +24,7 @@ enum EGameOjbectFlags
 enum class ELayerID : uint8
 {
   DynamicObject = 3 ,
-  StaticObject = 4 ,
+  StaticObject = 4,
   COUNT
 };
 
@@ -101,6 +101,8 @@ public:
   inline void ResetRenderStateDirtyFlag() { m_gameObjectFlags &= ~EGameOjbectFlags::RenderState; }
   inline void SetRenderStateDirty() { m_gameObjectFlags |= EGameOjbectFlags::RenderState; }
   Component* GetComponentOfType( EComponentTypes a_type );
+  template<class T>
+  T* TGetComponentOfType(EComponentTypes a_type);
 
   World* GetWorld() { return m_world; }
 
@@ -140,3 +142,12 @@ private:
   bool m_physicsDirty;
   bool m_rotationMatrixDirty;
 };
+
+template<class T>
+T* GameObject::TGetComponentOfType(EComponentTypes a_type)
+{
+  for (auto itr = m_components.begin(); itr != m_components.end(); ++itr)
+    if ((*itr)->IsComponentOfType(a_type))
+      return (T*)(*itr);
+  return nullptr;
+}

@@ -62,7 +62,7 @@ void Grid::Render(Renderer2D* a_renderer )
   renderInfo.shader = ShaderManager::GI()->GetShader( EShaderID::BasicRender );
   renderInfo.textures.push_back( std::pair<uint , Texture*>(0, &m_gridTexture) );
   glm::mat4 renderMat;
-  renderMat = glm::translate( renderMat , glm::vec3( m_gridTransform.position , 1.0f ) );
+  renderMat = glm::translate( renderMat , glm::vec3( m_gridTransform.position , 0.99f));
   renderMat = glm::rotate( renderMat , m_gridTransform.rotation , glm::vec3( 0 , 0 , 1 ) );
   glm::vec3 scale = glm::vec3(m_gridTransform.scale,1.0f);
   scale.x *= m_gridImage.getSize().x;

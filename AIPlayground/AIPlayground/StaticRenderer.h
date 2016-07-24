@@ -26,11 +26,12 @@ public:
   void UpdatePosition( uint a_index , glm::mat4 a_mat );
   void UnRegister( uint a_index );
   void Flush();
-
+  void SetCameraPos( glm::vec2 a_camPos ) { m_cameraPos = a_camPos; }
 private:
   GLuint m_vao , m_vbo;
   Shader* m_shader;
   Texture* m_texture;
+  glm::vec2 m_cameraPos;
   struct SpriteInfo
   {
     glm::vec4 Top;

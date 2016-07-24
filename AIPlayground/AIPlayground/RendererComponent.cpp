@@ -23,7 +23,7 @@ void RendererComponent::OnCosntruct()
   ChangeTextureID(0);
 }
 
-
+#include <common/log.h>
 void RendererComponent::PreRender()
 {
   Component::PreRender();
@@ -50,7 +50,8 @@ void RendererComponent::Render(Renderer2D* a_renderer)
   Camera* camera = world->GetCamera();
   Transform trans = GetParent()->GetTransform();
   ELayerID layer = GetParent()->GetLayer();
-  spriteRender.Submit(glm::vec3(trans.position - camera->GetPos(), (uint8)layer / 10.0f), trans.scale * m_textureCoordInfo.sizeInPixels, trans.rotation * (int)m_renderRotated,
+  float z = (uint8)layer / 10.0f;
+  spriteRender.Submit(glm::vec3(trans.position - camera->GetPos(), z), trans.scale * m_textureCoordInfo.sizeInPixels, trans.rotation * (int)m_renderRotated,
     glm::vec4(m_textureCoordInfo.topLeft, m_textureCoordInfo.topRight), glm::vec4(m_textureCoordInfo.bottomLeft, m_textureCoordInfo.bottomRight));
 
 }
@@ -93,5 +94,6 @@ void RendererComponent::ChangeRenderType(RenderType a_type)
     m_textureCoordInfo = TextureManager::GI()->GetTextureCoordInfo(ETextureID::StaticSpriteSheet, m_textureID);
     renderer.UpdatePosition(m_registeredID, GetParent()->GetTransform().MakeMatrix());
     renderer.UpdateTexCoords(m_registeredID, glm::vec4(m_textureCoordInfo.topLeft, m_textureCoordInfo.topRight), glm::vec4(m_textureCoordInfo.bottomLeft, m_textureCoordInfo.bottomRight));
+    GetParent()->SetLayer( ELayerID::StaticObject );
   }
 }

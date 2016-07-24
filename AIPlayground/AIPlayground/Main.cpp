@@ -86,7 +86,8 @@ int main()
     DebugOnScreenTimer::SetTimerValue(dtTimerIndex, dt);
     deltaTime.Reset();
 
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClearDepth( 1.0f );
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     mainWindow.Update();
 
     if (fixedUpdateAccum >= TimeConsts::fixedUpdateTimeStep)

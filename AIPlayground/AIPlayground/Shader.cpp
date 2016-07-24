@@ -257,4 +257,5 @@ void Shader::Finalize()
 {
   m_projectionLocation = glGetUniformLocation( m_shaderHandle , "Proj" );
   m_modelLocation = glGetUniformLocation( m_shaderHandle , "Model" );
+  m_cameraPosLocation = glGetUniformLocation( m_shaderHandle , "CameraLoc" );
 }

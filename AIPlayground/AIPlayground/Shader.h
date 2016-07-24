@@ -20,6 +20,7 @@ public:
   void UnBind();
   uint GetShaderHandle() { return m_shaderHandle; }
   inline uint GetProjectionUniformLoc() { return m_projectionLocation; }
+  inline uint GetCameraLocationUniformLocation(){ return m_cameraPosLocation; }
   inline uint GetModelUnifromLoc() { return m_modelLocation; }
 
   int ListenOnBind( std::function<void( Shader* )>a_func )
@@ -42,7 +43,7 @@ private:
   void Finalize();
   uint m_shaderHandle;
   std::string m_fs , m_vs , m_gs;
-  uint m_projectionLocation;
+  uint m_projectionLocation, m_cameraPosLocation;
   uint m_modelLocation;
   std::vector < std::function< void( Shader* a_shader )>> m_OnBindCallBacks;
   std::map<EUniformId , uint8> m_uniformLocations;

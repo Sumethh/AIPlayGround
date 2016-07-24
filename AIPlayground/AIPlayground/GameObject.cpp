@@ -176,6 +176,7 @@ Component* GameObject::AddComponent(EComponentTypes a_componentType)
   return newComp;
 }
 
+
 Component* GameObject::GetComponentOfType(EComponentTypes a_type)
 {
   for (auto itr = m_components.begin(); itr != m_components.end(); ++itr)

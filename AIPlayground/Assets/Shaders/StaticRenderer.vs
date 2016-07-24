@@ -6,6 +6,7 @@ layout (location = 2) in mat4 Model;
 
 out vec2 out_textCoord;
 uniform mat4 Proj;
+uniform vec2 CameraLoc;
 //uniform mat4 ModelUni;
 
 out VS_OUT{
@@ -26,4 +27,5 @@ void main()
   vs_out.BottomRight = Bottom.zw;
   vs_out.ProjectionMat = Proj;
   vs_out.ModelMat = Model;
+  vs_out.ModelMat[3] -= vec4(CameraLoc,0,0);
 }

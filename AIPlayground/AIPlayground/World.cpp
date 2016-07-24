@@ -34,6 +34,7 @@ World::World() :
   m_worldInfo.topLeft = g_gridOrigin;
   m_worldInfo.bottomRight = g_gridOrigin + glm::vec2( g_tileSizeX * g_tileCountX , g_tileSizeY * g_tileCountY );
   m_worldInfo.tileSize = glm::vec2(g_tileSizeX, g_tileSizeY);
+  m_camera->SetMainCamera( true );
 }
 
 World::~World()
@@ -92,6 +93,7 @@ void World::Update( float a_dt )
   ImGui::Text("GO count");
   ImGui::Text(std::to_string(m_gameObjects.size()).c_str());
   m_playerController->Update( a_dt );
+  m_camera->Update();
   for( auto gameObject : m_gameObjects )
   {
     if( !gameObject->IsDestroyed() )
@@ -105,6 +107,7 @@ void World::Update( float a_dt )
     DebugValues::GI()->RenderGrid = !DebugValues::GI()->RenderGrid;
   }
   ImGui::End();
+
 }
 
 void World::FixedUpdate( float a_dt )
@@ -122,8 +125,7 @@ void World::PreRender()
 void World::Render(Renderer2D* a_renderer)
 {
   //
-
-   m_grid->Render(a_renderer);
+  m_grid->Render(a_renderer);
   m_playerController->Render(a_renderer);
    m_physicsSystem->Render( a_renderer );
   for( auto gameObject : m_gameObjects )
